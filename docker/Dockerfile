@@ -1,23 +1,36 @@
-# Bun の公式イメージを使用（バージョン 1.2.2 を指定）
-FROM oven/bun:1.2.2-alpine
+# Stage 1: 依存関係のインストール
+FROM oven/bun:1.2.2-alpine as builder
 
-# 作業ディレクトリの設定
+# 必要なパッケージをインストール
+RUN apk add --no-cache python3 make g++ \
+  && ln -sf python3 /usr/bin/python
+
 WORKDIR /app
 
-# package.json と bun.lockb を先にコピーして依存関係のインストールをキャッシュする
+# package.jsonとlockファイルを先にコピー（キャッシュ利用）
 COPY package.json bun.lockb ./
 
 # 依存関係のインストール
-RUN bun install
+RUN bun install --frozen-lockfile
 
-# プロジェクト全体をコピー
+# Stage 2: 本番/開発用イメージの作成
+FROM oven/bun:1.2.2-alpine
+
+RUN apk add --no-cache python3 make g++ \
+  && ln -sf python3 /usr/bin/python
+
+WORKDIR /app
+
+# builder から node_modules と lockfile をコピー
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/bun.lockb ./bun.lockb
+
+# アプリ全体をコピー
 COPY . .
 
-# 必要に応じて SQLite のデータを格納するディレクトリを作成
+# SQLite 用のディレクトリ作成
 RUN mkdir -p data
 
-# コンテナ内で利用するポート（例: 3000）を公開
 EXPOSE 3000
 
-# コンテナ起動時のコマンド（Cloudflare Workers 環境ではwrangler やMiniflare経由のテストも可能ですが、今回は直接 Bun での起動例）
 CMD ["bun", "run", "src/index.ts"]
