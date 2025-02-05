@@ -2,12 +2,14 @@
   "name": "haiku_monument_api",
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy --minify"
+    "deploy": "wrangler deploy --minify",
+    "generate:migration": "drizzle-kit generate --config=src/models/drizzle.config.ts",
+    "migrate": "drizzle-kit migrate --config=src/models/drizzle.config.ts"
   },
   "dependencies": {
+    "@libsql/client": "^0.14.0",
     "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^22.13.1",
-    "better-sqlite3": "^11.8.1",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.39.1",
     "hono": "^4.6.8"
