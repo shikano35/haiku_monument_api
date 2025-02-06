@@ -1,9 +1,29 @@
-import { Hono } from 'hono'
+import { Hono } from 'hono';
+import locationsRoutes from './routes/locationsRoutes';
+import { errorHandler } from './middlewares/errorHandler';
+import { requestLogger } from './middlewares/requestLogger';
+import authorsRoutes from './routes/authorsRoutes';
+import sourcesRoutes from './routes/sourcesRoutes';
+import haikuMonumentRoutes from './routes/haikuMonumentRoutes';
+import tagsRoutes from './routes/tagsRoutes';
+import usersRoutes from './routes/usersRoutes';
 
-const app = new Hono()
+type Env = {
+  DB: D1Database;
+};
 
-app.get('/', (c) => {
-  return c.text('Hello Hono!')
-})
+const app = new Hono<{ Bindings: Env }>();
 
-export default app
+app.use('*', requestLogger);
+app.use('*', errorHandler);
+
+app.route('/locations', locationsRoutes);
+app.route('/authors', authorsRoutes);
+app.route('/sources', sourcesRoutes);
+app.route('/haiku-monuments', haikuMonumentRoutes);
+app.route('/tags', tagsRoutes);
+app.route('/users', usersRoutes);
+
+export default {
+  fetch: app.fetch,
+} satisfies ExportedHandler<Env>;
