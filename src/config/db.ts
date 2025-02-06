@@ -1,12 +1,14 @@
-// src/config/db.ts
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import developmentConfig from "./development";
-import { authors, sources, locations, haikuMonument, tags, haikuMonumentTag, users } from "../models/schema";
+import { drizzle as drizzleD1 } from "drizzle-orm/d1";
 
-const sqlite = new Database(developmentConfig.dbFile, {
-  verbose: console.log,
-});
-const db = drizzle(sqlite);
+// @ts-ignore
+const d1: D1Database | undefined = globalThis.DB;
 
-export { db, authors, sources, locations, haikuMonument, tags, haikuMonumentTag, users };
+if (!d1) {
+  throw new Error(
+    "Cloudflare D1 binding not found. Please configure the D1 binding (e.g., global 'DB') in Cloudflare Workers."
+  );
+}
+
+const db = drizzleD1(d1);
+
+export { db };
