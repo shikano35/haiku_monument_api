@@ -1,14 +1,14 @@
-version: "3.8"
-
+version: "3.9"
 services:
-  app:
+  api:
     build:
-      context: ..
+      context: ../
       dockerfile: docker/Dockerfile
-    volumes:
-      - ../:/app
-      - ./data:/app/data
     ports:
       - "3000:3000"
     environment:
       NODE_ENV: development
+      DB_FILE: "/app/data/db.sqlite"
+      PORT: 3000
+    volumes:
+      - ../data:/app/data
