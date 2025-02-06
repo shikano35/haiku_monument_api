@@ -1,36 +1,22 @@
-# Stage 1: 依存関係のインストール
-FROM oven/bun:1.2.2-alpine as builder
+# docker/Dockerfile
+# ※公式の Bun イメージが公開されている場合を想定しています。
+FROM oven/bun:1.2.2
 
-# 必要なパッケージをインストール
-RUN apk add --no-cache python3 make g++ \
-  && ln -sf python3 /usr/bin/python
-
+# 作業ディレクトリを設定
 WORKDIR /app
 
-# package.jsonとlockファイルを先にコピー（キャッシュ利用）
+# 依存ファイルのみを先にコピーし、依存関係をインストール
 COPY package.json bun.lockb ./
+RUN bun install
 
-# 依存関係のインストール
-RUN bun install --frozen-lockfile
-
-# Stage 2: 本番/開発用イメージの作成
-FROM oven/bun:1.2.2-alpine
-
-RUN apk add --no-cache python3 make g++ \
-  && ln -sf python3 /usr/bin/python
-
-WORKDIR /app
-
-# builder から node_modules と lockfile をコピー
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/bun.lockb ./bun.lockb
-
-# アプリ全体をコピー
+# アプリケーション全体をコピー
 COPY . .
 
-# SQLite 用のディレクトリ作成
-RUN mkdir -p data
+# 起動用シェルスクリプトに実行権限を付与
+RUN chmod +x docker/run.sh
 
+# コンテナ内で利用するポート（development.ts では 3000 を使用）
 EXPOSE 3000
 
-CMD ["bun", "run", "src/index.ts"]
+# コンテナ起動時にシェルスクリプトを実行
+CMD ["sh", "docker/run.sh"]
