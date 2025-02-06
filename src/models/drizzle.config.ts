@@ -1,25 +1,22 @@
-import { defineConfig } from "drizzle-kit";
+import 'dotenv/config';
+import { defineConfig } from 'drizzle-kit';
 
-const config =
-  process.env.NODE_ENV === "production"
-    ? defineConfig({
-        schema: "./src/models/schema.ts",
-        out: "./drizzle",
-        dialect: "sqlite",
-        driver: "d1-http",
-        dbCredentials: {
-          accountId: process.env.CLOUDFLARE_D1_ACCOUNT_ID!,
-          databaseId: process.env.CLOUDFLARE_D1_DATABASE_ID!,
-          token: process.env.CLOUDFLARE_D1_API_TOKEN!,
-        },
-      })
-    : defineConfig({
-        schema: "./src/models/schema.ts",
-        out: "./drizzle",
-        dialect: "sqlite",
-        dbCredentials: {
-          url: "./data/db.sqlite",
-        },
-      });
+function getEnv(key: string): string {
+  const value = process.env[key];
+  if (typeof value !== 'string' || value.trim() === '') {
+    throw new Error(`Missing or empty environment variable: ${key}`);
+  }
+  return value;
+}
 
-export default config;
+export default defineConfig({
+  out: './drizzle',
+  schema: './src/models/schema.ts',
+  dialect: 'sqlite',
+  driver: 'd1-http',
+  dbCredentials: {
+    accountId: getEnv('CLOUDFLARE_ACCOUNT_ID'),
+    databaseId: getEnv('CLOUDFLARE_DATABASE_ID'),
+    token: getEnv('CLOUDFLARE_D1_TOKEN'),
+  },
+});

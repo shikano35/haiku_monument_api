@@ -1,10 +1,8 @@
-// src/models/schema.ts
-import { sqliteTable, integer, text, real } from "drizzle-orm/sqlite-core";
+import { sqliteTable, integer, text, real, primaryKey } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
 // Authors テーブル
 export const authors = sqliteTable("authors", {
-  // SQLiteでは INTEGER PRIMARY KEY は自動的にオートインクリメントされます
   id: integer("id").primaryKey(),
   name: text("name").notNull(),
   biography: text("biography"),
@@ -39,11 +37,15 @@ export const locations = sqliteTable("locations", {
 export const haikuMonument = sqliteTable("haiku_monument", {
   id: integer("id").primaryKey(),
   text: text("text").notNull(),
-  authorId: integer("author_id").notNull(),
-  sourceId: integer("source_id"),
+  authorId: integer("author_id")
+    .notNull()
+    .references(() => authors.id, { onDelete: "cascade" }),
+  sourceId: integer("source_id")
+    .references(() => sources.id, { onDelete: "set null" }),
   // DATE型は ISO 8601 形式の文字列として保存
   establishedDate: text("established_date"),
-  locationId: integer("location_id"),
+  locationId: integer("location_id")
+    .references(() => locations.id, { onDelete: "set null" }),
   commentary: text("commentary"),
   imageUrl: text("image_url"),
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
@@ -57,12 +59,17 @@ export const tags = sqliteTable("tags", {
   description: text("description"),
 });
 
-// Haiku Monument Tag テーブル（複合主キー）  
-// 各カラムに .primaryKey() を付与することで複合主キーとします
+// Haiku Monument Tag テーブル（複合主キーかつ外部キー制約）  
 export const haikuMonumentTag = sqliteTable("haiku_monument_tag", {
-  haikuMonumentId: integer("haiku_monument_id").notNull().primaryKey(),
-  tagId: integer("tag_id").notNull().primaryKey(),
-});
+  haikuMonumentId: integer("haiku_monument_id")
+    .notNull()
+    .references(() => haikuMonument.id, { onDelete: "cascade" }),
+  tagId: integer("tag_id")
+    .notNull()
+    .references(() => tags.id, { onDelete: "cascade" }),
+}, (table) => ({
+  pk: primaryKey({ columns: [table.haikuMonumentId, table.tagId] }),
+}));
 
 // Users テーブル
 export const users = sqliteTable("users", {
