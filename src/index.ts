@@ -1,12 +1,12 @@
 import { Hono } from 'hono';
-import locationsRoutes from './routes/locationsRoutes';
-import { errorHandler } from './middlewares/errorHandler';
-import { requestLogger } from './middlewares/requestLogger';
-import authorsRoutes from './routes/authorsRoutes';
-import sourcesRoutes from './routes/sourcesRoutes';
-import haikuMonumentRoutes from './routes/haikuMonumentRoutes';
-import tagsRoutes from './routes/tagsRoutes';
-import usersRoutes from './routes/usersRoutes';
+import locationsRoutes from './interfaces/routes/locationsRoutes';
+import { errorHandler } from './interfaces/middlewares/errorHandler';
+import { requestLogger } from './interfaces/middlewares/requestLogger';
+import authorsRoutes from './interfaces/routes/authorsRoutes';
+import sourcesRoutes from './interfaces/routes/sourcesRoutes';
+import haikuMonumentRoutes from './interfaces/routes/haikuMonumentRoutes';
+import tagsRoutes from './interfaces/routes/tagsRoutes';
+import usersRoutes from './interfaces/routes/usersRoutes';
 
 type Env = {
   DB: D1Database;
