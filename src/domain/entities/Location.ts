@@ -1,6 +1,7 @@
-// ドメインエンティティとしてLocationの型定義
 export interface Location {
-  id?: number;
+  id: number;
+  prefecture: string;
+  region: string | null;
   address: string | null;
   latitude: number | null;
   longitude: number | null;

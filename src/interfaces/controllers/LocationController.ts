@@ -3,10 +3,6 @@ import { LocationUseCases } from '../../domain/usecases/LocationUseCases';
 import { LocationRepository } from '../../infrastructure/repositories/LocationRepository';
 import type { D1Database } from '@cloudflare/workers-types';
 
-/**
- * ※ 各リクエスト時に、Cloudflare Workersのenv（バインディング）から DB を取得し、Repository をインスタンス化しています。
- * DIコンテナなどを利用すると、より洗練された形にできます。
- */
 const getUseCases = (env: { DB: D1Database }) => {
   const locationRepo = new LocationRepository(env.DB);
   return new LocationUseCases(locationRepo);
@@ -31,7 +27,6 @@ export const getLocationById = async (ctx: Context) => {
 
 export const createLocation = async (ctx: Context) => {
   const payload = await ctx.req.json();
-  // 必須項目のチェック（ドメイン層やユースケースでのチェックに加え、ここでも基本的なチェック）
   if (!payload.address || payload.latitude === undefined || payload.longitude === undefined || !payload.name) {
     return ctx.json({ error: 'Missing required fields' }, 400);
   }
