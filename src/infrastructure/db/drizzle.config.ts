@@ -10,8 +10,8 @@ function getEnv(key: string): string {
 }
 
 export default defineConfig({
-  out: './drizzle',
-  schema: './src/models/schema.ts',
+  out: './src/infrastructure/db/migrations',
+  schema: './src/infrastructure/db/schema.ts',
   dialect: 'sqlite',
   driver: 'd1-http',
   dbCredentials: {
