@@ -3,7 +3,7 @@ CREATE TABLE `authors` (
 	`name` text NOT NULL,
 	`biography` text,
 	`links` text,
-	`image_url` text,
+	`imageUrl` text,
 	`created_at` text DEFAULT CURRENT_TIMESTAMP,
 	`updated_at` text DEFAULT CURRENT_TIMESTAMP
 );
@@ -17,8 +17,8 @@ CREATE TABLE `haiku_monument` (
 	`location_id` integer,
 	`commentary` text,
 	`image_url` text,
-	`created_at` text DEFAULT CURRENT_TIMESTAMP,
-	`updated_at` text DEFAULT CURRENT_TIMESTAMP,
+	`created_at` text DEFAULT (DATETIME('now','localtime')),
+	`updated_at` text DEFAULT (DATETIME('now','localtime')),
 	FOREIGN KEY (`author_id`) REFERENCES `authors`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`source_id`) REFERENCES `sources`(`id`) ON UPDATE no action ON DELETE set null,
 	FOREIGN KEY (`location_id`) REFERENCES `locations`(`id`) ON UPDATE no action ON DELETE set null
@@ -34,6 +34,8 @@ CREATE TABLE `haiku_monument_tag` (
 --> statement-breakpoint
 CREATE TABLE `locations` (
 	`id` integer PRIMARY KEY NOT NULL,
+	`prefecture` text NOT NULL,
+	`region` text,
 	`address` text,
 	`latitude` real,
 	`longitude` real,
