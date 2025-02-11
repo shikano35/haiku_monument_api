@@ -1,7 +1,7 @@
 import type { IHaikuMonumentRepository } from '../../domain/repositories/IHaikuMonumentRepository';
 import type { HaikuMonument } from '../../domain/entities/HaikuMonument';
 import { getDB } from '../db/db';
-import { haikuMonument } from '../db/schema';
+import { haikuMonument, authors, sources, locations } from '../db/schema';
 import { eq } from 'drizzle-orm/expressions';
 import type { D1Database } from '@cloudflare/workers-types';
 
@@ -13,13 +13,50 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
   }
 
   async getAll(): Promise<HaikuMonument[]> {
-    return await this.db.select().from(haikuMonument).all();
+    const results = await this.db
+      .select({
+        id: haikuMonument.id,
+        text: haikuMonument.text,
+        authorId: haikuMonument.authorId,
+        sourceId: haikuMonument.sourceId,
+        locationId: haikuMonument.locationId,
+        establishedDate: haikuMonument.establishedDate,
+        commentary: haikuMonument.commentary,
+        imageUrl: haikuMonument.imageUrl,
+        createdAt: haikuMonument.createdAt,
+        updatedAt: haikuMonument.updatedAt,
+        author: authors,
+        source: sources,
+        location: locations,
+      })
+      .from(haikuMonument)
+      .leftJoin(authors, eq(haikuMonument.authorId, authors.id))
+      .leftJoin(sources, eq(haikuMonument.sourceId, sources.id))
+      .leftJoin(locations, eq(haikuMonument.locationId, locations.id));
+    return results;
   }
 
   async getById(id: number): Promise<HaikuMonument | null> {
     const result = await this.db
-      .select()
+      .select({
+        id: haikuMonument.id,
+        text: haikuMonument.text,
+        authorId: haikuMonument.authorId,
+        sourceId: haikuMonument.sourceId,
+        locationId: haikuMonument.locationId,
+        establishedDate: haikuMonument.establishedDate,
+        commentary: haikuMonument.commentary,
+        imageUrl: haikuMonument.imageUrl,
+        createdAt: haikuMonument.createdAt,
+        updatedAt: haikuMonument.updatedAt,
+        author: authors,
+        source: sources,
+        location: locations,
+      })
       .from(haikuMonument)
+      .leftJoin(authors, eq(haikuMonument.authorId, authors.id))
+      .leftJoin(sources, eq(haikuMonument.sourceId, sources.id))
+      .leftJoin(locations, eq(haikuMonument.locationId, locations.id))
       .where(eq(haikuMonument.id, id))
       .limit(1);
     return result.length > 0 ? result[0] : null;

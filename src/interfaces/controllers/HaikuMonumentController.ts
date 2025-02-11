@@ -11,8 +11,12 @@ const getUseCases = (env: { DB: D1Database }) => {
 export const getAllHaikuMonuments = async (ctx: Context) => {
   const useCases = getUseCases(ctx.env);
   const data = await useCases.getAllHaikuMonuments();
-  return ctx.json({ data });
+
+  const transformedData = data.map(({ authorId, sourceId, locationId, ...rest }) => rest);
+
+  return ctx.json({ data: transformedData });
 };
+
 
 export const getHaikuMonumentById = async (ctx: Context) => {
   const id = Number(ctx.req.param('id'));
@@ -27,7 +31,6 @@ export const getHaikuMonumentById = async (ctx: Context) => {
 
 export const createHaikuMonument = async (ctx: Context) => {
   const payload = await ctx.req.json();
-  // 必須フィールドのチェック（text と authorId は必須）
   if (!payload.text || !payload.authorId) {
     return ctx.json({ error: 'Missing required fields: text and authorId' }, 400);
   }
