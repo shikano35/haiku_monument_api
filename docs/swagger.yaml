@@ -1,0 +1,386 @@
+openapi: 3.0.3
+info:
+  title: 句碑 API
+  version: 1.0.0
+  description: |-
+    句碑の情報を取得するためのAPIです。
+
+    APIの詳細については、[句碑APIドキュメント](https://example.com)をご参照ください。
+
+servers: 
+- url: "http://localhost:8787"
+  description: "Local server"
+
+tags:
+  - name: "haiku-monuments"
+    description: "句碑に関するAPI"
+  - name: "authors"
+    description: "俳人に関するAPI"
+  - name: "locations"
+    description: "句碑の設置場所に関するAPI"
+  - name: "sources"
+    description: "句碑の出典に関するAPI"
+  - name: "tags"
+    description: "句碑に刻まれている俳句に関するAPI"
+
+paths:
+  /haiku-monuments:
+    get:
+      description: "句碑の一覧を取得"
+      tags:
+        - "haiku-monuments"
+      responses:
+        "200":
+          description: "Success operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HaikuMonuments"
+  /haiku-monuments/{id}:
+    get:
+      description: "句碑の詳細を取得"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - "haiku-monuments"
+      responses:
+        "200":
+          description: "Success operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HaikuMonuments"
+  /authors:
+    get:
+      description: "俳人の一覧を取得"
+      tags:
+        - "authors"
+      responses:
+        "200":
+          description: "Success operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Authors"
+  /authors/{id}:
+    get:
+      description: "俳人の詳細を取得"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - "authors"
+      responses:
+        "200":
+          description: "Success operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Authors"
+  /authors/{id}/haiku-monuments:
+    get:
+      description: "俳人の句碑一覧を取得"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - "authors"
+      responses:
+        "200":
+          description: "Success operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HaikuMonuments"
+  /locations:
+    get:
+      description: "句碑の設置場所一覧を取得"
+      tags:
+        - "locations"
+      responses:
+        "200":
+          description: "Success operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Locations"
+  /locations/{id}:
+    get:
+      description: "句碑の設置場所を取得"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - "locations"
+      responses:
+        "200":
+          description: "Success operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Locations"
+  /locations/{id}/haiku-monuments:
+    get:
+      description: "句碑の設置場所に関連する句碑一覧を取得"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - "locations"
+      responses:
+        "200":
+          description: "Success operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HaikuMonuments"
+  /sources:
+    get:
+      description: "句碑の出典一覧を取得"
+      tags:
+        - "sources"
+      responses:
+        "200":
+          description: "Success operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sources"
+  /sources/{id}:
+    get:
+      description: "句碑の出典を取得"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - "sources"
+      responses:
+        "200":
+          description: "Success operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sources"
+  /sources/{id}/haiku-monuments:
+    get:
+      description: "句碑の出典に関連する句碑一覧を取得"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - "sources"
+      responses:
+        "200":
+          description: "Success operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HaikuMonuments"
+  /tags:
+    get:
+      description: "句碑に刻まれている俳句に関する情報を取得"
+      tags:
+        - "tags"
+      responses:
+        "200":
+          description: "Success operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tags"
+  /tags/{id}:
+    get:
+      description: "句碑に刻まれている俳句に関する情報を取得"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - "tags"
+      responses:
+        "200":
+          description: "Success operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tags"
+  
+components:
+  schemas:
+    HaikuMonuments:
+      type: object
+      properties:
+        haiku_monuments:
+          type: array
+          items:
+            $ref: "#/components/schemas/HaikuMonument"
+      required:
+        - haiku_monuments
+    HaikuMonument:
+      type: object
+      properties:
+        id:
+          type: integer
+        text:
+          type: string
+        established_date:
+          type: string
+          format: date
+        commentary:
+          type: string
+        image_url:
+          type: string
+          format: uri
+          example: "https://example.com/image.jpg"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        authors:
+          type: array
+          items:
+            $ref: "#/components/schemas/Authors"
+        sources:
+          type: array
+          items:
+            $ref: "#/components/schemas/Sources"
+        locations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Locations"
+      required:
+        - id
+        - text
+        - established_date
+        - commentary
+        - image_url
+        - authors
+        - sources
+        - locations
+
+    Authors:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        biography:
+          type: string
+        links:
+          type: string
+        image_url:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - biography
+        - links
+        - image_url
+
+    Locations:
+      type: object
+      properties:
+        id:
+          type: integer
+        prefecture:
+          type: string
+        region:
+          type: string
+        address:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - prefecture
+        - region
+        - address
+        - latitude
+        - longitude
+        - name
+
+    Sources:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        author:
+          type: string
+        year:
+          type: integer
+        url:
+          type: string
+        publisher:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - author
+        - year
+        - url
+        - publisher
+
+    Tags:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+      required:
+        - id
+        - name
+        - description
