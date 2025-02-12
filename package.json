@@ -4,8 +4,7 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy --minify",
     "generate:migration": "drizzle-kit generate --config=src/infrastructure/db/drizzle.config.ts",
-    "migrate": "drizzle-kit migrate --config=src/infrastructure/db/drizzle.config.ts",
-    "migrate:local": "drizzle-kit migrate --local --config=src/infrastructure/db/drizzle.config.ts"
+    "migrate": "drizzle-kit migrate --config=src/infrastructure/db/drizzle.config.ts"
   },
   "dependencies": {
     "@libsql/client": "^0.14.0",
