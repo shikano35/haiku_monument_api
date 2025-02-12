@@ -3,7 +3,7 @@ CREATE TABLE `authors` (
 	`name` text NOT NULL,
 	`biography` text,
 	`links` text,
-	`imageUrl` text,
+	`image_url` text,
 	`created_at` text DEFAULT CURRENT_TIMESTAMP,
 	`updated_at` text DEFAULT CURRENT_TIMESTAMP
 );
@@ -11,7 +11,7 @@ CREATE TABLE `authors` (
 CREATE TABLE `haiku_monument` (
 	`id` integer PRIMARY KEY NOT NULL,
 	`text` text NOT NULL,
-	`author_id` integer NOT NULL,
+	`author_id` integer,
 	`source_id` integer,
 	`established_date` text,
 	`location_id` integer,
