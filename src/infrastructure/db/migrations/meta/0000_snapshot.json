@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "8a334d40-2b42-44fa-bc25-99a5049ce17f",
+  "id": "525c26d9-314f-4f33-a2fc-b79002f6c6e0",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "authors": {
@@ -86,7 +86,7 @@
           "name": "author_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "source_id": {
@@ -130,7 +130,7 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP"
+          "default": "(DATETIME('now','localtime'))"
         },
         "updated_at": {
           "name": "updated_at",
@@ -138,7 +138,7 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP"
+          "default": "(DATETIME('now','localtime'))"
         }
       },
       "indexes": {},
@@ -254,6 +254,20 @@
           "type": "integer",
           "primaryKey": true,
           "notNull": true,
+          "autoincrement": false
+        },
+        "prefecture": {
+          "name": "prefecture",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "region": {
+          "name": "region",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "address": {

@@ -6,7 +6,6 @@ import { eq } from 'drizzle-orm/expressions';
 import type { D1Database } from '@cloudflare/workers-types';
 
 export class LocationRepository implements ILocationRepository {
-  // Cloudflare Workers側から渡されるDBバインディングを受け取る
   constructor(private readonly dbBinding: D1Database) {}
 
   private get db() {
@@ -28,7 +27,6 @@ export class LocationRepository implements ILocationRepository {
   }
 
   async update(id: number, locationData: Partial<Location>): Promise<Location | null> {
-    // 存在チェック（場合によってはユースケース側で実施）
     const exists = await this.getById(id);
     if (!exists) return null;
 
