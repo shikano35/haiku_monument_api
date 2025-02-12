@@ -2,6 +2,7 @@ import type { Context } from 'hono';
 import { SourceUseCases } from '../../domain/usecases/SourceUseCases';
 import { SourceRepository } from '../../infrastructure/repositories/SourceRepository';
 import type { D1Database } from '@cloudflare/workers-types';
+import { convertKeysToSnakeCase } from '../../utils/convertKeysToSnakeCase';
 
 const getUseCases = (env: { DB: D1Database }) => {
   const sourceRepo = new SourceRepository(env.DB);
@@ -11,7 +12,7 @@ const getUseCases = (env: { DB: D1Database }) => {
 export const getAllSources = async (ctx: Context) => {
   const useCases = getUseCases(ctx.env);
   const data = await useCases.getAllSources();
-  return ctx.json({ data });
+  return ctx.json(convertKeysToSnakeCase(data));
 };
 
 export const getSourceById = async (ctx: Context) => {
@@ -22,7 +23,7 @@ export const getSourceById = async (ctx: Context) => {
   const data = await useCases.getSourceById(id);
   if (!data) return ctx.json({ error: 'Source not found' }, 404);
 
-  return ctx.json({ data });
+  return ctx.json(convertKeysToSnakeCase(data));
 };
 
 export const createSource = async (ctx: Context) => {
@@ -32,7 +33,7 @@ export const createSource = async (ctx: Context) => {
   }
   const useCases = getUseCases(ctx.env);
   const data = await useCases.createSource(payload);
-  return ctx.json({ data }, 201);
+  return ctx.json(convertKeysToSnakeCase(data), 201);
 };
 
 export const updateSource = async (ctx: Context) => {
@@ -44,7 +45,7 @@ export const updateSource = async (ctx: Context) => {
   const data = await useCases.updateSource(id, payload);
   if (!data) return ctx.json({ error: 'Source not found' }, 404);
 
-  return ctx.json({ data });
+  return ctx.json(convertKeysToSnakeCase(data));
 };
 
 export const deleteSource = async (ctx: Context) => {
