@@ -165,27 +165,51 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Authors"
-  /authors/{id}/haiku-monuments:
-    get:
-      description: "俳人の句碑一覧を取得"
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-          required: true
-      tags:
-        - "authors"
-      responses:
-        "200":
-          description: "Success operation"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HaikuMonuments"
   /locations:
     get:
       description: "句碑の設置場所一覧を取得"
+      parameters:
+        - in: query
+          name: limit
+          description: "取得する件数"
+          schema:
+            type: integer
+          required: false
+        - in: query
+          name: offset
+          description: "取得する位置"
+          schema:
+            type: integer
+          required: false
+        - in: query
+          name: prefecture
+          description: "検索対象の都道府県名"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: region
+          description: "検索対象の地域名"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: ordering
+          description: |-
+            並び順
+            * `prefecture` - 都道府県の昇順
+            * `-prefecture` - 都道府県の降順
+            * `region` - 地域の昇順
+            * `-region` - 地域の降順
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -prefecture
+                - -region
+                - prefecture
+                - region
       tags:
         - "locations"
       responses:
@@ -213,24 +237,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Locations"
-  /locations/{id}/haiku-monuments:
-    get:
-      description: "句碑の設置場所に関連する句碑一覧を取得"
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-          required: true
-      tags:
-        - "locations"
-      responses:
-        "200":
-          description: "Success operation"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HaikuMonuments"
   /sources:
     get:
       description: "句碑の出典一覧を取得"
@@ -261,24 +267,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Sources"
-  /sources/{id}/haiku-monuments:
-    get:
-      description: "句碑の出典に関連する句碑一覧を取得"
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-          required: true
-      tags:
-        - "sources"
-      responses:
-        "200":
-          description: "Success operation"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HaikuMonuments"
   /tags:
     get:
       description: "句碑に刻まれている俳句に関する情報を取得"
