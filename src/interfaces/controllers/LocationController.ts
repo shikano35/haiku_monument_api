@@ -2,6 +2,7 @@ import type { Context } from 'hono';
 import { LocationUseCases } from '../../domain/usecases/LocationUseCases';
 import { LocationRepository } from '../../infrastructure/repositories/LocationRepository';
 import type { D1Database } from '@cloudflare/workers-types';
+import { parseQueryParams } from '../../utils/parseQueryParams';
 
 const getUseCases = (env: { DB: D1Database }) => {
   const locationRepo = new LocationRepository(env.DB);
@@ -9,8 +10,9 @@ const getUseCases = (env: { DB: D1Database }) => {
 };
 
 export const getAllLocations = async (ctx: Context) => {
+  const queryParams = parseQueryParams(new URLSearchParams(ctx.req.query()));
   const useCases = getUseCases(ctx.env);
-  const data = await useCases.getAllLocations();
+  const data = await useCases.getAllLocations(queryParams);
   return ctx.json({ data });
 };
 
@@ -27,7 +29,12 @@ export const getLocationById = async (ctx: Context) => {
 
 export const createLocation = async (ctx: Context) => {
   const payload = await ctx.req.json();
-  if (!payload.address || payload.latitude === undefined || payload.longitude === undefined || !payload.name) {
+  if (
+    !payload.address ||
+    typeof payload.latitude !== 'number' ||
+    typeof payload.longitude !== 'number' ||
+    !payload.name
+  ) {
     return ctx.json({ error: 'Missing required fields' }, 400);
   }
 
