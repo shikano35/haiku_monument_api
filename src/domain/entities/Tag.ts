@@ -1,4 +1,3 @@
-// タグのエンティティ定義
 export interface Tag {
   id?: number;
   name: string;
