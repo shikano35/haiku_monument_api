@@ -3,6 +3,7 @@ import { HaikuMonumentUseCases } from '../../domain/usecases/HaikuMonumentUseCas
 import { HaikuMonumentRepository } from '../../infrastructure/repositories/HaikuMonumentRepository';
 import type { D1Database } from '@cloudflare/workers-types';
 import { convertKeysToSnakeCase } from '../../utils/convertKeysToSnakeCase';
+import { parseQueryParams } from '../../utils/parseQueryParams';
 
 const getUseCases = (env: { DB: D1Database }) => {
   const monumentRepo = new HaikuMonumentRepository(env.DB);
@@ -10,8 +11,9 @@ const getUseCases = (env: { DB: D1Database }) => {
 };
 
 export const getAllHaikuMonuments = async (ctx: Context) => {
+  const queryParams = parseQueryParams(new URLSearchParams(ctx.req.query()));
   const useCases = getUseCases(ctx.env);
-  const data = await useCases.getAllHaikuMonuments();
+  const data = await useCases.getAllHaikuMonuments(queryParams);
 
   const transformedData = data.map(({ authorId, sourceId, locationId, ...rest }) =>
     convertKeysToSnakeCase(rest)
