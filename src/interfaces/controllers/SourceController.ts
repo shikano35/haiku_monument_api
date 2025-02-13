@@ -3,6 +3,7 @@ import { SourceUseCases } from '../../domain/usecases/SourceUseCases';
 import { SourceRepository } from '../../infrastructure/repositories/SourceRepository';
 import type { D1Database } from '@cloudflare/workers-types';
 import { convertKeysToSnakeCase } from '../../utils/convertKeysToSnakeCase';
+import { parseQueryParams } from '../../utils/parseQueryParams';
 
 const getUseCases = (env: { DB: D1Database }) => {
   const sourceRepo = new SourceRepository(env.DB);
@@ -10,8 +11,9 @@ const getUseCases = (env: { DB: D1Database }) => {
 };
 
 export const getAllSources = async (ctx: Context) => {
+  const queryParams = parseQueryParams(new URLSearchParams(ctx.req.query()));
   const useCases = getUseCases(ctx.env);
-  const data = await useCases.getAllSources();
+  const data = await useCases.getAllSources(queryParams);
   return ctx.json(convertKeysToSnakeCase(data));
 };
 

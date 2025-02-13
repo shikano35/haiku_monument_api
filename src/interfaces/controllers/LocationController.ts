@@ -2,6 +2,7 @@ import type { Context } from 'hono';
 import { LocationUseCases } from '../../domain/usecases/LocationUseCases';
 import { LocationRepository } from '../../infrastructure/repositories/LocationRepository';
 import type { D1Database } from '@cloudflare/workers-types';
+import { parseQueryParams } from '../../utils/parseQueryParams';
 
 const getUseCases = (env: { DB: D1Database }) => {
   const locationRepo = new LocationRepository(env.DB);
@@ -9,9 +10,10 @@ const getUseCases = (env: { DB: D1Database }) => {
 };
 
 export const getAllLocations = async (ctx: Context) => {
+  const queryParams = parseQueryParams(new URLSearchParams(ctx.req.query()));
   const useCases = getUseCases(ctx.env);
-  const data = await useCases.getAllLocations();
-  return ctx.json({ data });
+  const data = await useCases.getAllLocations(queryParams);
+  return ctx.json(data);
 };
 
 export const getLocationById = async (ctx: Context) => {
@@ -22,18 +24,23 @@ export const getLocationById = async (ctx: Context) => {
   const data = await useCases.getLocationById(id);
   if (!data) return ctx.json({ error: 'Location not found' }, 404);
 
-  return ctx.json({ data });
+  return ctx.json(data);
 };
 
 export const createLocation = async (ctx: Context) => {
   const payload = await ctx.req.json();
-  if (!payload.address || payload.latitude === undefined || payload.longitude === undefined || !payload.name) {
+  if (
+    !payload.address ||
+    typeof payload.latitude !== 'number' ||
+    typeof payload.longitude !== 'number' ||
+    !payload.name
+  ) {
     return ctx.json({ error: 'Missing required fields' }, 400);
   }
 
   const useCases = getUseCases(ctx.env);
   const data = await useCases.createLocation(payload);
-  return ctx.json({ data }, 201);
+  return ctx.json(data, 201);
 };
 
 export const updateLocation = async (ctx: Context) => {
@@ -45,7 +52,7 @@ export const updateLocation = async (ctx: Context) => {
   const data = await useCases.updateLocation(id, payload);
   if (!data) return ctx.json({ error: 'Location not found' }, 404);
 
-  return ctx.json({ data });
+  return ctx.json(data);
 };
 
 export const deleteLocation = async (ctx: Context) => {

@@ -3,7 +3,7 @@ info:
   title: 句碑 API
   version: 1.0.0
   description: |-
-    句碑の情報を取得するためのAPIです。
+    このAPIは句碑の情報を提供します。
 
     APIの詳細については、[句碑APIドキュメント](https://example.com)をご参照ください。
 
@@ -27,6 +27,143 @@ paths:
   /haiku-monuments:
     get:
       description: "句碑の一覧を取得"
+      parameters:
+        - in: query
+          name: limit
+          description: "取得する件数"
+          schema:
+            type: integer
+          required: false
+        - in: query
+          name: offset
+          description: "取得する位置"
+          schema:
+            type: integer
+          required: false
+        - in: query
+          name: ordering
+          description: |-
+            並び替え
+            * `text` - 俳句の昇順
+            * `-text` - 俳句の降順
+            * `established_date` - 建立日の昇順
+            * `-established_date` - 建立日の降順
+            * `author` - 著者の昇順
+            * `-author` - 著者の降順
+            * `source` - 出典の昇順
+            * `-source` - 出典の降順
+            * `prefecture` - 都道府県の昇順
+            * `-prefecture` - 都道府県の降順
+            * `region` - 地域の昇順
+            * `-region` - 地域の降順
+            * `created_at` - 作成日時の昇順
+            * `-created_at` - 作成日時の降順
+            * `updated_at` - 更新日時の昇順
+            * `-updated_at` - 更新日時の降順
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -text
+                - -established_date
+                - -author
+                - -source
+                - -prefecture
+                - -region
+                - -created_at
+                - -updated_at
+                - text
+                - established_date
+                - author
+                - source
+                - prefecture
+                - region
+                - created_at
+                - updated_at
+          required: false
+        - in: query
+          name: search
+          description: "俳句と俳句の解説で検索"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: title_contains
+          description: "俳句に対する検索"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: description_contains
+          description: "俳句の解説に対する検索"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: name_contains
+          description: "著者に対する検索"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: biography_contains
+          description: "著者の解説に対する検索"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: prefecture
+          description: "都道府県名での絞り込み"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: region
+          description: "地域名での絞り込み"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: created_at_gt
+          description: |-
+            作成日時が指定した日時以降のもの
+
+            例: 2025-01-01 00:00:00
+          schema:
+            type: string
+            format: date-time
+          required: false
+        - in: query
+          name: created_at_lt
+          description: |-
+            作成日時が指定した日時以前のもの
+
+            例: 2025-01-01 00:00:00
+          schema:
+            type: string
+            format: date-time
+          required: false
+        - in: query
+          name: updated_at_gt
+          description: |-
+            更新日時が指定した日時以降のもの
+
+            例: 2025-01-01 00:00:00
+          schema:
+            type: string
+            format: date-time
+          required: false
+        - in: query
+          name: updated_at_lt
+          description: |-
+            更新日時が指定した日時以前のもの
+
+            例: 2025-01-01 00:00:00
+          schema:
+            type: string
+            format: date-time
+          required: false
       tags:
         - "haiku-monuments"
       responses:
@@ -57,6 +194,95 @@ paths:
   /authors:
     get:
       description: "俳人の一覧を取得"
+      parameters:
+        - in: query
+          name: limit
+          description: "取得する件数"
+          schema:
+            type: integer
+          required: false
+        - in: query
+          name: offset
+          description: "取得する位置"
+          schema:
+            type: integer
+          required: false
+        - in: query
+          name: ordering
+          description: |-
+            並び替え
+            * `created_at` - 作成日時の昇順
+            * `-created_at` - 作成日時の降順
+            * `updated_at` - 更新日時の昇順
+            * `-updated_at` - 更新日時の降順
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - -updated_at
+                - created_at
+                - updated_at
+          required: false
+        - in: query
+          name: search
+          description: "検索"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: name_contains
+          description: "名前に含まれる文字列"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: biography_contains
+          description: "俳人の情報に含まれる文字列"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: created_at_gt
+          description: |-
+            作成日時が指定した日時以降のもの
+
+            例: 2025-01-01 00:00:00
+          schema:
+            type: string
+            format: date-time
+          required: false
+        - in: query
+          name: created_at_lt
+          description: |-
+            作成日時が指定した日時以前のもの
+
+            例: 2025-01-01 00:00:00
+          schema:
+            type: string
+            format: date-time
+          required: false
+        - in: query
+          name: updated_at_gt
+          description: |-
+            更新日時が指定した日時以降のもの
+
+            例: 2025-01-01 00:00:00
+          schema:
+            type: string
+            format: date-time
+          required: false
+        - in: query
+          name: updated_at_lt
+          description: |-
+            更新日時が指定した日時以前のもの
+
+            例: 2025-01-01 00:00:00
+          schema:
+            type: string
+            format: date-time
+          required: false
       tags:
         - "authors"
       responses:
@@ -86,13 +312,7 @@ paths:
                 $ref: "#/components/schemas/Authors"
   /authors/{id}/haiku-monuments:
     get:
-      description: "俳人の句碑一覧を取得"
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-          required: true
+      description: "俳人に関連する句碑の一覧を取得"
       tags:
         - "authors"
       responses:
@@ -105,6 +325,48 @@ paths:
   /locations:
     get:
       description: "句碑の設置場所一覧を取得"
+      parameters:
+        - in: query
+          name: limit
+          description: "取得する件数"
+          schema:
+            type: integer
+          required: false
+        - in: query
+          name: offset
+          description: "取得する位置"
+          schema:
+            type: integer
+          required: false
+        - in: query
+          name: ordering
+          description: |-
+            並び順
+            * `prefecture` - 都道府県の昇順
+            * `-prefecture` - 都道府県の降順
+            * `region` - 地域の昇順
+            * `-region` - 地域の降順
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -prefecture
+                - -region
+                - prefecture
+                - region
+        - in: query
+          name: prefecture
+          description: "検索対象の都道府県名"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: region
+          description: "検索対象の地域名"
+          schema:
+            type: string
+          required: false
       tags:
         - "locations"
       responses:
@@ -134,13 +396,7 @@ paths:
                 $ref: "#/components/schemas/Locations"
   /locations/{id}/haiku-monuments:
     get:
-      description: "句碑の設置場所に関連する句碑一覧を取得"
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-          required: true
+      description: "句碑の設置場所に関連する句碑の一覧を取得"
       tags:
         - "locations"
       responses:
@@ -153,6 +409,71 @@ paths:
   /sources:
     get:
       description: "句碑の出典一覧を取得"
+      parameters:
+        - in: query
+          name: limit
+          description: "取得する件数"
+          schema:
+            type: integer
+          required: false
+        - in: query
+          name: offset
+          description: "取得する位置"
+          schema:
+            type: integer
+          required: false
+        - in: query
+          name: ordering
+          description: |-
+            並び替え
+            * `title` - タイトルの昇順
+            * `-title` - タイトルの降順
+            * `author` - 著者の昇順
+            * `-author` - 著者の降順
+            * `year` - 出版年の昇順
+            * `-year` - 出版年の降順
+            * `publisher` - 出版社の昇順
+            * `-publisher` - 出版社の降順
+            * `created_at` - 作成日時の昇順
+            * `-created_at` - 作成日時の降順
+            * `updated_at` - 更新日時の昇順
+            * `-updated_at` - 更新日時の降順
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -title
+                - -author
+                - -year
+                - -publisher
+                - -created_at
+                - -updated_at
+                - title
+                - author
+                - year
+                - publisher
+                - created_at
+                - updated_at
+          required: false
+        - in: query
+          name: search
+          description: "検索"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: title_contains
+          description: "タイトルに含まれる文字列"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: name_contains
+          description: "著者に含まれる文字列"
+          schema:
+            type: string
+          required: false
       tags:
         - "sources"
       responses:
@@ -182,13 +503,7 @@ paths:
                 $ref: "#/components/schemas/Sources"
   /sources/{id}/haiku-monuments:
     get:
-      description: "句碑の出典に関連する句碑一覧を取得"
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-          required: true
+      description: "句碑の出典に関連する句碑の一覧を取得"
       tags:
         - "sources"
       responses:
@@ -201,6 +516,53 @@ paths:
   /tags:
     get:
       description: "句碑に刻まれている俳句に関する情報を取得"
+      parameters:
+        - in: query
+          name: limit
+          description: "取得する件数"
+          schema:
+            type: integer
+          required: false
+        - in: query
+          name: offset
+          description: "取得する位置"
+          schema:
+            type: integer
+          required: false
+        - in: query
+          name: ordering
+          description: |-
+            並び替え
+            * `name` - 名前の昇順
+            * `-name` - 名前の降順
+            * `description` - 説明の昇順
+            * `-description` - 説明の降順
+            * `id` - IDの昇順
+            * `-id` - IDの降順
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -name
+                - -description
+                - -id
+                - name
+                - description
+                - id
+          required: false
+        - in: query
+          name: search
+          description: "検索"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: name_contains
+          description: "名前に含まれる文字列"
+          schema:
+            type: string
+          required: false
       tags:
         - "tags"
       responses:
@@ -228,7 +590,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Tags"
-  
+  /tags/{id}/haiku-monuments:
+    get:
+      description: "句碑に刻まれている俳句に関連する句碑の一覧を取得"
+      tags:
+        - "tags"
+      responses:
+        "200":
+          description: "Success operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HaikuMonuments"
 components:
   schemas:
     HaikuMonuments:
