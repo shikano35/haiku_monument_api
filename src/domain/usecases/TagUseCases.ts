@@ -1,11 +1,12 @@
+import type { QueryParams } from '../common/QueryParams';
 import type { Tag } from '../entities/Tag';
 import type { ITagRepository } from '../repositories/ITagRepository';
 
 export class TagUseCases {
   constructor(private readonly tagRepo: ITagRepository) {}
 
-  async getAllTags(): Promise<Tag[]> {
-    return this.tagRepo.getAll();
+  async getAllTags(queryParams?: QueryParams): Promise<Tag[]> {
+    return this.tagRepo.getAll(queryParams);
   }
 
   async getTagById(id: number): Promise<Tag | null> {

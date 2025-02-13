@@ -2,6 +2,7 @@ import type { Context } from 'hono';
 import { TagUseCases } from '../../domain/usecases/TagUseCases';
 import { TagRepository } from '../../infrastructure/repositories/TagRepository';
 import type { D1Database } from '@cloudflare/workers-types';
+import { parseQueryParams } from '../../utils/parseQueryParams';
 
 const getUseCases = (env: { DB: D1Database }) => {
   const tagRepo = new TagRepository(env.DB);
@@ -9,8 +10,9 @@ const getUseCases = (env: { DB: D1Database }) => {
 };
 
 export const getAllTags = async (ctx: Context) => {
+  const queryParams = parseQueryParams(new URLSearchParams(ctx.req.query()));
   const useCases = getUseCases(ctx.env);
-  const data = await useCases.getAllTags();
+  const data = await useCases.getAllTags(queryParams);
   return ctx.json({ data });
 };
 
