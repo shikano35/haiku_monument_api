@@ -13,7 +13,7 @@ export const getAllLocations = async (ctx: Context) => {
   const queryParams = parseQueryParams(new URLSearchParams(ctx.req.query()));
   const useCases = getUseCases(ctx.env);
   const data = await useCases.getAllLocations(queryParams);
-  return ctx.json({ data });
+  return ctx.json(data);
 };
 
 export const getLocationById = async (ctx: Context) => {
@@ -24,7 +24,7 @@ export const getLocationById = async (ctx: Context) => {
   const data = await useCases.getLocationById(id);
   if (!data) return ctx.json({ error: 'Location not found' }, 404);
 
-  return ctx.json({ data });
+  return ctx.json(data);
 };
 
 export const createLocation = async (ctx: Context) => {
@@ -40,7 +40,7 @@ export const createLocation = async (ctx: Context) => {
 
   const useCases = getUseCases(ctx.env);
   const data = await useCases.createLocation(payload);
-  return ctx.json({ data }, 201);
+  return ctx.json(data, 201);
 };
 
 export const updateLocation = async (ctx: Context) => {
@@ -52,7 +52,7 @@ export const updateLocation = async (ctx: Context) => {
   const data = await useCases.updateLocation(id, payload);
   if (!data) return ctx.json({ error: 'Location not found' }, 404);
 
-  return ctx.json({ data });
+  return ctx.json(data);
 };
 
 export const deleteLocation = async (ctx: Context) => {
