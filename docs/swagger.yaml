@@ -3,7 +3,7 @@ info:
   title: 句碑 API
   version: 1.0.0
   description: |-
-    句碑の情報を取得するためのAPIです。
+    このAPIは句碑の情報を提供します。
 
     APIの詳細については、[句碑APIドキュメント](https://example.com)をご参照ください。
 
@@ -57,6 +57,87 @@ paths:
   /authors:
     get:
       description: "俳人の一覧を取得"
+      parameters:
+        - in: query
+          name: limit
+          description: "取得する件数"
+          schema:
+            type: integer
+          required: false
+        - in: query
+          name: offset
+          description: "取得する位置"
+          schema:
+            type: integer
+          required: false
+        - in: query
+          name: ordering
+          description: |-
+            並び替え
+            * `created_at` - 作成日時の昇順
+            * `-created_at` - 作成日時の降順
+            * `updated_at` - 更新日時の昇順
+            * `-updated_at` - 更新日時の降順
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - -updated_at
+                - created_at
+                - updated_at
+          required: false
+        - in: query
+          name: search
+          description: "検索"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: name_contains
+          description: "名前に含まれる文字列"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: biography_contains
+          description: "俳人の情報に含まれる文字列"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: created_at_gt
+          description: "作成日時が指定した日時以降のもの"
+          schema:
+            type: string
+            format: date-time
+            example: "2025-01-01 00:00:00"
+          required: false
+        - in: query
+          name: created_at_lt
+          description: "作成日時が指定した日時以前のもの"
+          schema:
+            type: string
+            format: date-time
+            example: "2025-01-01 00:00:00"
+          required: false
+        - in: query
+          name: updated_at_gt
+          description: "更新日時が指定した日時以降のもの"
+          schema:
+            type: string
+            format: date-time
+            example: "2025-01-01 00:00:00"
+          required: false
+        - in: query
+          name: updated_at_lt
+          description: "更新日時が指定した日時以前のもの"
+          schema:
+            type: string
+            format: date-time
+            example: "2025-01-01 00:00:00"
+          required: false
       tags:
         - "authors"
       responses:
