@@ -108,35 +108,43 @@ paths:
           required: false
         - in: query
           name: created_at_gt
-          description: "作成日時が指定した日時以降のもの"
+          description: |-
+            作成日時が指定した日時以降のもの
+
+            例: 2025-01-01 00:00:00
           schema:
             type: string
             format: date-time
-            example: "2025-01-01 00:00:00"
           required: false
         - in: query
           name: created_at_lt
-          description: "作成日時が指定した日時以前のもの"
+          description: |-
+            作成日時が指定した日時以前のもの
+
+            例: 2025-01-01 00:00:00
           schema:
             type: string
             format: date-time
-            example: "2025-01-01 00:00:00"
           required: false
         - in: query
           name: updated_at_gt
-          description: "更新日時が指定した日時以降のもの"
+          description: |-
+            更新日時が指定した日時以降のもの
+
+            例: 2025-01-01 00:00:00
           schema:
             type: string
             format: date-time
-            example: "2025-01-01 00:00:00"
           required: false
         - in: query
           name: updated_at_lt
-          description: "更新日時が指定した日時以前のもの"
+          description: |-
+            更新日時が指定した日時以前のもの
+
+            例: 2025-01-01 00:00:00
           schema:
             type: string
             format: date-time
-            example: "2025-01-01 00:00:00"
           required: false
       tags:
         - "authors"
@@ -182,18 +190,6 @@ paths:
             type: integer
           required: false
         - in: query
-          name: prefecture
-          description: "検索対象の都道府県名"
-          schema:
-            type: string
-          required: false
-        - in: query
-          name: region
-          description: "検索対象の地域名"
-          schema:
-            type: string
-          required: false
-        - in: query
           name: ordering
           description: |-
             並び順
@@ -210,6 +206,18 @@ paths:
                 - -region
                 - prefecture
                 - region
+        - in: query
+          name: prefecture
+          description: "検索対象の都道府県名"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: region
+          description: "検索対象の地域名"
+          schema:
+            type: string
+          required: false
       tags:
         - "locations"
       responses:
@@ -240,6 +248,71 @@ paths:
   /sources:
     get:
       description: "句碑の出典一覧を取得"
+      parameters:
+        - in: query
+          name: limit
+          description: "取得する件数"
+          schema:
+            type: integer
+          required: false
+        - in: query
+          name: offset
+          description: "取得する位置"
+          schema:
+            type: integer
+          required: false
+        - in: query
+          name: ordering
+          description: |-
+            並び替え
+            * `title` - タイトルの昇順
+            * `-title` - タイトルの降順
+            * `author` - 著者の昇順
+            * `-author` - 著者の降順
+            * `year` - 出版年の昇順
+            * `-year` - 出版年の降順
+            * `publisher` - 出版社の昇順
+            * `-publisher` - 出版社の降順
+            * `created_at` - 作成日時の昇順
+            * `-created_at` - 作成日時の降順
+            * `updated_at` - 更新日時の昇順
+            * `-updated_at` - 更新日時の降順
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -title
+                - -author
+                - -year
+                - -publisher
+                - -created_at
+                - -updated_at
+                - title
+                - author
+                - year
+                - publisher
+                - created_at
+                - updated_at
+          required: false
+        - in: query
+          name: search
+          description: "検索"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: title_contains
+          description: "タイトルに含まれる文字列"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: name_contains
+          description: "著者に含まれる文字列"
+          schema:
+            type: string
+          required: false
       tags:
         - "sources"
       responses:
@@ -270,6 +343,53 @@ paths:
   /tags:
     get:
       description: "句碑に刻まれている俳句に関する情報を取得"
+      parameters:
+        - in: query
+          name: limit
+          description: "取得する件数"
+          schema:
+            type: integer
+          required: false
+        - in: query
+          name: offset
+          description: "取得する位置"
+          schema:
+            type: integer
+          required: false
+        - in: query
+          name: ordering
+          description: |-
+            並び替え
+            * `name` - 名前の昇順
+            * `-name` - 名前の降順
+            * `description` - 説明の昇順
+            * `-description` - 説明の降順
+            * `id` - IDの昇順
+            * `-id` - IDの降順
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -name
+                - -description
+                - -id
+                - name
+                - description
+                - id
+          required: false
+        - in: query
+          name: search
+          description: "検索"
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: name_contains
+          description: "名前に含まれる文字列"
+          schema:
+            type: string
+          required: false
       tags:
         - "tags"
       responses:
