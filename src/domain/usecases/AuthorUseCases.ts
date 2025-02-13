@@ -1,11 +1,12 @@
 import type { Author } from '../entities/Author';
 import type { IAuthorRepository } from '../repositories/IAuthorRepository';
+import type { QueryParams } from '../common/QueryParams';
 
 export class AuthorUseCases {
   constructor(private readonly authorRepo: IAuthorRepository) {}
 
-  async getAllAuthors(): Promise<Author[]> {
-    return this.authorRepo.getAll();
+  async getAllAuthors(queryParams?: QueryParams): Promise<Author[]> {
+    return this.authorRepo.getAll(queryParams);
   }
 
   async getAuthorById(id: number): Promise<Author | null> {

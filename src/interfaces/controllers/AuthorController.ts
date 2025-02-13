@@ -3,6 +3,8 @@ import { AuthorUseCases } from '../../domain/usecases/AuthorUseCases';
 import { AuthorRepository } from '../../infrastructure/repositories/AuthorRepository';
 import type { D1Database } from '@cloudflare/workers-types';
 import { convertKeysToSnakeCase } from '../../utils/convertKeysToSnakeCase';
+import { convertKeysToCamelCase } from '../../utils/convertKeysToCamelCase';
+import { parseQueryParams } from '../../utils/parseQueryParams';
 
 const getUseCases = (env: { DB: D1Database }) => {
   const authorRepo = new AuthorRepository(env.DB);
@@ -10,8 +12,9 @@ const getUseCases = (env: { DB: D1Database }) => {
 };
 
 export const getAllAuthors = async (ctx: Context) => {
+  const queryParams = parseQueryParams(new URLSearchParams(ctx.req.query()));
   const useCases = getUseCases(ctx.env);
-  const data = await useCases.getAllAuthors();
+  const data = await useCases.getAllAuthors(queryParams);
   return ctx.json(convertKeysToSnakeCase(data));
 };
 
@@ -25,8 +28,6 @@ export const getAuthorById = async (ctx: Context) => {
 
   return ctx.json(convertKeysToSnakeCase(data));
 };
-
-import { convertKeysToCamelCase } from '../../utils/convertKeysToCamelCase';
 
 export const createAuthor = async (ctx: Context) => {
   const payload = await ctx.req.json();
