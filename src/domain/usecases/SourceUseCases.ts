@@ -1,11 +1,12 @@
+import type { QueryParams } from '../common/QueryParams';
 import type { Source } from '../entities/Source';
 import type { ISourceRepository } from '../repositories/ISourceRepository';
 
 export class SourceUseCases {
   constructor(private readonly sourceRepo: ISourceRepository) {}
 
-  async getAllSources(): Promise<Source[]> {
-    return this.sourceRepo.getAll();
+  async getAllSources(queryParams?: QueryParams): Promise<Source[]> {
+    return this.sourceRepo.getAll(queryParams);
   }
 
   async getSourceById(id: number): Promise<Source | null> {
