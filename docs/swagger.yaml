@@ -20,8 +20,6 @@ tags:
     description: "句碑の設置場所に関するAPI"
   - name: "sources"
     description: "句碑の出典に関するAPI"
-  - name: "tags"
-    description: "句碑に刻まれている俳句に関するAPI"
 
 paths:
   /haiku-monuments:
@@ -313,6 +311,12 @@ paths:
   /authors/{id}/haiku-monuments:
     get:
       description: "俳人に関連する句碑の一覧を取得"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
       tags:
         - "authors"
       responses:
@@ -397,6 +401,12 @@ paths:
   /locations/{id}/haiku-monuments:
     get:
       description: "句碑の設置場所に関連する句碑の一覧を取得"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
       tags:
         - "locations"
       responses:
@@ -504,77 +514,6 @@ paths:
   /sources/{id}/haiku-monuments:
     get:
       description: "句碑の出典に関連する句碑の一覧を取得"
-      tags:
-        - "sources"
-      responses:
-        "200":
-          description: "Success operation"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HaikuMonuments"
-  /tags:
-    get:
-      description: "句碑に刻まれている俳句に関する情報を取得"
-      parameters:
-        - in: query
-          name: limit
-          description: "取得する件数"
-          schema:
-            type: integer
-          required: false
-        - in: query
-          name: offset
-          description: "取得する位置"
-          schema:
-            type: integer
-          required: false
-        - in: query
-          name: ordering
-          description: |-
-            並び替え
-            * `name` - 名前の昇順
-            * `-name` - 名前の降順
-            * `description` - 説明の昇順
-            * `-description` - 説明の降順
-            * `id` - IDの昇順
-            * `-id` - IDの降順
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - -name
-                - -description
-                - -id
-                - name
-                - description
-                - id
-          required: false
-        - in: query
-          name: search
-          description: "検索"
-          schema:
-            type: string
-          required: false
-        - in: query
-          name: name_contains
-          description: "名前に含まれる文字列"
-          schema:
-            type: string
-          required: false
-      tags:
-        - "tags"
-      responses:
-        "200":
-          description: "Success operation"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Tags"
-  /tags/{id}:
-    get:
-      description: "句碑に刻まれている俳句に関する情報を取得"
       parameters:
         - in: path
           name: id
@@ -582,19 +521,7 @@ paths:
             type: integer
           required: true
       tags:
-        - "tags"
-      responses:
-        "200":
-          description: "Success operation"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Tags"
-  /tags/{id}/haiku-monuments:
-    get:
-      description: "句碑に刻まれている俳句に関連する句碑の一覧を取得"
-      tags:
-        - "tags"
+        - "sources"
       responses:
         "200":
           description: "Success operation"
@@ -743,17 +670,3 @@ components:
         - year
         - url
         - publisher
-
-    Tags:
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-        description:
-          type: string
-      required:
-        - id
-        - name
-        - description
