@@ -6,7 +6,6 @@ import locationsRoutes from './interfaces/routes/locationsRoutes';
 import authorsRoutes from './interfaces/routes/authorsRoutes';
 import sourcesRoutes from './interfaces/routes/sourcesRoutes';
 import haikuMonumentRoutes from './interfaces/routes/haikuMonumentRoutes';
-import tagsRoutes from './interfaces/routes/tagsRoutes';
 import usersRoutes from './interfaces/routes/usersRoutes';
 
 type Env = {
@@ -23,7 +22,6 @@ app.route('/locations', locationsRoutes);
 app.route('/authors', authorsRoutes);
 app.route('/sources', sourcesRoutes);
 app.route('/haiku-monuments', haikuMonumentRoutes);
-app.route('/tags', tagsRoutes);
 app.route('/users', usersRoutes);
 
 app.all('*', (ctx) => ctx.json({ error: 'Not Found' }, 404));
