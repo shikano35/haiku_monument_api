@@ -3,6 +3,8 @@ import * as AuthorController from '../controllers/AuthorController';
 
 const router = new Hono();
 
+router.get('/:authorId/haiku-monuments', AuthorController.getHaikuMonumentsByAuthor);
+
 router.get('/', AuthorController.getAllAuthors);
 router.get('/:id', AuthorController.getAuthorById);
 router.post('/', AuthorController.createAuthor);

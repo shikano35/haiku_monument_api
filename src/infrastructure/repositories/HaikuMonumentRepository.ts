@@ -263,4 +263,100 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
       .returning();
     return results.length > 0;
   }
+
+  async getByAuthorId(authorId: number): Promise<HaikuMonument[]> {
+    const result = await this.db
+      .select({
+        id: haikuMonument.id,
+        text: haikuMonument.text,
+        establishedDate: haikuMonument.establishedDate,
+        commentary: haikuMonument.commentary,
+        imageUrl: haikuMonument.imageUrl,
+        createdAt: haikuMonument.createdAt,
+        updatedAt: haikuMonument.updatedAt,
+        authorId: haikuMonument.authorId,
+        sourceId: haikuMonument.sourceId,
+        locationId: haikuMonument.locationId,
+        author: authors,
+        source: sources,
+        location: locations,
+      })
+      .from(haikuMonument)
+      .leftJoin(authors, eq(haikuMonument.authorId, authors.id))
+      .leftJoin(sources, eq(haikuMonument.sourceId, sources.id))
+      .leftJoin(locations, eq(haikuMonument.locationId, locations.id))
+      .where(eq(haikuMonument.authorId, authorId))
+      .all();
+  
+    return result.map(item => ({
+      ...item,
+      authorId: item.authorId || null,
+      sourceId: item.sourceId || null,
+      locationId: item.locationId || null,
+    }));
+  }
+
+  async getByLocationId(locationId: number): Promise<HaikuMonument[]> {
+    const result = await this.db
+      .select({
+        id: haikuMonument.id,
+        text: haikuMonument.text,
+        establishedDate: haikuMonument.establishedDate,
+        commentary: haikuMonument.commentary,
+        imageUrl: haikuMonument.imageUrl,
+        createdAt: haikuMonument.createdAt,
+        updatedAt: haikuMonument.updatedAt,
+        authorId: haikuMonument.authorId,
+        sourceId: haikuMonument.sourceId,
+        locationId: haikuMonument.locationId,
+        author: authors,
+        source: sources,
+        location: locations,
+      })
+      .from(haikuMonument)
+      .leftJoin(authors, eq(haikuMonument.authorId, authors.id))
+      .leftJoin(sources, eq(haikuMonument.sourceId, sources.id))
+      .leftJoin(locations, eq(haikuMonument.locationId, locations.id))
+      .where(eq(haikuMonument.locationId, locationId))
+      .all();
+  
+      return result.map(item => ({
+        ...item,
+        authorId: item.authorId || null,
+        sourceId: item.sourceId || null,
+        locationId: item.locationId || null,
+      }));
+  }
+
+  async getBySourceId(sourceId: number): Promise<HaikuMonument[]> {
+    const result = await this.db
+      .select({
+        id: haikuMonument.id,
+        text: haikuMonument.text,
+        establishedDate: haikuMonument.establishedDate,
+        commentary: haikuMonument.commentary,
+        imageUrl: haikuMonument.imageUrl,
+        createdAt: haikuMonument.createdAt,
+        updatedAt: haikuMonument.updatedAt,
+        authorId: haikuMonument.authorId,
+        sourceId: haikuMonument.sourceId,
+        locationId: haikuMonument.locationId,
+        author: authors,
+        source: sources,
+        location: locations,
+      })
+      .from(haikuMonument)
+      .leftJoin(authors, eq(haikuMonument.authorId, authors.id))
+      .leftJoin(sources, eq(haikuMonument.sourceId, sources.id))
+      .leftJoin(locations, eq(haikuMonument.locationId, locations.id))
+      .where(eq(haikuMonument.sourceId, sourceId))
+      .all();
+  
+      return result.map(item => ({
+        ...item,
+        authorId: item.authorId || null,
+        sourceId: item.sourceId || null,
+        locationId: item.locationId || null,
+      }));
+  }
 }
