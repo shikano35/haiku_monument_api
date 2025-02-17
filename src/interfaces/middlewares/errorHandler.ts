@@ -5,6 +5,7 @@ export const errorHandler = async (ctx: Context, next: Next) => {
     await next();
   } catch (error) {
     console.error('Unhandled error:', error);
-    return ctx.json({ error: 'Internal Server Error' }, 500);
+    ctx.status(500);
+    return ctx.json({ error: 'Internal Server Error' });
   }
 };
