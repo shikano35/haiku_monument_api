@@ -25,11 +25,17 @@ export const getAllLocations = async (ctx: Context) => {
 
 export const getLocationById = async (ctx: Context) => {
   const id = Number(ctx.req.param('id'));
-  if (Number.isNaN(id)) return ctx.json({ error: 'Invalid ID' }, 400);
+  if (Number.isNaN(id)) {
+    ctx.status(400);
+    return ctx.json({ error: 'Invalid ID' });
+  }
 
   const { LocationUseCases } = getUseCases(ctx.env);
   const data = await LocationUseCases.getLocationById(id);
-  if (!data) return ctx.json({ error: 'Location not found' }, 404);
+  if (!data) {
+    ctx.status(404);
+    return ctx.json({ error: 'Location not found' });
+  }
 
   return ctx.json(data);
 };
@@ -42,41 +48,56 @@ export const createLocation = async (ctx: Context) => {
     typeof payload.longitude !== 'number' ||
     !payload.name
   ) {
-    return ctx.json({ error: 'Missing required fields' }, 400);
+    ctx.status(400);
+    return ctx.json({ error: 'Missing required fields' });
   }
 
   const { LocationUseCases } = getUseCases(ctx.env);
   const data = await LocationUseCases.createLocation(payload);
-  return ctx.json(data, 201);
+  ctx.status(201);
+  return ctx.json(data);
 };
 
 export const updateLocation = async (ctx: Context) => {
   const id = Number(ctx.req.param('id'));
-  if (Number.isNaN(id)) return ctx.json({ error: 'Invalid ID' }, 400);
+  if (Number.isNaN(id)) {
+    ctx.status(400);
+    return ctx.json({ error: 'Invalid ID' });
+  }
 
   const payload = await ctx.req.json();
   const { LocationUseCases } = getUseCases(ctx.env);
   const data = await LocationUseCases.updateLocation(id, payload);
-  if (!data) return ctx.json({ error: 'Location not found' }, 404);
+  if (!data) {
+    ctx.status(404);
+    return ctx.json({ error: 'Location not found' });
+  }
 
   return ctx.json(data);
 };
 
 export const deleteLocation = async (ctx: Context) => {
   const id = Number(ctx.req.param('id'));
-  if (Number.isNaN(id)) return ctx.json({ error: 'Invalid ID' }, 400);
+  if (Number.isNaN(id)) {
+    ctx.status(400);
+    return ctx.json({ error: 'Invalid ID' });
+  }
 
   const { LocationUseCases } = getUseCases(ctx.env);
   const success = await LocationUseCases.deleteLocation(id);
-  if (!success) return ctx.json({ error: 'Location not found' }, 404);
+  if (!success) {
+    ctx.status(404);
+    return ctx.json({ error: 'Location not found' });
+  }
 
-  return ctx.json({ message: 'Location deleted successfully' });
+  return ctx.json({ id, message: 'Location deleted successfully' });
 };
 
 export const getHaikuMonumentsByLocation = async (ctx: Context) => {
   const locationId = Number(ctx.req.param('locationId'));
   if (Number.isNaN(locationId)) {
-    return ctx.json({ error: 'Invalid locationId' }, 400);
+    ctx.status(400);
+    return ctx.json({ error: 'Invalid locationId' });
   }
 
   const { monumentUseCases } = getUseCases(ctx.env);
