@@ -1,5 +1,5 @@
 import type { ILocationRepository } from '../../domain/repositories/ILocationRepository';
-import type { Location } from '../../domain/entities/Location';
+import type { CreateLocationInput, Location } from '../../domain/entities/Location';
 import { getDB } from '../db/db';
 import { locations } from '../db/schema';
 import { and, asc, desc, eq, like } from 'drizzle-orm/expressions';
@@ -70,7 +70,7 @@ export class LocationRepository implements ILocationRepository {
     return result.length > 0 ? result[0] : null;
   }
 
-  async create(locationData: Location): Promise<Location> {
+  async create(locationData: CreateLocationInput): Promise<Location> {
     const [inserted] = await this.db
       .insert(locations)
       .values(locationData)

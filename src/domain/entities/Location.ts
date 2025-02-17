@@ -7,3 +7,5 @@ export interface Location {
   longitude: number | null;
   name: string | null;
 }
+
+export type CreateLocationInput = Omit<Location, 'id'>;
