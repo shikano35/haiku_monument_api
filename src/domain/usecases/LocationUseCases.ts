@@ -1,5 +1,5 @@
 import type { QueryParams } from '../common/QueryParams';
-import type { Location } from '../entities/Location';
+import type { CreateLocationInput, Location } from '../entities/Location';
 import type { ILocationRepository } from '../repositories/ILocationRepository';
 
 export class LocationUseCases {
@@ -13,7 +13,7 @@ export class LocationUseCases {
     return this.locationRepo.getById(id);
   }
 
-  async createLocation(locationData: Location): Promise<Location> {
+  async createLocation(locationData: CreateLocationInput): Promise<Location> {
     return this.locationRepo.create(locationData);
   }
 

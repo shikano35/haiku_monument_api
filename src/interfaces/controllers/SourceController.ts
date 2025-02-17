@@ -25,11 +25,17 @@ export const getAllSources = async (ctx: Context) => {
 
 export const getSourceById = async (ctx: Context) => {
   const id = Number(ctx.req.param('id'));
-  if (Number.isNaN(id)) return ctx.json({ error: 'Invalid ID' }, 400);
+  if (Number.isNaN(id)) {
+    ctx.status(400);
+    return ctx.json({ error: 'Invalid ID' });
+  }
 
   const { sourceUseCases } = getUseCases(ctx.env);
   const data = await sourceUseCases.getSourceById(id);
-  if (!data) return ctx.json({ error: 'Source not found' }, 404);
+  if (!data) {
+    ctx.status(404);
+    return ctx.json({ error: 'Source not found' });
+  }
 
   return ctx.json(convertKeysToSnakeCase(data));
 };
@@ -37,32 +43,46 @@ export const getSourceById = async (ctx: Context) => {
 export const createSource = async (ctx: Context) => {
   const payload = await ctx.req.json();
   if (!payload.title) {
-    return ctx.json({ error: 'Missing required field: title' }, 400);
+    ctx.status(400);
+    return ctx.json({ error: 'Missing required field: title' });
   }
   const { sourceUseCases } = getUseCases(ctx.env);
   const data = await sourceUseCases.createSource(payload);
-  return ctx.json(convertKeysToSnakeCase(data), 201);
+  ctx.status(201);
+  return ctx.json(convertKeysToSnakeCase(data));
 };
 
 export const updateSource = async (ctx: Context) => {
   const id = Number(ctx.req.param('id'));
-  if (Number.isNaN(id)) return ctx.json({ error: 'Invalid ID' }, 400);
+  if (Number.isNaN(id)) {
+    ctx.status(400);
+    return ctx.json({ error: 'Invalid ID' });
+  }
 
   const payload = await ctx.req.json();
   const { sourceUseCases } = getUseCases(ctx.env);
   const data = await sourceUseCases.updateSource(id, payload);
-  if (!data) return ctx.json({ error: 'Source not found' }, 404);
+  if (!data) {
+    ctx.status(404);
+    return ctx.json({ error: 'Source not found' });
+  }
 
   return ctx.json(convertKeysToSnakeCase(data));
 };
 
 export const deleteSource = async (ctx: Context) => {
   const id = Number(ctx.req.param('id'));
-  if (Number.isNaN(id)) return ctx.json({ error: 'Invalid ID' }, 400);
+  if (Number.isNaN(id)) {
+    ctx.status(400);
+    return ctx.json({ error: 'Invalid ID' });
+  }
 
   const { sourceUseCases } = getUseCases(ctx.env);
   const success = await sourceUseCases.deleteSource(id);
-  if (!success) return ctx.json({ error: 'Source not found' }, 404);
+  if (!success) {
+    ctx.status(404);
+    return ctx.json({ error: 'Source not found' });
+  }
 
   return ctx.json({ message: 'Source deleted successfully' });
 };
@@ -70,7 +90,8 @@ export const deleteSource = async (ctx: Context) => {
 export const getHaikuMonumentsBySource = async (ctx: Context) => {
   const sourceId = Number(ctx.req.param('sourceId'));
   if (Number.isNaN(sourceId)) {
-    return ctx.json({ error: 'Invalid sourceId' }, 400);
+    ctx.status(400);
+    return ctx.json({ error: 'Invalid sourceId' });
   }
 
   const { monumentUseCases } = getUseCases(ctx.env);
