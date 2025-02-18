@@ -1,5 +1,5 @@
 import type { IUserRepository } from '../../domain/repositories/IUserRepository';
-import type { User } from '../../domain/entities/User';
+import type { CreateUserInput, User } from '../../domain/entities/User';
 import { getDB } from '../db/db';
 import { users } from '../db/schema';
 import { eq } from 'drizzle-orm/expressions';
@@ -21,7 +21,7 @@ export class UserRepository implements IUserRepository {
     return result.length > 0 ? result[0] : null;
   }
 
-  async create(userData: User): Promise<User> {
+  async create(userData: CreateUserInput): Promise<User> {
     const [inserted] = await this.db.insert(users).values(userData).returning();
     return inserted;
   }

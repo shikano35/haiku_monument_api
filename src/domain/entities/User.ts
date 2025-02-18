@@ -11,4 +11,4 @@ export interface User {
   status?: string;
 }
 
-export type CreateUserInput = Omit<User, 'id'>;
+export type CreateUserInput = Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'lastLoginAt' | 'status'>;
