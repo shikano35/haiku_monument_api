@@ -8,7 +8,6 @@ import { convertKeysToCamelCase } from '../../utils/convertKeysToCamelCase';
 import { convertKeysToSnakeCase } from '../../utils/convertKeysToSnakeCase';
 import { parseQueryParams } from '../../utils/parseQueryParams';
 
-// authorスキーマ（既存 or 新規）
 const authorInputSchema = z.union([
   z.object({ id: z.number() }),
   z.object({
@@ -19,7 +18,6 @@ const authorInputSchema = z.union([
   }),
 ]).optional().nullable();
 
-// sourceスキーマ（既存 or 新規）
 const sourceInputSchema = z.union([
   z.object({ id: z.number() }),
   z.object({
@@ -31,7 +29,6 @@ const sourceInputSchema = z.union([
   }),
 ]).optional().nullable();
 
-// locationスキーマ（新規の場合、必ず各プロパティを null もしくは値にする）
 const locationInputSchema = z.union([
   z.object({ id: z.number() }),
   z.object({
@@ -44,7 +41,6 @@ const locationInputSchema = z.union([
   }),
 ]).optional().nullable();
 
-// POST用スキーマ
 const createHaikuMonumentSchema = z.object({
   text: z.string().min(1, 'Text is required'),
   established_date: z.string().optional().nullable(),
@@ -63,7 +59,6 @@ const createHaikuMonumentSchema = z.object({
   location: data.location ?? null,
 }));
 
-// PUT用スキーマ（更新は部分的な入力となるので、全体をPartialにする）
 const updateHaikuMonumentSchema = z.object({
   text: z.string().min(1, 'Text is required'),
   established_date: z.string().optional().nullable(),
@@ -82,12 +77,10 @@ const updateHaikuMonumentSchema = z.object({
   location: data.location ?? null,
 }));
 
-// パスパラメータ用スキーマ：idを文字列から数値へ変換
 const idParamSchema = z.object({
   id: z.string().regex(/^\d+$/, 'Invalid ID').transform(Number),
 });
 
-// ユースケース取得（DI）
 const getUseCases = (env: Env) => {
   const monumentRepo = new HaikuMonumentRepository(env.DB);
   return new HaikuMonumentUseCases(monumentRepo);
