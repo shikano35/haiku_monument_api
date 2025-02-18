@@ -7,10 +7,7 @@ import authorsRoutes from './interfaces/routes/authorsRoutes';
 import sourcesRoutes from './interfaces/routes/sourcesRoutes';
 import haikuMonumentRoutes from './interfaces/routes/haikuMonumentRoutes';
 import usersRoutes from './interfaces/routes/usersRoutes';
-
-type Env = {
-  DB: D1Database;
-};
+import type { Env } from './types/env';
 
 const app = new Hono<{ Bindings: Env }>();
 
