@@ -18,4 +18,4 @@ export interface HaikuMonument {
   updatedAt: string | null;
 }
 
-export type CreateHaikuMonumentInput = Omit<Source, 'id' | 'createdAt' | 'updatedAt'>;
+export type CreateHaikuMonumentInput = Omit<HaikuMonument, 'id' | 'createdAt' | 'updatedAt'>;
