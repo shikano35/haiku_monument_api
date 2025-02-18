@@ -1,5 +1,5 @@
 import type { QueryParams } from '../common/QueryParams';
-import type { Source } from '../entities/Source';
+import type { CreateSourceInput, Source } from '../entities/Source';
 import type { ISourceRepository } from '../repositories/ISourceRepository';
 
 export class SourceUseCases {
@@ -13,7 +13,7 @@ export class SourceUseCases {
     return this.sourceRepo.getById(id);
   }
 
-  async createSource(sourceData: Source): Promise<Source> {
+  async createSource(sourceData: CreateSourceInput): Promise<Source> {
     return this.sourceRepo.create(sourceData);
   }
 

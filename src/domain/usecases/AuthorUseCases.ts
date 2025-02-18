@@ -1,4 +1,4 @@
-import type { Author } from '../entities/Author';
+import type { Author, CreateAuthorInput } from '../entities/Author';
 import type { IAuthorRepository } from '../repositories/IAuthorRepository';
 import type { QueryParams } from '../common/QueryParams';
 
@@ -13,7 +13,7 @@ export class AuthorUseCases {
     return this.authorRepo.getById(id);
   }
 
-  async createAuthor(authorData: Author): Promise<Author> {
+  async createAuthor(authorData: CreateAuthorInput): Promise<Author> {
     return this.authorRepo.create(authorData);
   }
 

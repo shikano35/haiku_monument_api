@@ -1,5 +1,5 @@
 import type { QueryParams } from '../common/QueryParams';
-import type { HaikuMonument } from '../entities/HaikuMonument';
+import type { CreateHaikuMonumentInput, HaikuMonument, UpdateHaikuMonumentInput } from '../entities/HaikuMonument';
 import type { IHaikuMonumentRepository } from '../repositories/IHaikuMonumentRepository';
 
 export class HaikuMonumentUseCases {
@@ -13,11 +13,11 @@ export class HaikuMonumentUseCases {
     return this.monumentRepo.getById(id);
   }
 
-  async createHaikuMonument(monumentData: HaikuMonument): Promise<HaikuMonument> {
+  async createHaikuMonument(monumentData: CreateHaikuMonumentInput): Promise<HaikuMonument> {
     return this.monumentRepo.create(monumentData);
   }
 
-  async updateHaikuMonument(id: number, monumentData: Partial<HaikuMonument>): Promise<HaikuMonument | null> {
+  async updateHaikuMonument(id: number, monumentData: UpdateHaikuMonumentInput): Promise<HaikuMonument | null> {
     return this.monumentRepo.update(id, monumentData);
   }
 

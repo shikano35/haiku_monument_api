@@ -1,6 +1,6 @@
 // src/infrastructure/repositories/SourceRepository.ts
 import type { ISourceRepository } from '../../domain/repositories/ISourceRepository';
-import type { Source } from '../../domain/entities/Source';
+import type { CreateSourceInput, Source } from '../../domain/entities/Source';
 import { getDB } from '../db/db';
 import { sources } from '../db/schema';
 import {
@@ -115,7 +115,7 @@ export class SourceRepository implements ISourceRepository {
     return result.length > 0 ? result[0] : null;
   }
 
-  async create(sourceData: Source): Promise<Source> {
+  async create(sourceData: CreateSourceInput): Promise<Source> {
     const [inserted] = await this.db.insert(sources).values(sourceData).returning();
     return inserted;
   }

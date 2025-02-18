@@ -1,6 +1,5 @@
-// ユーザーのエンティティ定義
 export interface User {
-  id?: number;
+  id: number;
   username: string;
   email: string;
   hashedPassword: string;
@@ -11,3 +10,5 @@ export interface User {
   lastLoginAt?: string | null;
   status?: string;
 }
+
+export type CreateUserInput = Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'lastLoginAt' | 'status'>;

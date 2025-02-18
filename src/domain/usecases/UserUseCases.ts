@@ -1,4 +1,4 @@
-import type { User } from '../entities/User';
+import type { CreateUserInput, User } from '../entities/User';
 import type { IUserRepository } from '../repositories/IUserRepository';
 
 export class UserUseCases {
@@ -12,7 +12,7 @@ export class UserUseCases {
     return this.userRepo.getById(id);
   }
 
-  async createUser(userData: User): Promise<User> {
+  async createUser(userData: CreateUserInput): Promise<User> {
     return this.userRepo.create(userData);
   }
 

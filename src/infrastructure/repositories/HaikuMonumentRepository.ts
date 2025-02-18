@@ -1,5 +1,5 @@
 import type { IHaikuMonumentRepository } from '../../domain/repositories/IHaikuMonumentRepository';
-import type { HaikuMonument } from '../../domain/entities/HaikuMonument';
+import type { CreateHaikuMonumentInput, HaikuMonument, UpdateHaikuMonumentInput } from '../../domain/entities/HaikuMonument';
 import { getDB } from '../db/db';
 import { haikuMonument, authors, sources, locations } from '../db/schema';
 import {
@@ -178,79 +178,169 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
     return result.length > 0 ? result[0] : null;
   }
 
-  async create(monumentData: HaikuMonument): Promise<HaikuMonument> {
-    let authorId: number | null = monumentData.authorId;
+  async create(monumentData: CreateHaikuMonumentInput): Promise<HaikuMonument> {
+    let authorId: number | null = null;
     if (monumentData.author) {
-      const [insertedAuthor] = await this.db
-        .insert(authors)
-        .values({
-          name: monumentData.author.name,
-          biography: monumentData.author.biography,
-          links: monumentData.author.links,
-          imageUrl: monumentData.author.imageUrl,
-        })
-        .returning();
-      authorId = insertedAuthor.id;
+      if ('id' in monumentData.author) {
+        authorId = monumentData.author.id;
+      } else {
+        const [insertedAuthor] = await this.db
+          .insert(authors)
+          .values({
+            name: monumentData.author.name,
+            biography: monumentData.author.biography,
+            links: monumentData.author.links,
+            imageUrl: monumentData.author.imageUrl,
+          })
+          .returning();
+        authorId = insertedAuthor.id;
+      }
     }
 
-    let sourceId: number | null = monumentData.sourceId;
+    let sourceId: number | null = null;
     if (monumentData.source) {
-      const [insertedSource] = await this.db
-        .insert(sources)
-        .values({
-          title: monumentData.source.title,
-          author: monumentData.source.author,
-          year: monumentData.source.year,
-          url: monumentData.source.url,
-          publisher: monumentData.source.publisher,
-        })
-        .returning();
-      sourceId = insertedSource.id;
+      if ('id' in monumentData.source) {
+        sourceId = monumentData.source.id;
+      } else {
+        const [insertedSource] = await this.db
+          .insert(sources)
+          .values({
+            title: monumentData.source.title,
+            author: monumentData.source.author,
+            year: monumentData.source.year,
+            url: monumentData.source.url,
+            publisher: monumentData.source.publisher,
+          })
+          .returning();
+        sourceId = insertedSource.id;
+      }
     }
 
-    let locationId: number | null = monumentData.locationId;
+    let locationId: number | null = null;
     if (monumentData.location) {
-      const [insertedLocation] = await this.db
-        .insert(locations)
-        .values({
-          prefecture: monumentData.location.prefecture,
-          region: monumentData.location.region,
-          address: monumentData.location.address,
-          latitude: monumentData.location.latitude,
-          longitude: monumentData.location.longitude,
-          name: monumentData.location.name,
-        })
-        .returning();
-      locationId = insertedLocation.id;
+      if ('id' in monumentData.location) {
+        locationId = monumentData.location.id;
+      } else {
+        const [insertedLocation] = await this.db
+          .insert(locations)
+          .values({
+            prefecture: monumentData.location.prefecture,
+            region: monumentData.location.region,
+            address: monumentData.location.address,
+            latitude: monumentData.location.latitude,
+            longitude: monumentData.location.longitude,
+            name: monumentData.location.name,
+          })
+          .returning();
+        locationId = insertedLocation.id;
+      }
     }
 
     const monumentToInsert = {
       text: monumentData.text,
-      authorId: authorId,
-      sourceId: sourceId,
       establishedDate: monumentData.establishedDate,
-      locationId: locationId,
       commentary: monumentData.commentary,
       imageUrl: monumentData.imageUrl,
+      authorId,
+      sourceId,
+      locationId,
     };
 
     const [insertedMonument] = await this.db
       .insert(haikuMonument)
       .values(monumentToInsert)
       .returning();
-
     return insertedMonument;
   }
 
-  async update(
-    id: number,
-    monumentData: Partial<HaikuMonument>
-  ): Promise<HaikuMonument | null> {
+  async update(id: number, monumentData: UpdateHaikuMonumentInput): Promise<HaikuMonument | null> {
     const exists = await this.getById(id);
     if (!exists) return null;
+
+    let authorId: number | null = exists.authorId;
+    if (monumentData.author !== undefined) {
+      if (monumentData.author) {
+        if ('id' in monumentData.author) {
+          authorId = monumentData.author.id;
+        } else {
+          const [insertedAuthor] = await this.db
+            .insert(authors)
+            .values({
+              name: monumentData.author.name,
+              biography: monumentData.author.biography,
+              links: monumentData.author.links,
+              imageUrl: monumentData.author.imageUrl,
+            })
+            .returning();
+          authorId = insertedAuthor.id;
+        }
+      } else {
+        authorId = null;
+      }
+    }
+
+    let sourceId: number | null = exists.sourceId;
+    if (monumentData.source !== undefined) {
+      if (monumentData.source) {
+        if ('id' in monumentData.source) {
+          sourceId = monumentData.source.id;
+        } else {
+          const [insertedSource] = await this.db
+            .insert(sources)
+            .values({
+              title: monumentData.source.title,
+              author: monumentData.source.author,
+              year: monumentData.source.year,
+              url: monumentData.source.url,
+              publisher: monumentData.source.publisher,
+            })
+            .returning();
+          sourceId = insertedSource.id;
+        }
+      } else {
+        sourceId = null;
+      }
+    }
+
+    let locationId: number | null = exists.locationId;
+    if (monumentData.location !== undefined) {
+      if (monumentData.location) {
+        if ('id' in monumentData.location) {
+          locationId = monumentData.location.id;
+        } else {
+          const [insertedLocation] = await this.db
+            .insert(locations)
+            .values({
+              prefecture: monumentData.location.prefecture,
+              region: monumentData.location.region,
+              address: monumentData.location.address,
+              latitude: monumentData.location.latitude,
+              longitude: monumentData.location.longitude,
+              name: monumentData.location.name,
+            })
+            .returning();
+          locationId = insertedLocation.id;
+        }
+      } else {
+        locationId = null;
+      }
+    }
+
+    const monumentToUpdate = {
+      text: monumentData.text ?? exists.text,
+      establishedDate:
+        monumentData.establishedDate !== undefined ? monumentData.establishedDate : exists.establishedDate,
+      commentary:
+        monumentData.commentary !== undefined ? monumentData.commentary : exists.commentary,
+      imageUrl: monumentData.imageUrl !== undefined ? monumentData.imageUrl : exists.imageUrl,
+      authorId,
+      sourceId,
+      locationId,
+    };
+
     const [updated] = await this.db
       .update(haikuMonument)
-      .set(monumentData)
+      .set(monumentToUpdate)
       .where(eq(haikuMonument.id, id))
       .returning();
     return updated;

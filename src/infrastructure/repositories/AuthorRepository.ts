@@ -1,5 +1,5 @@
 import type { IAuthorRepository } from '../../domain/repositories/IAuthorRepository';
-import type { Author } from '../../domain/entities/Author';
+import type { Author, CreateAuthorInput } from '../../domain/entities/Author';
 import { getDB } from '../db/db';
 import { authors } from '../db/schema';
 import { eq, like, gt, lt, or, asc, desc } from 'drizzle-orm/expressions';
@@ -103,7 +103,7 @@ export class AuthorRepository implements IAuthorRepository {
     return result.length > 0 ? result[0] : null;
   }
 
-  async create(authorData: Author): Promise<Author> {
+  async create(authorData: CreateAuthorInput): Promise<Author> {
     const [inserted] = await this.db
       .insert(authors)
       .values(authorData)
