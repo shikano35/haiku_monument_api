@@ -13,7 +13,7 @@ const createLocationSchema = z.object({
   address: z.string().min(1, 'Address is required').max(255, 'Address is too long'),
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
-  name: z.string().min(1, 'Name is required').max(255, 'Name is too long'),
+  name: z.string().max(255, 'Name is too long').nullable().optional().default(null),
   prefecture: z.string().default(''),
   region: z.string().nullable().default(null),
 });
@@ -22,7 +22,8 @@ const updateLocationSchema = z.object({
   address: z.string().nonempty().optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
-  name: z.string().nonempty().optional(),
+  name: z.string().max(255, 'Name is too long').nullable().optional()
+    .transform((val) => (val === "" ? null : val)),
   prefecture: z.string().optional(),
   region: z.string().nullable().optional(),
 });
@@ -68,9 +69,9 @@ router.get('/:id', async (c) => {
 
 router.post(
   '/',
-  zValidator('form', createLocationSchema),
+  zValidator('json', createLocationSchema),
   async (c) => {
-    const payload = c.req.valid('form');
+    const payload = c.req.valid('json');
     const { locationUseCases } = getUseCases(c.env);
     const created = await locationUseCases.createLocation(payload);
     return c.json(created, 201);
@@ -79,14 +80,14 @@ router.post(
 
 router.put(
   '/:id',
-  zValidator('form', updateLocationSchema),
+  zValidator('json', updateLocationSchema),
   async (c) => {
     const parseResult = idParamSchema.safeParse({ id: c.req.param('id') });
     if (!parseResult.success) {
       return c.json({ error: parseResult.error.errors[0].message }, 400);
     }
     const { id } = parseResult.data;
-    const payload = c.req.valid('form');
+    const payload = c.req.valid('json');
     const { locationUseCases } = getUseCases(c.env);
     const updated = await locationUseCases.updateLocation(id, payload);
     if (!updated) {
