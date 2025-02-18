@@ -1,6 +1,13 @@
 import type { Author } from './Author';
 import type { Source } from './Source';
 import type { Location } from './Location';
+import type { CreateAuthorInput } from './Author';
+import type { CreateSourceInput } from './Source';
+import type { CreateLocationInput } from './Location';
+
+export type HaikuMonumentAuthorInput = { id: number } | CreateAuthorInput;
+export type HaikuMonumentSourceInput = { id: number } | CreateSourceInput;
+export type HaikuMonumentLocationInput = { id: number } | CreateLocationInput;
 
 export interface HaikuMonument {
   id: number;
@@ -18,4 +25,15 @@ export interface HaikuMonument {
   updatedAt: string | null;
 }
 
-export type CreateHaikuMonumentInput = Omit<HaikuMonument, 'id' | 'createdAt' | 'updatedAt'>;
+export interface HaikuMonumentInput {
+  text: string;
+  establishedDate: string | null;
+  commentary: string | null;
+  imageUrl?: string | null;
+  author?: HaikuMonumentAuthorInput | null;
+  source?: HaikuMonumentSourceInput | null;
+  location?: HaikuMonumentLocationInput | null;
+}
+
+export type CreateHaikuMonumentInput = HaikuMonumentInput;
+export type UpdateHaikuMonumentInput = Partial<HaikuMonumentInput>;
