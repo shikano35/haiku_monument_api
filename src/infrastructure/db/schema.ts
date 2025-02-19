@@ -1,4 +1,4 @@
-import { sqliteTable, integer, text, real, primaryKey } from "drizzle-orm/sqlite-core";
+import { sqliteTable, integer, text, real } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
 // Authors テーブル
@@ -51,26 +51,6 @@ export const haikuMonument = sqliteTable("haiku_monument", {
   createdAt: text("created_at").default(sql`(DATETIME('now','localtime'))`),
   updatedAt: text("updated_at").default(sql`(DATETIME('now','localtime'))`),
 });
-
-// Tags テーブル
-export const tags = sqliteTable("tags", {
-  id: integer("id").primaryKey(),
-  name: text("name").notNull(),
-  description: text("description"),
-});
-
-// Haiku Monument Tag テーブル（複合主キーかつ外部キー制約）
-export const haikuMonumentTag = sqliteTable("haiku_monument_tag", {
-  haikuMonumentId: integer("haiku_monument_id")
-    .notNull()
-    .references(() => haikuMonument.id, { onDelete: "cascade" }),
-  tagId: integer("tag_id")
-    .notNull()
-    .references(() => tags.id, { onDelete: "cascade" }),
-}, (table) => [
-  primaryKey({ columns: [table.haikuMonumentId, table.tagId] })
-]);
-
 
 // Users テーブル
 export const users = sqliteTable("users", {

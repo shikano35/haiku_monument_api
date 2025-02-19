@@ -627,12 +627,6 @@ components:
           type: number
         name:
           type: string
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
       required:
         - id
         - prefecture
