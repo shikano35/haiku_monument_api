@@ -1,57 +1,57 @@
-import type { IAuthorRepository } from '../../domain/repositories/IAuthorRepository';
-import type { Author, CreateAuthorInput } from '../../domain/entities/Author';
+import type { IPoetRepository } from '../../domain/repositories/IPoetRepository';
+import type { Poet, CreatePoetInput } from '../../domain/entities/Poet';
 import { getDB } from '../db/db';
-import { authors } from '../db/schema';
+import { poets } from '../db/schema';
 import { eq, like, gt, lt, or, asc, desc } from 'drizzle-orm/expressions';
 import type { D1Database } from '@cloudflare/workers-types';
 import type { QueryParams } from '../../domain/common/QueryParams';
 
-export class AuthorRepository implements IAuthorRepository {
+export class PoetRepository implements IPoetRepository {
   constructor(private readonly dbBinding: D1Database) {}
 
   private get db() {
     return getDB(this.dbBinding);
   }
 
-  async getAll(queryParams?: QueryParams): Promise<Author[]> {
-    let query = this.db.select().from(authors);
+  async getAll(queryParams?: QueryParams): Promise<Poet[]> {
+    let query = this.db.select().from(poets);
 
     if (queryParams) {
       if (queryParams.name_contains) {
         query = query.where(
-          like(authors.name, `%${queryParams.name_contains}%`)
+          like(poets.name, `%${queryParams.name_contains}%`)
         ) as typeof query;
       }
       if (queryParams.biography_contains) {
         query = query.where(
-          like(authors.biography, `%${queryParams.biography_contains}%`)
+          like(poets.biography, `%${queryParams.biography_contains}%`)
         ) as typeof query;
       }
       if (queryParams.created_at_gt) {
         query = query.where(
-          gt(authors.createdAt, queryParams.created_at_gt)
+          gt(poets.createdAt, queryParams.created_at_gt)
         ) as typeof query;
       }
       if (queryParams.created_at_lt) {
         query = query.where(
-          lt(authors.createdAt, queryParams.created_at_lt)
+          lt(poets.createdAt, queryParams.created_at_lt)
         ) as typeof query;
       }
       if (queryParams.updated_at_gt) {
         query = query.where(
-          gt(authors.updatedAt, queryParams.updated_at_gt)
+          gt(poets.updatedAt, queryParams.updated_at_gt)
         ) as typeof query;
       }
       if (queryParams.updated_at_lt) {
         query = query.where(
-          lt(authors.updatedAt, queryParams.updated_at_lt)
+          lt(poets.updatedAt, queryParams.updated_at_lt)
         ) as typeof query;
       }
       if (queryParams.search) {
         query = query.where(
           or(
-            like(authors.name, `%${queryParams.search}%`),
-            like(authors.biography, `%${queryParams.search}%`)
+            like(poets.name, `%${queryParams.search}%`),
+            like(poets.biography, `%${queryParams.search}%`)
           )
         ) as typeof query;
       }
@@ -63,20 +63,20 @@ export class AuthorRepository implements IAuthorRepository {
           if (columnName === 'name') {
             query = query.orderBy(
               direction === 'asc'
-                ? asc(authors.name)
-                : desc(authors.name)
+                ? asc(poets.name)
+                : desc(poets.name)
             ) as typeof query;
           } else if (columnName === 'created_at') {
             query = query.orderBy(
               direction === 'asc'
-                ? asc(authors.createdAt)
-                : desc(authors.createdAt)
+                ? asc(poets.createdAt)
+                : desc(poets.createdAt)
             ) as typeof query;
           } else if (columnName === 'updated_at') {
             query = query.orderBy(
               direction === 'asc'
-                ? asc(authors.updatedAt)
-                : desc(authors.updatedAt)
+                ? asc(poets.updatedAt)
+                : desc(poets.updatedAt)
             ) as typeof query;
           }
         }
@@ -93,56 +93,56 @@ export class AuthorRepository implements IAuthorRepository {
     return await query.all();
   }
 
-  async getById(id: number): Promise<Author | null> {
+  async getById(id: number): Promise<Poet | null> {
     const result = await this.db
       .select()
-      .from(authors)
-      .where(eq(authors.id, id))
+      .from(poets)
+      .where(eq(poets.id, id))
       .limit(1)
       .all();
     return result.length > 0 ? result[0] : null;
   }
 
-  async create(authorData: CreateAuthorInput): Promise<Author> {
+  async create(poetData: CreatePoetInput): Promise<Poet> {
     const [inserted] = await this.db
-      .insert(authors)
-      .values(authorData)
+      .insert(poets)
+      .values(poetData)
       .returning({
-        id: authors.id,
-        name: authors.name,
-        biography: authors.biography,
-        links: authors.links,
-        imageUrl: authors.imageUrl,
-        createdAt: authors.createdAt,
-        updatedAt: authors.updatedAt,
+        id: poets.id,
+        name: poets.name,
+        biography: poets.biography,
+        links: poets.links,
+        imageUrl: poets.imageUrl,
+        createdAt: poets.createdAt,
+        updatedAt: poets.updatedAt,
       });
     return inserted;
   }
 
-  async update(id: number, authorData: Partial<Author>): Promise<Author | null> {
+  async update(id: number, poetData: Partial<Poet>): Promise<Poet | null> {
     const exists = await this.getById(id);
     if (!exists) return null;
     const [updated] = await this.db
-      .update(authors)
-      .set(authorData)
-      .where(eq(authors.id, id))
+      .update(poets)
+      .set(poetData)
+      .where(eq(poets.id, id))
       .returning({
-        id: authors.id,
-        name: authors.name,
-        biography: authors.biography,
-        links: authors.links,
-        imageUrl: authors.imageUrl,
-        createdAt: authors.createdAt,
-        updatedAt: authors.updatedAt,
+        id: poets.id,
+        name: poets.name,
+        biography: poets.biography,
+        links: poets.links,
+        imageUrl: poets.imageUrl,
+        createdAt: poets.createdAt,
+        updatedAt: poets.updatedAt,
       });
     return updated;
   }
 
   async delete(id: number): Promise<boolean> {
     const results = await this.db
-      .delete(authors)
-      .where(eq(authors.id, id))
-      .returning({ id: authors.id });
+      .delete(poets)
+      .where(eq(poets.id, id))
+      .returning({ id: poets.id });
     return results.length > 0;
   }
 }
