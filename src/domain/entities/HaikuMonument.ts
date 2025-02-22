@@ -1,19 +1,19 @@
-import type { Author } from './Author';
+import type { Poet } from './Poet';
 import type { Source } from './Source';
 import type { Location } from './Location';
-import type { CreateAuthorInput } from './Author';
+import type { CreatePoetInput } from './Poet';
 import type { CreateSourceInput } from './Source';
 import type { CreateLocationInput } from './Location';
 
-export type HaikuMonumentAuthorInput = { id: number } | CreateAuthorInput;
+export type HaikuMonumentPoetInput = { id: number } | CreatePoetInput;
 export type HaikuMonumentSourceInput = { id: number } | CreateSourceInput;
 export type HaikuMonumentLocationInput = { id: number } | CreateLocationInput;
 
 export interface HaikuMonument {
   id: number;
   text: string;
-  authorId: number | null;
-  author?: Author | null;
+  poetId: number | null;
+  poet?: Poet | null;
   sourceId: number | null;
   source?: Source | null;
   establishedDate: string | null;
@@ -30,7 +30,7 @@ export interface HaikuMonumentInput {
   establishedDate: string | null;
   commentary: string | null;
   imageUrl?: string | null;
-  author?: HaikuMonumentAuthorInput | null;
+  poet?: HaikuMonumentPoetInput | null;
   source?: HaikuMonumentSourceInput | null;
   location?: HaikuMonumentLocationInput | null;
 }

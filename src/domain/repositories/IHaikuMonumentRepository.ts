@@ -7,7 +7,7 @@ export interface IHaikuMonumentRepository {
   create(monument: CreateHaikuMonumentInput): Promise<HaikuMonument>;
   update(id: number, monumentData: UpdateHaikuMonumentInput): Promise<HaikuMonument | null>;
   delete(id: number): Promise<boolean>;
-  getByAuthorId(authorId: number): Promise<HaikuMonument[]>;
+  getByPoetId(poetId: number): Promise<HaikuMonument[]>;
   getByLocationId(locationId: number): Promise<HaikuMonument[]>;
   getBySourceId(sourceId: number): Promise<HaikuMonument[]>;
 }
