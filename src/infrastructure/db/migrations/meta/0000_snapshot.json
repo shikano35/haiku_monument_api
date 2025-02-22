@@ -1,72 +1,11 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "525c26d9-314f-4f33-a2fc-b79002f6c6e0",
+  "id": "f5c23124-164d-4307-b5e9-50ae39c35a4c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "authors": {
-      "name": "authors",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "biography": {
-          "name": "biography",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "links": {
-          "name": "links",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "image_url": {
-          "name": "image_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "haiku_monument": {
-      "name": "haiku_monument",
+    "haiku_monuments": {
+      "name": "haiku_monuments",
       "columns": {
         "id": {
           "name": "id",
@@ -82,8 +21,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "author_id": {
-          "name": "author_id",
+        "poet_id": {
+          "name": "poet_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
@@ -143,22 +82,22 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "haiku_monument_author_id_authors_id_fk": {
-          "name": "haiku_monument_author_id_authors_id_fk",
-          "tableFrom": "haiku_monument",
-          "tableTo": "authors",
+        "haiku_monuments_poet_id_poets_id_fk": {
+          "name": "haiku_monuments_poet_id_poets_id_fk",
+          "tableFrom": "haiku_monuments",
+          "tableTo": "poets",
           "columnsFrom": [
-            "author_id"
+            "poet_id"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "no action"
         },
-        "haiku_monument_source_id_sources_id_fk": {
-          "name": "haiku_monument_source_id_sources_id_fk",
-          "tableFrom": "haiku_monument",
+        "haiku_monuments_source_id_sources_id_fk": {
+          "name": "haiku_monuments_source_id_sources_id_fk",
+          "tableFrom": "haiku_monuments",
           "tableTo": "sources",
           "columnsFrom": [
             "source_id"
@@ -166,12 +105,12 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "set null",
+          "onDelete": "restrict",
           "onUpdate": "no action"
         },
-        "haiku_monument_location_id_locations_id_fk": {
-          "name": "haiku_monument_location_id_locations_id_fk",
-          "tableFrom": "haiku_monument",
+        "haiku_monuments_location_id_locations_id_fk": {
+          "name": "haiku_monuments_location_id_locations_id_fk",
+          "tableFrom": "haiku_monuments",
           "tableTo": "locations",
           "columnsFrom": [
             "location_id"
@@ -179,70 +118,11 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "set null",
+          "onDelete": "restrict",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "haiku_monument_tag": {
-      "name": "haiku_monument_tag",
-      "columns": {
-        "haiku_monument_id": {
-          "name": "haiku_monument_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "tag_id": {
-          "name": "tag_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "haiku_monument_tag_haiku_monument_id_haiku_monument_id_fk": {
-          "name": "haiku_monument_tag_haiku_monument_id_haiku_monument_id_fk",
-          "tableFrom": "haiku_monument_tag",
-          "tableTo": "haiku_monument",
-          "columnsFrom": [
-            "haiku_monument_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "haiku_monument_tag_tag_id_tags_id_fk": {
-          "name": "haiku_monument_tag_tag_id_tags_id_fk",
-          "tableFrom": "haiku_monument_tag",
-          "tableTo": "tags",
-          "columnsFrom": [
-            "tag_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "haiku_monument_tag_haiku_monument_id_tag_id_pk": {
-          "columns": [
-            "haiku_monument_id",
-            "tag_id"
-          ],
-          "name": "haiku_monument_tag_haiku_monument_id_tag_id_pk"
-        }
-      },
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
@@ -305,6 +185,67 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
+    "poets": {
+      "name": "poets",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "biography": {
+          "name": "biography",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "links": {
+          "name": "links",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "image_url": {
+          "name": "image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "(DATETIME('now','localtime'))"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "(DATETIME('now','localtime'))"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
     "sources": {
       "name": "sources",
       "columns": {
@@ -356,7 +297,7 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP"
+          "default": "(DATETIME('now','localtime'))"
         },
         "updated_at": {
           "name": "updated_at",
@@ -364,38 +305,7 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "tags": {
-      "name": "tags",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "default": "(DATETIME('now','localtime'))"
         }
       },
       "indexes": {},
@@ -456,7 +366,7 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP"
+          "default": "(DATETIME('now','localtime'))"
         },
         "updated_at": {
           "name": "updated_at",
@@ -464,7 +374,7 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP"
+          "default": "(DATETIME('now','localtime'))"
         },
         "last_login_at": {
           "name": "last_login_at",
@@ -482,7 +392,22 @@
           "default": "'active'"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "users_username_unique": {
+          "name": "users_username_unique",
+          "columns": [
+            "username"
+          ],
+          "isUnique": true
+        },
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "columns": [
+            "email"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},

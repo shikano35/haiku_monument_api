@@ -2,10 +2,9 @@ import { corsMiddleware } from './interfaces/middlewares/corsMiddleware';
 import { errorHandler } from './interfaces/middlewares/errorHandler';
 import { requestLogger } from './interfaces/middlewares/requestLogger';
 import locationsRoutes from './interfaces/routes/locationsRoutes';
-import authorsRoutes from './interfaces/routes/authorsRoutes';
+import poetsRoutes from './interfaces/routes/poetsRoutes';
 import sourcesRoutes from './interfaces/routes/sourcesRoutes';
 import haikuMonumentRoutes from './interfaces/routes/haikuMonumentRoutes';
-import usersRoutes from './interfaces/routes/usersRoutes';
 import type { Env } from './types/env';
 import { swaggerUI } from '@hono/swagger-ui';
 import { OpenAPIHono } from '@hono/zod-openapi';
@@ -17,17 +16,21 @@ const openApiSpec = {
     version: "1.0.0",
     description: `このAPIは句碑の情報を提供します。
 
-APIの詳細については、[句碑APIドキュメント](https://example.com)をご参照ください。`,
+APIの概要については、[句碑APIドキュメント](https://developers.kuhiapi.com)をご参照ください。`,
   },
   servers: [
     {
+      url: "https://api.kuhiapi.com",
+      description: "Production server",
+    },
+    {
       url: "http://localhost:8787",
       description: "Local server",
-    }
+    },
   ],
   tags: [
     { name: "haiku-monuments", description: "句碑に関するAPI" },
-    { name: "authors", description: "俳人に関するAPI" },
+    { name: "poets", description: "俳人に関するAPI" },
     { name: "locations", description: "句碑の設置場所に関するAPI" },
     { name: "sources", description: "句碑の出典に関するAPI" },
   ],
@@ -41,10 +44,10 @@ app.use('*', requestLogger);
 app.use('*', errorHandler);
 
 app.route('/locations', locationsRoutes);
-app.route('/authors', authorsRoutes);
+app.route('/poets', poetsRoutes);
 app.route('/sources', sourcesRoutes);
 app.route('/haiku-monuments', haikuMonumentRoutes);
-app.route('/users', usersRoutes);
+// app.route('/users', usersRoutes);
 
 app.doc('/docs/json', openApiSpec);
 app.get('/docs', swaggerUI({ url: '/docs/json' }));

@@ -6,7 +6,7 @@ import { HaikuMonumentRepository } from '../../infrastructure/repositories/Haiku
 import { convertKeysToCamelCase } from '../../utils/convertKeysToCamelCase';
 import { parseQueryParams } from '../../utils/parseQueryParams';
 
-export interface AuthorResponse {
+export interface PoetResponse {
   id: number;
   name: string;
   biography: string | null;
@@ -45,10 +45,10 @@ export interface HaikuMonumentResponseType {
   image_url: string | null;
   created_at: string;
   updated_at: string;
-  author_id: number | null;
+  poet_id: number | null;
   source_id: number | null;
   location_id: number | null;
-  authors: AuthorResponse[];
+  poets: PoetResponse[];
   sources: SourceResponse[];
   locations: LocationResponse[];
 }
@@ -61,7 +61,7 @@ const idParamSchema = z
     param: { name: 'id', in: 'path' },
   });
 
-const haikuMonumentQuerySchema = z.object({
+const haikuMonumentsQuerySchema = z.object({
   limit: z.coerce.number().optional().openapi({
     param: { name: 'limit', description: '取得する件数', in: 'query', required: false },
     type: 'integer',
@@ -77,7 +77,7 @@ const haikuMonumentQuerySchema = z.object({
         z.enum([
           '-text',
           '-established_date',
-          '-author',
+          '-poet',
           '-source',
           '-prefecture',
           '-region',
@@ -85,7 +85,7 @@ const haikuMonumentQuerySchema = z.object({
           '-updated_at',
           'text',
           'established_date',
-          'author',
+          'poet',
           'source',
           'prefecture',
           'region',
@@ -103,8 +103,8 @@ const haikuMonumentQuerySchema = z.object({
 * \`-text\` - 俳句の降順
 * \`established_date\` - 建立日の昇順
 * \`-established_date\` - 建立日の降順
-* \`author\` - 著者の昇順
-* \`-author\` - 著者の降順
+* \`poet\` - 著者の昇順
+* \`-poet\` - 著者の降順
 * \`source\` - 出典の昇順
 * \`-source\` - 出典の降順
 * \`prefecture\` - 都道府県の昇順
@@ -178,9 +178,9 @@ const haikuMonumentQuerySchema = z.object({
   }),
 });
 
-const authorInputSchema = z
+const poetInputSchema = z
   .object({
-    name: z.string().min(1, 'Author name is required').max(255, 'Author name too long'),
+    name: z.string().min(1, 'Poet name is required').max(255, 'Poet name too long'),
     biography: z.string().optional().nullable(),
     links: z.string().optional().nullable(),
     image_url: z.string().optional().nullable(),
@@ -216,7 +216,7 @@ const createHaikuMonumentSchema = z.object({
   established_date: z.string().optional().nullable(),
   commentary: z.string().optional().nullable(),
   image_url: z.string().optional().nullable(),
-  authors: z.array(authorInputSchema).optional().nullable(),
+  poets: z.array(poetInputSchema).optional().nullable(),
   sources: z.array(sourceInputSchema).optional().nullable(),
   locations: z.array(locationInputSchema).optional().nullable(),
 }).transform(data => ({
@@ -224,7 +224,7 @@ const createHaikuMonumentSchema = z.object({
   establishedDate: data.established_date ?? null,
   commentary: data.commentary ?? null,
   imageUrl: data.image_url ?? null,
-  author: data.authors && data.authors.length > 0 ? data.authors[0] : null,
+  poet: data.poets && data.poets.length > 0 ? data.poets[0] : null,
   source: data.sources && data.sources.length > 0 ? data.sources[0] : null,
   location: data.locations && data.locations.length > 0 ? data.locations[0] : null,
 }));
@@ -234,7 +234,7 @@ const updateHaikuMonumentSchema = z.object({
   established_date: z.string().optional().nullable(),
   commentary: z.string().optional().nullable(),
   image_url: z.string().optional().nullable(),
-  authors: z.array(authorInputSchema).optional().nullable(),
+  poets: z.array(poetInputSchema).optional().nullable(),
   sources: z.array(sourceInputSchema).optional().nullable(),
   locations: z.array(locationInputSchema).optional().nullable(),
 }).transform(data => ({
@@ -242,7 +242,7 @@ const updateHaikuMonumentSchema = z.object({
   establishedDate: data.established_date ?? null,
   commentary: data.commentary ?? null,
   imageUrl: data.image_url ?? null,
-  author: data.authors && data.authors.length > 0 ? data.authors[0] : null,
+  poet: data.poets && data.poets.length > 0 ? data.poets[0] : null,
   source: data.sources && data.sources.length > 0 ? data.sources[0] : null,
   location: data.locations && data.locations.length > 0 ? data.locations[0] : null,
 }));
@@ -255,10 +255,10 @@ const haikuMonumentResponseSchema = z.object({
   image_url: z.string().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
-  author_id: z.number().nullable(),
+  poet_id: z.number().nullable(),
   source_id: z.number().nullable(),
   location_id: z.number().nullable(),
-  authors: z.array(
+  poets: z.array(
     z.object({
       id: z.number(),
       name: z.string(),
@@ -294,7 +294,7 @@ const haikuMonumentResponseSchema = z.object({
   ),
 });
 
-const convertAuthorToResponse = (author: {
+const convertPoetToResponse = (poet: {
   id: number;
   name: string;
   biography?: string | null;
@@ -302,14 +302,14 @@ const convertAuthorToResponse = (author: {
   imageUrl?: string | null;
   createdAt: string | null;
   updatedAt: string | null;
-}): AuthorResponse => ({
-  id: author.id,
-  name: author.name,
-  biography: author.biography ?? null,
-  links: author.links ?? null,
-  image_url: author.imageUrl ?? null,
-  created_at: author.createdAt ?? '',
-  updated_at: author.updatedAt ?? '',
+}): PoetResponse => ({
+  id: poet.id,
+  name: poet.name,
+  biography: poet.biography ?? null,
+  links: poet.links ?? null,
+  image_url: poet.imageUrl ?? null,
+  created_at: poet.createdAt ?? '',
+  updated_at: poet.updatedAt ?? '',
 });
 
 const convertSourceToResponse = (source: {
@@ -360,10 +360,10 @@ const convertHaikuMonumentToResponse = (
   image_url: monument.imageUrl ?? null,
   created_at: monument.createdAt ?? '',
   updated_at: monument.updatedAt ?? '',
-  author_id: monument.authorId ?? null,
+  poet_id: monument.poetId ?? null,
   source_id: monument.sourceId ?? null,
   location_id: monument.locationId ?? null,
-  authors: monument.author ? [convertAuthorToResponse(monument.author)] : [],
+  poets: monument.poet ? [convertPoetToResponse(monument.poet)] : [],
   sources: monument.source ? [convertSourceToResponse(monument.source)] : [],
   locations: monument.location ? [convertLocationToResponse(monument.location)] : [],
 });
@@ -380,7 +380,7 @@ const getAllHaikuMonumentsRoute = createRoute({
   tags: ['haiku-monuments'],
   path: '/',
   request: {
-    query: haikuMonumentQuerySchema,
+    query: haikuMonumentsQuerySchema,
   },
   responses: {
     200: {
@@ -434,110 +434,110 @@ router.openapi(getHaikuMonumentByIdRoute, async (c) => {
   return c.json({ haiku_monument: convertHaikuMonumentToResponse(monument) });
 });
 
-const createHaikuMonumentRoute = createRoute({
-  method: 'post',
-  tags: ['haiku-monuments'],
-  path: '/',
-  request: {
-    body: {
-      content: {
-        'application/json': { schema: createHaikuMonumentSchema },
-      },
-      required: true,
-      description: '句碑の作成',
-    },
-  },
-  responses: {
-    201: {
-      description: '句碑の作成に成功',
-      content: {
-        'application/json': {
-          schema: z.object({
-            haiku_monument: haikuMonumentResponseSchema,
-          }),
-        },
-      },
-    },
-  },
-});
-router.openapi(createHaikuMonumentRoute, async (c) => {
-  const rawPayload = c.req.valid('json');
-  const payload = convertKeysToCamelCase(rawPayload);
-  const useCases = getUseCases(c.env);
-  const created: HaikuMonument = await useCases.createHaikuMonument(payload);
-  return c.json({ haiku_monument: convertHaikuMonumentToResponse(created) }, 201);
-});
+// const createHaikuMonumentRoute = createRoute({
+//   method: 'post',
+//   tags: ['haiku-monuments'],
+//   path: '/',
+//   request: {
+//     body: {
+//       content: {
+//         'application/json': { schema: createHaikuMonumentSchema },
+//       },
+//       required: true,
+//       description: '句碑の作成',
+//     },
+//   },
+//   responses: {
+//     201: {
+//       description: '句碑の作成に成功',
+//       content: {
+//         'application/json': {
+//           schema: z.object({
+//             haiku_monument: haikuMonumentResponseSchema,
+//           }),
+//         },
+//       },
+//     },
+//   },
+// });
+// router.openapi(createHaikuMonumentRoute, async (c) => {
+//   const rawPayload = c.req.valid('json');
+//   const payload = convertKeysToCamelCase(rawPayload);
+//   const useCases = getUseCases(c.env);
+//   const created: HaikuMonument = await useCases.createHaikuMonument(payload);
+//   return c.json({ haiku_monument: convertHaikuMonumentToResponse(created) }, 201);
+// });
 
-const updateHaikuMonumentRoute = createRoute({
-  method: 'put',
-  tags: ['haiku-monuments'],
-  path: '/{id}',
-  request: {
-    params: idParamSchema,
-    body: {
-      content: {
-        'application/json': { schema: updateHaikuMonumentSchema },
-      },
-      required: true,
-      description: '句碑の更新',
-    },
-  },
-  responses: {
-    200: {
-      description: '句碑の更新に成功',
-      content: {
-        'application/json': {
-          schema: z.object({
-            haiku_monument: haikuMonumentResponseSchema,
-          }),
-        },
-      },
-    },
-    404: { description: 'Haiku Monument not found' },
-  },
-});
-router.openapi(updateHaikuMonumentRoute, async (c) => {
-  const { id } = c.req.valid('param');
-  const rawPayload = c.req.valid('json');
-  const payload = convertKeysToCamelCase(rawPayload);
-  const useCases = getUseCases(c.env);
-  const updated: HaikuMonument | null = await useCases.updateHaikuMonument(id, payload);
-  if (!updated) {
-    return c.json({ error: 'Haiku Monument not found' }, 404);
-  }
-  return c.json({ haiku_monument: convertHaikuMonumentToResponse(updated) });
-});
+// const updateHaikuMonumentRoute = createRoute({
+//   method: 'put',
+//   tags: ['haiku-monuments'],
+//   path: '/{id}',
+//   request: {
+//     params: idParamSchema,
+//     body: {
+//       content: {
+//         'application/json': { schema: updateHaikuMonumentSchema },
+//       },
+//       required: true,
+//       description: '句碑の更新',
+//     },
+//   },
+//   responses: {
+//     200: {
+//       description: '句碑の更新に成功',
+//       content: {
+//         'application/json': {
+//           schema: z.object({
+//             haiku_monument: haikuMonumentResponseSchema,
+//           }),
+//         },
+//       },
+//     },
+//     404: { description: 'Haiku Monument not found' },
+//   },
+// });
+// router.openapi(updateHaikuMonumentRoute, async (c) => {
+//   const { id } = c.req.valid('param');
+//   const rawPayload = c.req.valid('json');
+//   const payload = convertKeysToCamelCase(rawPayload);
+//   const useCases = getUseCases(c.env);
+//   const updated: HaikuMonument | null = await useCases.updateHaikuMonument(id, payload);
+//   if (!updated) {
+//     return c.json({ error: 'Haiku Monument not found' }, 404);
+//   }
+//   return c.json({ haiku_monument: convertHaikuMonumentToResponse(updated) });
+// });
 
-const deleteHaikuMonumentRoute = createRoute({
-  method: 'delete',
-  tags: ['haiku-monuments'],
-  path: '/{id}',
-  request: {
-    params: idParamSchema,
-  },
-  responses: {
-    200: {
-      description: '句碑の削除に成功',
-      content: {
-        'application/json': {
-          schema: z.object({
-            id: z.number(),
-            message: z.string(),
-          }),
-        },
-      },
-    },
-    404: { description: 'Haiku Monument not found' },
-  },
-});
-router.openapi(deleteHaikuMonumentRoute, async (c) => {
-  const { id } = c.req.valid('param');
-  const useCases = getUseCases(c.env);
-  const success: boolean = await useCases.deleteHaikuMonument(id);
-  if (!success) {
-    return c.json({ error: 'Haiku Monument not found' }, 404);
-  }
-  return c.json({ message: 'Haiku Monument deleted successfully', id });
-});
+// const deleteHaikuMonumentRoute = createRoute({
+//   method: 'delete',
+//   tags: ['haiku-monuments'],
+//   path: '/{id}',
+//   request: {
+//     params: idParamSchema,
+//   },
+//   responses: {
+//     200: {
+//       description: '句碑の削除に成功',
+//       content: {
+//         'application/json': {
+//           schema: z.object({
+//             id: z.number(),
+//             message: z.string(),
+//           }),
+//         },
+//       },
+//     },
+//     404: { description: 'Haiku Monument not found' },
+//   },
+// });
+// router.openapi(deleteHaikuMonumentRoute, async (c) => {
+//   const { id } = c.req.valid('param');
+//   const useCases = getUseCases(c.env);
+//   const success: boolean = await useCases.deleteHaikuMonument(id);
+//   if (!success) {
+//     return c.json({ error: 'Haiku Monument not found' }, 404);
+//   }
+//   return c.json({ message: 'Haiku Monument deleted successfully', id });
+// });
 
 export default router;

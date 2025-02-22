@@ -25,8 +25,8 @@ export class HaikuMonumentUseCases {
     return this.monumentRepo.delete(id);
   }
 
-  async getHaikuMonumentsByAuthor(authorId: number): Promise<HaikuMonument[]> {
-    return this.monumentRepo.getByAuthorId(authorId);
+  async getHaikuMonumentsByPoet(poetId: number): Promise<HaikuMonument[]> {
+    return this.monumentRepo.getByPoetId(poetId);
   }
 
   async getHaikuMonumentsByLocation(locationId: number): Promise<HaikuMonument[]> {
