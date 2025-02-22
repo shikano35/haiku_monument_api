@@ -1,4 +1,3 @@
-// src/infrastructure/repositories/SourceRepository.ts
 import type { ISourceRepository } from '../../domain/repositories/ISourceRepository';
 import type { CreateSourceInput, Source } from '../../domain/entities/Source';
 import { getDB } from '../db/db';
