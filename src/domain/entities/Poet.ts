@@ -1,4 +1,4 @@
-export interface Author {
+export interface Poet {
   id: number;
   name: string;
   biography?: string | null;
@@ -8,4 +8,4 @@ export interface Author {
   updatedAt: string | null;
 }
 
-export type CreateAuthorInput = Omit<Author, 'id' | 'createdAt' | 'updatedAt'>;
+export type CreatePoetInput = Omit<Poet, 'id' | 'createdAt' | 'updatedAt'>;
