@@ -1,21 +1,21 @@
 import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi';
 import type { Env } from '../../types/env';
-import { AuthorRepository } from '../../infrastructure/repositories/AuthorRepository';
+import { PoetRepository } from '../../infrastructure/repositories/PoetRepository';
 import { HaikuMonumentRepository } from '../../infrastructure/repositories/HaikuMonumentRepository';
-import { AuthorUseCases } from '../../domain/usecases/AuthorUseCases';
+import { PoetUseCases } from '../../domain/usecases/PoetUseCases';
 import { HaikuMonumentUseCases } from '../../domain/usecases/HaikuMonumentUseCases';
 import { parseQueryParams } from '../../utils/parseQueryParams';
 import { convertKeysToCamelCase } from '../../utils/convertKeysToCamelCase';
 import { convertKeysToSnakeCase } from '../../utils/convertKeysToSnakeCase';
 
-const createAuthorSchema = z.object({
+const createPoetSchema = z.object({
   name: z.string().min(1, 'Name is required').max(255, 'Name is too long'),
   biography: z.string().optional().nullable(),
   links: z.string().optional().nullable(),
   image_url: z.string().optional().nullable(),
 });
 
-const updateAuthorSchema = z.object({
+const updatePoetSchema = z.object({
   name: z.string().min(1, 'Name is required').max(255, 'Name is too long').optional(),
   biography: z.string().optional().nullable(),
   links: z.string().optional().nullable(),
@@ -28,7 +28,7 @@ const idParamSchema = z.object({
   param: { name: 'id', in: 'path' },
 });
 
-const authorsQuerySchema = z.object({
+const PoetsQuerySchema = z.object({
   limit: z.coerce.number().optional().openapi({
     param: { name: 'limit', description: '取得する件数', in: 'query', required: false },
     type: 'integer',
@@ -75,7 +75,7 @@ const authorsQuerySchema = z.object({
   }),
 });
 
-const convertAuthorToSnakeCase = (author: {
+const convertPoetToSnakeCase = (poet: {
   id: number;
   name: string;
   biography?: string | null;
@@ -92,16 +92,16 @@ const convertAuthorToSnakeCase = (author: {
   created_at: string;
   updated_at: string;
 } => ({
-  id: author.id,
-  name: author.name,
-  biography: author.biography ?? null,
-  links: author.links ?? null,
-  image_url: author.imageUrl ?? null,
-  created_at: author.createdAt as string,
-  updated_at: author.updatedAt as string,
+  id: poet.id,
+  name: poet.name,
+  biography: poet.biography ?? null,
+  links: poet.links ?? null,
+  image_url: poet.imageUrl ?? null,
+  created_at: poet.createdAt as string,
+  updated_at: poet.updatedAt as string,
 });
 
-const convertAuthorsToSnakeCase = (authors: Array<{
+const convertPoetsToSnakeCase = (poets: Array<{
   id: number;
   name: string;
   biography?: string | null;
@@ -109,25 +109,25 @@ const convertAuthorsToSnakeCase = (authors: Array<{
   imageUrl?: string | null;
   createdAt: string | null;
   updatedAt: string | null;
-}>) => authors.map(convertAuthorToSnakeCase);
+}>) => poets.map(convertPoetToSnakeCase);
 
 const getUseCases = (env: Env) => {
-  const authorRepo = new AuthorRepository(env.DB);
+  const poetRepo = new PoetRepository(env.DB);
   const monumentRepo = new HaikuMonumentRepository(env.DB);
   return {
-    authorUseCases: new AuthorUseCases(authorRepo),
+    poetUseCases: new PoetUseCases(poetRepo),
     monumentUseCases: new HaikuMonumentUseCases(monumentRepo),
   };
 };
 
 const router = new OpenAPIHono<{ Bindings: Env }>();
 
-const getAllAuthorsRoute = createRoute({
+const getAllPoetsRoute = createRoute({
   method: 'get',
-  tags: ['authors'],
+  tags: ['poets'],
   path: '/',
   request: {
-    query: authorsQuerySchema,
+    query: PoetsQuerySchema,
   },
   responses: {
     200: {
@@ -150,16 +150,16 @@ const getAllAuthorsRoute = createRoute({
     },
   },
 });
-router.openapi(getAllAuthorsRoute, async (c) => {
+router.openapi(getAllPoetsRoute, async (c) => {
   const queryParams = parseQueryParams(new URLSearchParams(c.req.query()));
-  const { authorUseCases } = getUseCases(c.env);
-  const authors = await authorUseCases.getAllAuthors(queryParams);
-  return c.json(convertAuthorsToSnakeCase(authors));
+  const { poetUseCases } = getUseCases(c.env);
+  const poets = await poetUseCases.getAllPoets(queryParams);
+  return c.json(convertPoetsToSnakeCase(poets));
 });
 
-const getAuthorByIdRoute = createRoute({
+const getPoetByIdRoute = createRoute({
   method: 'get',
-  tags: ['authors'],
+  tags: ['poets'],
   path: '/{id}',
   request: {
     params: idParamSchema,
@@ -181,147 +181,147 @@ const getAuthorByIdRoute = createRoute({
         },
       },
     },
-    404: { description: 'Author not found' },
+    404: { description: 'Poet not found' },
   },
 });
-router.openapi(getAuthorByIdRoute, async (c) => {
+router.openapi(getPoetByIdRoute, async (c) => {
   const { id } = c.req.valid('param');
-  const { authorUseCases } = getUseCases(c.env);
-  const author = await authorUseCases.getAuthorById(id);
-  if (!author) {
-    return c.json({ error: 'Author not found' }, 404);
+  const { poetUseCases } = getUseCases(c.env);
+  const poet = await poetUseCases.getPoetById(id);
+  if (!poet) {
+    return c.json({ error: 'Poet not found' }, 404);
   }
-  return c.json(convertAuthorToSnakeCase(author));
+  return c.json(convertPoetToSnakeCase(poet));
 });
 
-const createAuthorRoute = createRoute({
-  method: 'post',
-  tags: ['authors'],
-  path: '/',
-  request: {
-    body: {
-      content: {
-        'application/json': { schema: createAuthorSchema },
-      },
-      required: true,
-      description: 'Create an author',
-    },
-  },
-  responses: {
-    201: {
-      description: 'Author created',
-      content: {
-        'application/json': {
-          schema: z.object({
-            id: z.number(),
-            name: z.string(),
-            biography: z.string().nullable(),
-            links: z.string().nullable(),
-            image_url: z.string().nullable(),
-            created_at: z.string(),
-            updated_at: z.string(),
-          }),
-        },
-      },
-    },
-  },
-});
-router.openapi(createAuthorRoute, async (c) => {
-  const rawPayload = c.req.valid('json');
-  const payload = convertKeysToCamelCase(rawPayload);
-  const { authorUseCases } = getUseCases(c.env);
-  const created = await authorUseCases.createAuthor(payload);
-  return c.json(convertAuthorToSnakeCase(created), 201);
-});
+// const createPoetRoute = createRoute({
+//   method: 'post',
+//   tags: ['poets'],
+//   path: '/',
+//   request: {
+//     body: {
+//       content: {
+//         'application/json': { schema: createPoetSchema },
+//       },
+//       required: true,
+//       description: 'Create an poet',
+//     },
+//   },
+//   responses: {
+//     201: {
+//       description: 'Poet created',
+//       content: {
+//         'application/json': {
+//           schema: z.object({
+//             id: z.number(),
+//             name: z.string(),
+//             biography: z.string().nullable(),
+//             links: z.string().nullable(),
+//             image_url: z.string().nullable(),
+//             created_at: z.string(),
+//             updated_at: z.string(),
+//           }),
+//         },
+//       },
+//     },
+//   },
+// });
+// router.openapi(createPoetRoute, async (c) => {
+//   const rawPayload = c.req.valid('json');
+//   const payload = convertKeysToCamelCase(rawPayload);
+//   const { poetUseCases } = getUseCases(c.env);
+//   const created = await poetUseCases.createPoet(payload);
+//   return c.json(convertPoetToSnakeCase(created), 201);
+// });
 
-const updateAuthorRoute = createRoute({
-  method: 'put',
-  tags: ['authors'],
-  path: '/{id}',
-  request: {
-    params: idParamSchema,
-    body: {
-      content: {
-        'application/json': { schema: updateAuthorSchema },
-      },
-      required: true,
-      description: 'Update an author',
-    },
-  },
-  responses: {
-    200: {
-      description: 'Author updated',
-      content: {
-        'application/json': {
-          schema: z.object({
-            id: z.number(),
-            name: z.string(),
-            biography: z.string().nullable(),
-            links: z.string().nullable(),
-            image_url: z.string().nullable(),
-            created_at: z.string(),
-            updated_at: z.string(),
-          }),
-        },
-      },
-    },
-    404: { description: 'Author not found' },
-  },
-});
-router.openapi(updateAuthorRoute, async (c) => {
-  const { id } = c.req.valid('param');
-  const rawPayload = c.req.valid('json');
-  const payload = convertKeysToCamelCase(rawPayload);
-  const { authorUseCases } = getUseCases(c.env);
-  const updated = await authorUseCases.updateAuthor(id, payload);
-  if (!updated) {
-    return c.json({ error: 'Author not found' }, 404);
-  }
-  return c.json(convertAuthorToSnakeCase(updated));
-});
+// const updatePoetRoute = createRoute({
+//   method: 'put',
+//   tags: ['poets'],
+//   path: '/{id}',
+//   request: {
+//     params: idParamSchema,
+//     body: {
+//       content: {
+//         'application/json': { schema: updatePoetSchema },
+//       },
+//       required: true,
+//       description: 'Update an poet',
+//     },
+//   },
+//   responses: {
+//     200: {
+//       description: 'Poet updated',
+//       content: {
+//         'application/json': {
+//           schema: z.object({
+//             id: z.number(),
+//             name: z.string(),
+//             biography: z.string().nullable(),
+//             links: z.string().nullable(),
+//             image_url: z.string().nullable(),
+//             created_at: z.string(),
+//             updated_at: z.string(),
+//           }),
+//         },
+//       },
+//     },
+//     404: { description: 'Poet not found' },
+//   },
+// });
+// router.openapi(updatePoetRoute, async (c) => {
+//   const { id } = c.req.valid('param');
+//   const rawPayload = c.req.valid('json');
+//   const payload = convertKeysToCamelCase(rawPayload);
+//   const { poetUseCases } = getUseCases(c.env);
+//   const updated = await poetUseCases.updatePoet(id, payload);
+//   if (!updated) {
+//     return c.json({ error: 'Poet not found' }, 404);
+//   }
+//   return c.json(convertPoetToSnakeCase(updated));
+// });
 
-const deleteAuthorRoute = createRoute({
-  method: 'delete',
-  tags: ['authors'],
-  path: '/{id}',
-  request: {
-    params: idParamSchema,
-  },
-  responses: {
-    200: {
-      description: 'Author deleted',
-      content: {
-        'application/json': {
-          schema: z.object({
-            id: z.number(),
-            message: z.string(),
-          }),
-        },
-      },
-    },
-    404: { description: 'Author not found' },
-  },
-});
-router.openapi(deleteAuthorRoute, async (c) => {
-  const { id } = c.req.valid('param');
-  const { authorUseCases } = getUseCases(c.env);
-  const success = await authorUseCases.deleteAuthor(id);
-  if (!success) {
-    return c.json({ error: 'Author not found' }, 404);
-  }
-  return c.json({ id, message: 'Author deleted successfully' });
-});
+// const deletePoetRoute = createRoute({
+//   method: 'delete',
+//   tags: ['poets'],
+//   path: '/{id}',
+//   request: {
+//     params: idParamSchema,
+//   },
+//   responses: {
+//     200: {
+//       description: 'Poet deleted',
+//       content: {
+//         'application/json': {
+//           schema: z.object({
+//             id: z.number(),
+//             message: z.string(),
+//           }),
+//         },
+//       },
+//     },
+//     404: { description: 'Poet not found' },
+//   },
+// });
+// router.openapi(deletePoetRoute, async (c) => {
+//   const { id } = c.req.valid('param');
+//   const { poetUseCases } = getUseCases(c.env);
+//   const success = await poetUseCases.deletePoet(id);
+//   if (!success) {
+//     return c.json({ error: 'Poet not found' }, 404);
+//   }
+//   return c.json({ id, message: 'Poet deleted successfully' });
+// });
 
-const getAuthorHaikuMonumentsRoute = createRoute({
+const getPoetHaikuMonumentsRoute = createRoute({
   method: 'get',
-  tags: ['authors'],
+  tags: ['poets'],
   path: '/{id}/haiku-monuments',
   request: {
     params: idParamSchema,
   },
   responses: {
     200: {
-      description: 'Haiku monuments for an author',
+      description: 'Haiku monuments for an poet',
       content: {
         'application/json': {
           schema: z.array(
@@ -341,11 +341,11 @@ const getAuthorHaikuMonumentsRoute = createRoute({
     400: { description: 'Invalid ID' },
   },
 });
-router.openapi(getAuthorHaikuMonumentsRoute, async (c) => {
+router.openapi(getPoetHaikuMonumentsRoute, async (c) => {
   const { id } = c.req.valid('param');
   const { monumentUseCases } = getUseCases(c.env);
-  const monuments = await monumentUseCases.getHaikuMonumentsByAuthor(id);
-  const cleaned = monuments.map(({ authorId, sourceId, locationId, ...rest }) => rest);
+  const monuments = await monumentUseCases.getHaikuMonumentsByPoet(id);
+  const cleaned = monuments.map(({ poetId, sourceId, locationId, ...rest }) => rest);
   return c.json(convertKeysToSnakeCase(cleaned));
 });
 
