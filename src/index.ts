@@ -8,6 +8,7 @@ import haikuMonumentRoutes from './interfaces/routes/haikuMonumentRoutes';
 import type { Env } from './types/env';
 import { swaggerUI } from '@hono/swagger-ui';
 import { OpenAPIHono } from '@hono/zod-openapi';
+import { securityHeaders } from './interfaces/middlewares/securityHeaders';
 
 const openApiSpec = {
   openapi: "3.0.3",
@@ -42,6 +43,7 @@ const app = new OpenAPIHono<{ Bindings: Env }>();
 app.use('*', corsMiddleware);
 app.use('*', requestLogger);
 app.use('*', errorHandler);
+app.use('*', securityHeaders);
 
 app.route('/locations', locationsRoutes);
 app.route('/poets', poetsRoutes);
