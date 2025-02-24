@@ -4,9 +4,11 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy --minify",
     "generate:migration": "drizzle-kit generate --config=src/infrastructure/db/drizzle.config.ts",
-    "migrate": "drizzle-kit migrate --config=src/infrastructure/db/drizzle.config.ts"
+    "migrate": "drizzle-kit migrate --config=src/infrastructure/db/drizzle.config.ts",
+    "test": "vitest"
   },
   "dependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.7.1",
     "@hono/swagger-ui": "^0.5.0",
     "@hono/zod-openapi": "^0.18.4",
     "@hono/zod-validator": "^0.4.3",
@@ -16,7 +18,8 @@
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.39.1",
     "hono": "^4.6.8",
-    "miniflare": "^3.20250129.0"
+    "miniflare": "^3.20250129.0",
+    "vitest": "2.1.8"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
