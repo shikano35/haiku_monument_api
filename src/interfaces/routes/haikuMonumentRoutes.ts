@@ -6,6 +6,7 @@ import { HaikuMonumentRepository } from '../../infrastructure/repositories/Haiku
 import { convertKeysToCamelCase } from '../../utils/convertKeysToCamelCase';
 import { parseQueryParams } from '../../utils/parseQueryParams';
 
+// 不要なコードが多いのでリファクタリング
 export interface PoetResponse {
   id: number;
   name: string;
