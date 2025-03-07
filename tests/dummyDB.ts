@@ -52,18 +52,18 @@ export const dummyDB = {
       all: async () => {
         const lowerQuery = query.toLowerCase();
         if (lowerQuery.includes("from locations")) {
-          return { results: locations };
+          return locations;
         }
-        return { results: [] };
+        return [];
       },
-      run: async () => ({ results: [] }),
+      run: async () => ({}),
       first: async () => {
         const lowerQuery = query.toLowerCase();
         if (lowerQuery.includes("from locations") && lowerQuery.includes("where")) {
-          return { results: locations[0] };
+          return locations[0];
         }
-        return { results: null };
+        return null;
       },
     };
-  }
+  },
 };
