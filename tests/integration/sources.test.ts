@@ -7,6 +7,7 @@ describe("Sources API GET Endpoints", () => {
 
   beforeAll(async () => {
     worker = await unstable_dev("./src/index.ts", {
+      bindings: { DB: globalThis.DB },
       experimental: { disableExperimentalWarning: true },
     });
   });
