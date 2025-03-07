@@ -22,11 +22,11 @@ const updatePoetSchema = z.object({
   image_url: z.string().optional().nullable(),
 });
 
-const idParamSchema = z.object({
-  id: z.string().regex(/^\d+$/, 'Invalid ID').transform(Number),
-}).openapi({
-  param: { name: 'id', in: 'path' },
-});
+const idParamSchema = z
+  .object({
+    id: z.string().regex(/^\d+$/, 'Invalid ID').transform(Number),
+  })
+  .openapi({ param: { name: 'id', in: 'path' } });
 
 const PoetsQuerySchema = z.object({
   limit: z.coerce.number().optional().openapi({
@@ -37,17 +37,21 @@ const PoetsQuerySchema = z.object({
     param: { name: 'offset', description: '取得する位置', in: 'query', required: false },
     type: 'integer',
   }),
-  ordering: z.preprocess(
-    (arg) => (typeof arg === 'string' ? [arg] : arg),
-    z.array(z.enum(["-created_at", "-updated_at", "created_at", "updated_at"]))
-  ).optional().openapi({
-    param: {
-      name: 'ordering',
-      description: "並び替え\n* `created_at` - 作成日時の昇順\n* `-created_at` - 作成日時の降順\n* `updated_at` - 更新日時の昇順\n* `-updated_at` - 更新日時の降順",
-      in: 'query',
-      required: false,
-    },
-  }),
+  ordering: z
+    .preprocess(
+      (arg) => (typeof arg === 'string' ? [arg] : arg),
+      z.array(z.enum(["-created_at", "-updated_at", "created_at", "updated_at"]))
+    )
+    .optional()
+    .openapi({
+      param: {
+        name: 'ordering',
+        description:
+          "並び替え\n* `created_at` - 作成日時の昇順\n* `-created_at` - 作成日時の降順\n* `updated_at` - 更新日時の昇順\n* `-updated_at` - 更新日時の降順",
+        in: 'query',
+        required: false,
+      },
+    }),
   search: z.string().optional().openapi({
     param: { name: 'search', description: '検索', in: 'query', required: false },
   }),
@@ -58,19 +62,39 @@ const PoetsQuerySchema = z.object({
     param: { name: 'biography_contains', description: '俳人の情報に含まれる文字列', in: 'query', required: false },
   }),
   created_at_gt: z.string().optional().openapi({
-    param: { name: 'created_at_gt', description: "作成日時が指定した日時以降のもの\n例: 2025-01-01 00:00:00", in: 'query', required: false },
+    param: {
+      name: 'created_at_gt',
+      description: "作成日時が指定した日時以降のもの\n例: 2025-01-01 00:00:00",
+      in: 'query',
+      required: false,
+    },
     format: 'date-time',
   }),
   created_at_lt: z.string().optional().openapi({
-    param: { name: 'created_at_lt', description: "作成日時が指定した日時以前のもの\n例: 2025-01-01 00:00:00", in: 'query', required: false },
+    param: {
+      name: 'created_at_lt',
+      description: "作成日時が指定した日時以前のもの\n例: 2025-01-01 00:00:00",
+      in: 'query',
+      required: false,
+    },
     format: 'date-time',
   }),
   updated_at_gt: z.string().optional().openapi({
-    param: { name: 'updated_at_gt', description: "更新日時が指定した日時以降のもの\n例: 2025-01-01 00:00:00", in: 'query', required: false },
+    param: {
+      name: 'updated_at_gt',
+      description: "更新日時が指定した日時以降のもの\n例: 2025-01-01 00:00:00",
+      in: 'query',
+      required: false,
+    },
     format: 'date-time',
   }),
   updated_at_lt: z.string().optional().openapi({
-    param: { name: 'updated_at_lt', description: "更新日時が指定した日時以前のもの\n例: 2025-01-01 00:00:00", in: 'query', required: false },
+    param: {
+      name: 'updated_at_lt',
+      description: "更新日時が指定した日時以前のもの\n例: 2025-01-01 00:00:00",
+      in: 'query',
+      required: false,
+    },
     format: 'date-time',
   }),
 });
@@ -97,8 +121,8 @@ const convertPoetToSnakeCase = (poet: {
   biography: poet.biography ?? null,
   links: poet.links ?? null,
   image_url: poet.imageUrl ?? null,
-  created_at: poet.createdAt as string,
-  updated_at: poet.updatedAt as string,
+  created_at: poet.createdAt ?? '',
+  updated_at: poet.updatedAt ?? '',
 });
 
 const convertPoetsToSnakeCase = (poets: Array<{
@@ -126,9 +150,7 @@ const getAllPoetsRoute = createRoute({
   method: 'get',
   tags: ['poets'],
   path: '/',
-  request: {
-    query: PoetsQuerySchema,
-  },
+  request: { query: PoetsQuerySchema },
   responses: {
     200: {
       description: 'Success operation',
@@ -161,9 +183,7 @@ const getPoetByIdRoute = createRoute({
   method: 'get',
   tags: ['poets'],
   path: '/{id}',
-  request: {
-    params: idParamSchema,
-  },
+  request: { params: idParamSchema },
   responses: {
     200: {
       description: 'Success operation',
@@ -194,131 +214,123 @@ router.openapi(getPoetByIdRoute, async (c) => {
   return c.json(convertPoetToSnakeCase(poet));
 });
 
-// const createPoetRoute = createRoute({
-//   method: 'post',
-//   tags: ['poets'],
-//   path: '/',
-//   request: {
-//     body: {
-//       content: {
-//         'application/json': { schema: createPoetSchema },
-//       },
-//       required: true,
-//       description: 'Create an poet',
-//     },
-//   },
-//   responses: {
-//     201: {
-//       description: 'Poet created',
-//       content: {
-//         'application/json': {
-//           schema: z.object({
-//             id: z.number(),
-//             name: z.string(),
-//             biography: z.string().nullable(),
-//             links: z.string().nullable(),
-//             image_url: z.string().nullable(),
-//             created_at: z.string(),
-//             updated_at: z.string(),
-//           }),
-//         },
-//       },
-//     },
-//   },
-// });
-// router.openapi(createPoetRoute, async (c) => {
-//   const rawPayload = c.req.valid('json');
-//   const payload = convertKeysToCamelCase(rawPayload);
-//   const { poetUseCases } = getUseCases(c.env);
-//   const created = await poetUseCases.createPoet(payload);
-//   return c.json(convertPoetToSnakeCase(created), 201);
-// });
+const createPoetRoute = createRoute({
+  method: 'post',
+  tags: ['poets'],
+  path: '/',
+  request: {
+    body: {
+      content: { 'application/json': { schema: createPoetSchema } },
+      required: true,
+      description: 'Create an poet',
+    },
+  },
+  responses: {
+    201: {
+      description: 'Poet created',
+      content: {
+        'application/json': {
+          schema: z.object({
+            id: z.number(),
+            name: z.string(),
+            biography: z.string().nullable(),
+            links: z.string().nullable(),
+            image_url: z.string().nullable(),
+            created_at: z.string(),
+            updated_at: z.string(),
+          }),
+        },
+      },
+    },
+  },
+});
+router.openapi(createPoetRoute, async (c) => {
+  const rawPayload = c.req.valid('json');
+  const payload = convertKeysToCamelCase(rawPayload);
+  const { poetUseCases } = getUseCases(c.env);
+  const created = await poetUseCases.createPoet(payload);
+  return c.json(convertPoetToSnakeCase(created), 201);
+});
 
-// const updatePoetRoute = createRoute({
-//   method: 'put',
-//   tags: ['poets'],
-//   path: '/{id}',
-//   request: {
-//     params: idParamSchema,
-//     body: {
-//       content: {
-//         'application/json': { schema: updatePoetSchema },
-//       },
-//       required: true,
-//       description: 'Update an poet',
-//     },
-//   },
-//   responses: {
-//     200: {
-//       description: 'Poet updated',
-//       content: {
-//         'application/json': {
-//           schema: z.object({
-//             id: z.number(),
-//             name: z.string(),
-//             biography: z.string().nullable(),
-//             links: z.string().nullable(),
-//             image_url: z.string().nullable(),
-//             created_at: z.string(),
-//             updated_at: z.string(),
-//           }),
-//         },
-//       },
-//     },
-//     404: { description: 'Poet not found' },
-//   },
-// });
-// router.openapi(updatePoetRoute, async (c) => {
-//   const { id } = c.req.valid('param');
-//   const rawPayload = c.req.valid('json');
-//   const payload = convertKeysToCamelCase(rawPayload);
-//   const { poetUseCases } = getUseCases(c.env);
-//   const updated = await poetUseCases.updatePoet(id, payload);
-//   if (!updated) {
-//     return c.json({ error: 'Poet not found' }, 404);
-//   }
-//   return c.json(convertPoetToSnakeCase(updated));
-// });
+const updatePoetRoute = createRoute({
+  method: 'put',
+  tags: ['poets'],
+  path: '/{id}',
+  request: {
+    params: idParamSchema,
+    body: {
+      content: { 'application/json': { schema: updatePoetSchema } },
+      required: true,
+      description: 'Update an poet',
+    },
+  },
+  responses: {
+    200: {
+      description: 'Poet updated',
+      content: {
+        'application/json': {
+          schema: z.object({
+            id: z.number(),
+            name: z.string(),
+            biography: z.string().nullable(),
+            links: z.string().nullable(),
+            image_url: z.string().nullable(),
+            created_at: z.string(),
+            updated_at: z.string(),
+          }),
+        },
+      },
+    },
+    404: { description: 'Poet not found' },
+  },
+});
+router.openapi(updatePoetRoute, async (c) => {
+  const { id } = c.req.valid('param');
+  const rawPayload = c.req.valid('json');
+  const payload = convertKeysToCamelCase(rawPayload);
+  const { poetUseCases } = getUseCases(c.env);
+  const updated = await poetUseCases.updatePoet(id, payload);
+  if (!updated) {
+    return c.json({ error: 'Poet not found' }, 404);
+  }
+  return c.json(convertPoetToSnakeCase(updated));
+});
 
-// const deletePoetRoute = createRoute({
-//   method: 'delete',
-//   tags: ['poets'],
-//   path: '/{id}',
-//   request: {
-//     params: idParamSchema,
-//   },
-//   responses: {
-//     200: {
-//       description: 'Poet deleted',
-//       content: {
-//         'application/json': {
-//           schema: z.object({
-//             id: z.number(),
-//             message: z.string(),
-//           }),
-//         },
-//       },
-//     },
-//     404: { description: 'Poet not found' },
-//   },
-// });
-// router.openapi(deletePoetRoute, async (c) => {
-//   const { id } = c.req.valid('param');
-//   const { poetUseCases } = getUseCases(c.env);
-//   const success = await poetUseCases.deletePoet(id);
-//   if (!success) {
-//     return c.json({ error: 'Poet not found' }, 404);
-//   }
-//   return c.json({ id, message: 'Poet deleted successfully' });
-// });
+const deletePoetRoute = createRoute({
+  method: 'delete',
+  tags: ['poets'],
+  path: '/{id}',
+  request: { params: idParamSchema },
+  responses: {
+    200: {
+      description: 'Poet deleted',
+      content: {
+        'application/json': {
+          schema: z.object({
+            id: z.number(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    404: { description: 'Poet not found' },
+  },
+});
+router.openapi(deletePoetRoute, async (c) => {
+  const { id } = c.req.valid('param');
+  const { poetUseCases } = getUseCases(c.env);
+  const success = await poetUseCases.deletePoet(id);
+  if (!success) {
+    return c.json({ error: 'Poet not found' }, 404);
+  }
+  return c.json({ id, message: 'Poet deleted successfully' });
+});
 
 const getPoetHaikuMonumentsRoute = createRoute({
   method: 'get',
   tags: ['poets'],
   path: '/{id}/haiku-monuments',
-  request: {
-    params: idParamSchema,
-  },
+  request: { params: idParamSchema },
   responses: {
     200: {
       description: 'Haiku monuments for an poet',

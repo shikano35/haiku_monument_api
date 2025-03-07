@@ -1,6 +1,6 @@
 import type { CreateUserInput, User } from '../entities/User';
 
-export interface IUserRepository {
+export type IUserRepository = {
   getAll(): Promise<User[]>;
   getById(id: number): Promise<User | null>;
   create(user: CreateUserInput): Promise<User>;

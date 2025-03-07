@@ -1,4 +1,4 @@
-export interface Source {
+export type Source = {
   id: number;
   title: string;
   author?: string | null;
