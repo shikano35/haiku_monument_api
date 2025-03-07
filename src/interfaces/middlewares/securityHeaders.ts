@@ -1,4 +1,4 @@
-import { MiddlewareHandler } from 'hono';
+import type { MiddlewareHandler } from 'hono';
 
 export const securityHeaders: MiddlewareHandler = async (ctx, next) => {
   await next();
