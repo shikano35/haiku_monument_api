@@ -1,11 +1,13 @@
 import { unstable_dev } from "wrangler";
 import type { Unstable_DevWorker } from "wrangler";
+import { dummyDB } from "../dummyDB";
 
 describe("Locations API GET Endpoints", () => {
   let worker: Unstable_DevWorker;
 
   beforeAll(async () => {
     worker = await unstable_dev("./src/index.ts", {
+      bindings: { DB: dummyDB },
       experimental: {
         disableExperimentalWarning: true,
       },
