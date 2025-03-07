@@ -1,7 +1,7 @@
 import type { QueryParams } from '../common/QueryParams';
 import type { CreateLocationInput, Location } from '../entities/Location';
 
-export interface ILocationRepository {
+export type ILocationRepository = {
   getAll(queryParams?: QueryParams): Promise<Location[]>;
   getById(id: number): Promise<Location | null>;
   create(location: CreateLocationInput): Promise<Location>;

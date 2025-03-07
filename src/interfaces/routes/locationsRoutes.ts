@@ -20,7 +20,8 @@ const updateLocationSchema = z.object({
   address: z.string().nonempty().optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
-  name: z.string()
+  name: z
+    .string()
     .max(255, 'Name is too long')
     .nullable()
     .optional()
@@ -29,26 +30,31 @@ const updateLocationSchema = z.object({
   region: z.string().nullable().optional(),
 });
 
-const idParamSchema = z.object({
-  id: z.string().regex(/^\d+$/, 'Invalid ID').transform(Number),
-}).openapi({
-  param: { name: 'id', in: 'path' },
-});
+const idParamSchema = z
+  .object({
+    id: z.string().regex(/^\d+$/, 'Invalid ID').transform(Number),
+  })
+  .openapi({
+    param: { name: 'id', in: 'path' },
+  });
 
-const orderingSchema = z.preprocess((arg) => {
-  if (typeof arg === 'string') {
-    return [arg];
-  }
-  return arg;
-}, z.array(z.enum(["-prefecture", "-region", "prefecture", "region"])))
-.optional().openapi({
-  param: {
-    name: 'ordering',
-    description: "並び順\n* `prefecture` - 都道府県の昇順\n* `-prefecture` - 都道府県の降順\n* `region` - 地域の昇順\n* `-region` - 地域の降順",
-    in: 'query',
-    required: false,
-  },
-});
+const orderingSchema = z
+  .preprocess((arg) => {
+    if (typeof arg === 'string') {
+      return [arg];
+    }
+    return arg;
+  }, z.array(z.enum(["-prefecture", "-region", "prefecture", "region"])))
+  .optional()
+  .openapi({
+    param: {
+      name: 'ordering',
+      description:
+        "並び順\n* `prefecture` - 都道府県の昇順\n* `-prefecture` - 都道府県の降順\n* `region` - 地域の昇順\n* `-region` - 地域の降順",
+      in: 'query',
+      required: false,
+    },
+  });
 
 const locationsQuerySchema = z.object({
   limit: z.coerce.number().optional().openapi({
@@ -79,13 +85,12 @@ const getUseCases = (env: Env) => {
 
 const router = new OpenAPIHono<{ Bindings: Env }>();
 
+// GET: 全Locationsの取得
 const getAllLocationsRoute = createRoute({
   method: 'get',
   tags: ['locations'],
   path: '/',
-  request: {
-    query: locationsQuerySchema,
-  },
+  request: { query: locationsQuerySchema },
   responses: {
     200: {
       description: 'List of locations',
@@ -114,13 +119,12 @@ router.openapi(getAllLocationsRoute, async (c) => {
   return c.json(locations);
 });
 
+// GET: ID指定のLocation取得
 const getLocationByIdRoute = createRoute({
   method: 'get',
   tags: ['locations'],
   path: '/{id}',
-  request: {
-    params: idParamSchema,
-  },
+  request: { params: idParamSchema },
   responses: {
     200: {
       description: 'Location detail',
@@ -151,17 +155,14 @@ router.openapi(getLocationByIdRoute, async (c) => {
   return c.json(location);
 });
 
+// POST: Location作成
 const createLocationRoute = createRoute({
   method: 'post',
   tags: ['locations'],
   path: '/',
   request: {
     body: {
-      content: {
-        'application/json': {
-          schema: createLocationSchema,
-        },
-      },
+      content: { 'application/json': { schema: createLocationSchema } },
       required: true,
       description: 'Create a location',
     },
@@ -192,6 +193,7 @@ router.openapi(createLocationRoute, async (c) => {
   return c.json(created, 201);
 });
 
+// PUT: Location更新
 const updateLocationRoute = createRoute({
   method: 'put',
   tags: ['locations'],
@@ -199,11 +201,7 @@ const updateLocationRoute = createRoute({
   request: {
     params: idParamSchema,
     body: {
-      content: {
-        'application/json': {
-          schema: updateLocationSchema,
-        },
-      },
+      content: { 'application/json': { schema: updateLocationSchema } },
       required: true,
       description: 'Update a location',
     },
@@ -239,13 +237,12 @@ router.openapi(updateLocationRoute, async (c) => {
   return c.json(updated);
 });
 
+// DELETE: Location削除
 const deleteLocationRoute = createRoute({
   method: 'delete',
   tags: ['locations'],
   path: '/{id}',
-  request: {
-    params: idParamSchema,
-  },
+  request: { params: idParamSchema },
   responses: {
     200: {
       description: 'Location deleted',
@@ -271,13 +268,12 @@ router.openapi(deleteLocationRoute, async (c) => {
   return c.json({ id, message: 'Location deleted successfully' });
 });
 
+// GET: 指定Locationに属するHaiku Monument一覧取得
 const getHaikuMonumentsRoute = createRoute({
   method: 'get',
   tags: ['locations'],
   path: '/{id}/haiku-monuments',
-  request: {
-    params: idParamSchema,
-  },
+  request: { params: idParamSchema },
   responses: {
     200: {
       description: 'Haiku monuments for a location',
@@ -304,6 +300,7 @@ router.openapi(getHaikuMonumentsRoute, async (c) => {
   const { id } = c.req.valid('param');
   const { monumentUseCases } = getUseCases(c.env);
   const monuments = await monumentUseCases.getHaikuMonumentsByLocation(id);
+  // 除外すべきキーを除いた後、スネークケースへ変換
   const cleaned = monuments.map(({ poetId, sourceId, locationId, ...rest }) => rest);
   return c.json(convertKeysToSnakeCase(cleaned));
 });

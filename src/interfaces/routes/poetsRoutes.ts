@@ -22,11 +22,11 @@ const updatePoetSchema = z.object({
   image_url: z.string().optional().nullable(),
 });
 
-const idParamSchema = z.object({
-  id: z.string().regex(/^\d+$/, 'Invalid ID').transform(Number),
-}).openapi({
-  param: { name: 'id', in: 'path' },
-});
+const idParamSchema = z
+  .object({
+    id: z.string().regex(/^\d+$/, 'Invalid ID').transform(Number),
+  })
+  .openapi({ param: { name: 'id', in: 'path' } });
 
 const PoetsQuerySchema = z.object({
   limit: z.coerce.number().optional().openapi({
@@ -37,17 +37,21 @@ const PoetsQuerySchema = z.object({
     param: { name: 'offset', description: '取得する位置', in: 'query', required: false },
     type: 'integer',
   }),
-  ordering: z.preprocess(
-    (arg) => (typeof arg === 'string' ? [arg] : arg),
-    z.array(z.enum(["-created_at", "-updated_at", "created_at", "updated_at"]))
-  ).optional().openapi({
-    param: {
-      name: 'ordering',
-      description: "並び替え\n* `created_at` - 作成日時の昇順\n* `-created_at` - 作成日時の降順\n* `updated_at` - 更新日時の昇順\n* `-updated_at` - 更新日時の降順",
-      in: 'query',
-      required: false,
-    },
-  }),
+  ordering: z
+    .preprocess(
+      (arg) => (typeof arg === 'string' ? [arg] : arg),
+      z.array(z.enum(["-created_at", "-updated_at", "created_at", "updated_at"]))
+    )
+    .optional()
+    .openapi({
+      param: {
+        name: 'ordering',
+        description:
+          "並び替え\n* `created_at` - 作成日時の昇順\n* `-created_at` - 作成日時の降順\n* `updated_at` - 更新日時の昇順\n* `-updated_at` - 更新日時の降順",
+        in: 'query',
+        required: false,
+      },
+    }),
   search: z.string().optional().openapi({
     param: { name: 'search', description: '検索', in: 'query', required: false },
   }),
@@ -58,19 +62,39 @@ const PoetsQuerySchema = z.object({
     param: { name: 'biography_contains', description: '俳人の情報に含まれる文字列', in: 'query', required: false },
   }),
   created_at_gt: z.string().optional().openapi({
-    param: { name: 'created_at_gt', description: "作成日時が指定した日時以降のもの\n例: 2025-01-01 00:00:00", in: 'query', required: false },
+    param: {
+      name: 'created_at_gt',
+      description: "作成日時が指定した日時以降のもの\n例: 2025-01-01 00:00:00",
+      in: 'query',
+      required: false,
+    },
     format: 'date-time',
   }),
   created_at_lt: z.string().optional().openapi({
-    param: { name: 'created_at_lt', description: "作成日時が指定した日時以前のもの\n例: 2025-01-01 00:00:00", in: 'query', required: false },
+    param: {
+      name: 'created_at_lt',
+      description: "作成日時が指定した日時以前のもの\n例: 2025-01-01 00:00:00",
+      in: 'query',
+      required: false,
+    },
     format: 'date-time',
   }),
   updated_at_gt: z.string().optional().openapi({
-    param: { name: 'updated_at_gt', description: "更新日時が指定した日時以降のもの\n例: 2025-01-01 00:00:00", in: 'query', required: false },
+    param: {
+      name: 'updated_at_gt',
+      description: "更新日時が指定した日時以降のもの\n例: 2025-01-01 00:00:00",
+      in: 'query',
+      required: false,
+    },
     format: 'date-time',
   }),
   updated_at_lt: z.string().optional().openapi({
-    param: { name: 'updated_at_lt', description: "更新日時が指定した日時以前のもの\n例: 2025-01-01 00:00:00", in: 'query', required: false },
+    param: {
+      name: 'updated_at_lt',
+      description: "更新日時が指定した日時以前のもの\n例: 2025-01-01 00:00:00",
+      in: 'query',
+      required: false,
+    },
     format: 'date-time',
   }),
 });
@@ -97,8 +121,8 @@ const convertPoetToSnakeCase = (poet: {
   biography: poet.biography ?? null,
   links: poet.links ?? null,
   image_url: poet.imageUrl ?? null,
-  created_at: poet.createdAt as string,
-  updated_at: poet.updatedAt as string,
+  created_at: poet.createdAt ?? '',
+  updated_at: poet.updatedAt ?? '',
 });
 
 const convertPoetsToSnakeCase = (poets: Array<{
@@ -126,9 +150,7 @@ const getAllPoetsRoute = createRoute({
   method: 'get',
   tags: ['poets'],
   path: '/',
-  request: {
-    query: PoetsQuerySchema,
-  },
+  request: { query: PoetsQuerySchema },
   responses: {
     200: {
       description: 'Success operation',
@@ -161,9 +183,7 @@ const getPoetByIdRoute = createRoute({
   method: 'get',
   tags: ['poets'],
   path: '/{id}',
-  request: {
-    params: idParamSchema,
-  },
+  request: { params: idParamSchema },
   responses: {
     200: {
       description: 'Success operation',
@@ -200,9 +220,7 @@ const createPoetRoute = createRoute({
   path: '/',
   request: {
     body: {
-      content: {
-        'application/json': { schema: createPoetSchema },
-      },
+      content: { 'application/json': { schema: createPoetSchema } },
       required: true,
       description: 'Create an poet',
     },
@@ -241,9 +259,7 @@ const updatePoetRoute = createRoute({
   request: {
     params: idParamSchema,
     body: {
-      content: {
-        'application/json': { schema: updatePoetSchema },
-      },
+      content: { 'application/json': { schema: updatePoetSchema } },
       required: true,
       description: 'Update an poet',
     },
@@ -284,9 +300,7 @@ const deletePoetRoute = createRoute({
   method: 'delete',
   tags: ['poets'],
   path: '/{id}',
-  request: {
-    params: idParamSchema,
-  },
+  request: { params: idParamSchema },
   responses: {
     200: {
       description: 'Poet deleted',
@@ -316,9 +330,7 @@ const getPoetHaikuMonumentsRoute = createRoute({
   method: 'get',
   tags: ['poets'],
   path: '/{id}/haiku-monuments',
-  request: {
-    params: idParamSchema,
-  },
+  request: { params: idParamSchema },
   responses: {
     200: {
       description: 'Haiku monuments for an poet',

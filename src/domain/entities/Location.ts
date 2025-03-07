@@ -1,4 +1,4 @@
-export interface Location {
+export type Location = {
   id: number;
   prefecture: string;
   region: string | null;

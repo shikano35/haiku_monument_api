@@ -1,4 +1,4 @@
-export interface Poet {
+export type Poet = {
   id: number;
   name: string;
   biography?: string | null;
