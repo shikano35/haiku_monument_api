@@ -127,7 +127,6 @@ const getUseCases = (env: Env) => {
 
 const router = new OpenAPIHono<{ Bindings: Env }>();
 
-// GET /sources - 句碑の出典一覧を取得
 const getAllSourcesRoute = createRoute({
   method: 'get',
   tags: ['sources'],
@@ -164,7 +163,6 @@ router.openapi(getAllSourcesRoute, async (c) => {
   return c.json(convertSourcesToSnakeCase(sources));
 });
 
-// GET /sources/{id} - 句碑の出典を取得
 const getSourceByIdRoute = createRoute({
   method: 'get',
   tags: ['sources'],
@@ -203,130 +201,128 @@ router.openapi(getSourceByIdRoute, async (c) => {
   return c.json(convertSourceToSnakeCase(source));
 });
 
-// POST /sources - 句碑の出典作成
-// const createSourceRoute = createRoute({
-//   method: 'post',
-//   tags: ['sources'],
-//   path: '/',
-//   request: {
-//     body: {
-//       content: {
-//         'application/json': { schema: createSourceSchema },
-//       },
-//       required: true,
-//       description: 'Create a source',
-//     },
-//   },
-//   responses: {
-//     201: {
-//       description: 'Source created',
-//       content: {
-//         'application/json': {
-//           schema: z.object({
-//             id: z.number(),
-//             title: z.string(),
-//             author: z.string().nullable(),
-//             year: z.number().nullable(),
-//             url: z.string().nullable(),
-//             publisher: z.string().nullable(),
-//             created_at: z.string(),
-//             updated_at: z.string(),
-//           }),
-//         },
-//       },
-//     },
-//   },
-// });
-// router.openapi(createSourceRoute, async (c) => {
-//   const rawPayload = c.req.valid('json');
-//   const payload = convertKeysToCamelCase(rawPayload);
-//   const { sourceUseCases } = getUseCases(c.env);
-//   const created = await sourceUseCases.createSource(payload);
-//   return c.json(convertSourceToSnakeCase(created), 201);
-// });
+const createSourceRoute = createRoute({
+  method: 'post',
+  tags: ['sources'],
+  path: '/',
+  request: {
+    body: {
+      content: {
+        'application/json': { schema: createSourceSchema },
+      },
+      required: true,
+      description: 'Create a source',
+    },
+  },
+  responses: {
+    201: {
+      description: 'Source created',
+      content: {
+        'application/json': {
+          schema: z.object({
+            id: z.number(),
+            title: z.string(),
+            author: z.string().nullable(),
+            year: z.number().nullable(),
+            url: z.string().nullable(),
+            publisher: z.string().nullable(),
+            created_at: z.string(),
+            updated_at: z.string(),
+          }),
+        },
+      },
+    },
+  },
+});
+router.openapi(createSourceRoute, async (c) => {
+  const rawPayload = c.req.valid('json');
+  const payload = convertKeysToCamelCase(rawPayload);
+  const { sourceUseCases } = getUseCases(c.env);
+  const created = await sourceUseCases.createSource(payload);
+  return c.json(convertSourceToSnakeCase(created), 201);
+});
 
-// // PUT /sources/{id} - 句碑の出典更新
-// const updateSourceRoute = createRoute({
-//   method: 'put',
-//   tags: ['sources'],
-//   path: '/{id}',
-//   request: {
-//     params: idParamSchema,
-//     body: {
-//       content: {
-//         'application/json': { schema: updateSourceSchema },
-//       },
-//       required: true,
-//       description: 'Update a source',
-//     },
-//   },
-//   responses: {
-//     200: {
-//       description: 'Source updated',
-//       content: {
-//         'application/json': {
-//           schema: z.object({
-//             id: z.number(),
-//             title: z.string(),
-//             author: z.string().nullable(),
-//             year: z.number().nullable(),
-//             url: z.string().nullable(),
-//             publisher: z.string().nullable(),
-//             created_at: z.string(),
-//             updated_at: z.string(),
-//           }),
-//         },
-//       },
-//     },
-//     404: { description: 'Source not found' },
-//   },
-// });
-// router.openapi(updateSourceRoute, async (c) => {
-//   const { id } = c.req.valid('param');
-//   const rawPayload = c.req.valid('json');
-//   const payload = convertKeysToCamelCase(rawPayload);
-//   const { sourceUseCases } = getUseCases(c.env);
-//   const updated = await sourceUseCases.updateSource(id, payload);
-//   if (!updated) {
-//     return c.json({ error: 'Source not found' }, 404);
-//   }
-//   return c.json(convertSourceToSnakeCase(updated));
-// });
+// PUT /sources/{id} - 句碑の出典更新
+const updateSourceRoute = createRoute({
+  method: 'put',
+  tags: ['sources'],
+  path: '/{id}',
+  request: {
+    params: idParamSchema,
+    body: {
+      content: {
+        'application/json': { schema: updateSourceSchema },
+      },
+      required: true,
+      description: 'Update a source',
+    },
+  },
+  responses: {
+    200: {
+      description: 'Source updated',
+      content: {
+        'application/json': {
+          schema: z.object({
+            id: z.number(),
+            title: z.string(),
+            author: z.string().nullable(),
+            year: z.number().nullable(),
+            url: z.string().nullable(),
+            publisher: z.string().nullable(),
+            created_at: z.string(),
+            updated_at: z.string(),
+          }),
+        },
+      },
+    },
+    404: { description: 'Source not found' },
+  },
+});
+router.openapi(updateSourceRoute, async (c) => {
+  const { id } = c.req.valid('param');
+  const rawPayload = c.req.valid('json');
+  const payload = convertKeysToCamelCase(rawPayload);
+  const { sourceUseCases } = getUseCases(c.env);
+  const updated = await sourceUseCases.updateSource(id, payload);
+  if (!updated) {
+    return c.json({ error: 'Source not found' }, 404);
+  }
+  return c.json(convertSourceToSnakeCase(updated));
+});
 
-// // DELETE /sources/{id} - 句碑の出典削除
-// const deleteSourceRoute = createRoute({
-//   method: 'delete',
-//   tags: ['sources'],
-//   path: '/{id}',
-//   request: {
-//     params: idParamSchema,
-//   },
-//   responses: {
-//     200: {
-//       description: 'Source deleted',
-//       content: {
-//         'application/json': {
-//           schema: z.object({
-//             id: z.number(),
-//             message: z.string(),
-//           }),
-//         },
-//       },
-//     },
-//     404: { description: 'Source not found' },
-//   },
-// });
-// router.openapi(deleteSourceRoute, async (c) => {
-//   const { id } = c.req.valid('param');
-//   const { sourceUseCases } = getUseCases(c.env);
-//   const success = await sourceUseCases.deleteSource(id);
-//   if (!success) {
-//     return c.json({ error: 'Source not found' }, 404);
-//   }
-//   return c.json({ id, message: 'Source deleted successfully' });
-// });
+// DELETE /sources/{id} - 句碑の出典削除
+const deleteSourceRoute = createRoute({
+  method: 'delete',
+  tags: ['sources'],
+  path: '/{id}',
+  request: {
+    params: idParamSchema,
+  },
+  responses: {
+    200: {
+      description: 'Source deleted',
+      content: {
+        'application/json': {
+          schema: z.object({
+            id: z.number(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    404: { description: 'Source not found' },
+  },
+});
+router.openapi(deleteSourceRoute, async (c) => {
+  const { id } = c.req.valid('param');
+  const { sourceUseCases } = getUseCases(c.env);
+  const success = await sourceUseCases.deleteSource(id);
+  if (!success) {
+    return c.json({ error: 'Source not found' }, 404);
+  }
+  return c.json({ id, message: 'Source deleted successfully' });
+});
 
-// GET /sources/{id}/haiku-monuments - 句碑の出典に関連する句碑一覧取得
 const getSourceHaikuMonumentsRoute = createRoute({
   method: 'get',
   tags: ['sources'],

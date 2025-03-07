@@ -194,123 +194,123 @@ router.openapi(getPoetByIdRoute, async (c) => {
   return c.json(convertPoetToSnakeCase(poet));
 });
 
-// const createPoetRoute = createRoute({
-//   method: 'post',
-//   tags: ['poets'],
-//   path: '/',
-//   request: {
-//     body: {
-//       content: {
-//         'application/json': { schema: createPoetSchema },
-//       },
-//       required: true,
-//       description: 'Create an poet',
-//     },
-//   },
-//   responses: {
-//     201: {
-//       description: 'Poet created',
-//       content: {
-//         'application/json': {
-//           schema: z.object({
-//             id: z.number(),
-//             name: z.string(),
-//             biography: z.string().nullable(),
-//             links: z.string().nullable(),
-//             image_url: z.string().nullable(),
-//             created_at: z.string(),
-//             updated_at: z.string(),
-//           }),
-//         },
-//       },
-//     },
-//   },
-// });
-// router.openapi(createPoetRoute, async (c) => {
-//   const rawPayload = c.req.valid('json');
-//   const payload = convertKeysToCamelCase(rawPayload);
-//   const { poetUseCases } = getUseCases(c.env);
-//   const created = await poetUseCases.createPoet(payload);
-//   return c.json(convertPoetToSnakeCase(created), 201);
-// });
+const createPoetRoute = createRoute({
+  method: 'post',
+  tags: ['poets'],
+  path: '/',
+  request: {
+    body: {
+      content: {
+        'application/json': { schema: createPoetSchema },
+      },
+      required: true,
+      description: 'Create an poet',
+    },
+  },
+  responses: {
+    201: {
+      description: 'Poet created',
+      content: {
+        'application/json': {
+          schema: z.object({
+            id: z.number(),
+            name: z.string(),
+            biography: z.string().nullable(),
+            links: z.string().nullable(),
+            image_url: z.string().nullable(),
+            created_at: z.string(),
+            updated_at: z.string(),
+          }),
+        },
+      },
+    },
+  },
+});
+router.openapi(createPoetRoute, async (c) => {
+  const rawPayload = c.req.valid('json');
+  const payload = convertKeysToCamelCase(rawPayload);
+  const { poetUseCases } = getUseCases(c.env);
+  const created = await poetUseCases.createPoet(payload);
+  return c.json(convertPoetToSnakeCase(created), 201);
+});
 
-// const updatePoetRoute = createRoute({
-//   method: 'put',
-//   tags: ['poets'],
-//   path: '/{id}',
-//   request: {
-//     params: idParamSchema,
-//     body: {
-//       content: {
-//         'application/json': { schema: updatePoetSchema },
-//       },
-//       required: true,
-//       description: 'Update an poet',
-//     },
-//   },
-//   responses: {
-//     200: {
-//       description: 'Poet updated',
-//       content: {
-//         'application/json': {
-//           schema: z.object({
-//             id: z.number(),
-//             name: z.string(),
-//             biography: z.string().nullable(),
-//             links: z.string().nullable(),
-//             image_url: z.string().nullable(),
-//             created_at: z.string(),
-//             updated_at: z.string(),
-//           }),
-//         },
-//       },
-//     },
-//     404: { description: 'Poet not found' },
-//   },
-// });
-// router.openapi(updatePoetRoute, async (c) => {
-//   const { id } = c.req.valid('param');
-//   const rawPayload = c.req.valid('json');
-//   const payload = convertKeysToCamelCase(rawPayload);
-//   const { poetUseCases } = getUseCases(c.env);
-//   const updated = await poetUseCases.updatePoet(id, payload);
-//   if (!updated) {
-//     return c.json({ error: 'Poet not found' }, 404);
-//   }
-//   return c.json(convertPoetToSnakeCase(updated));
-// });
+const updatePoetRoute = createRoute({
+  method: 'put',
+  tags: ['poets'],
+  path: '/{id}',
+  request: {
+    params: idParamSchema,
+    body: {
+      content: {
+        'application/json': { schema: updatePoetSchema },
+      },
+      required: true,
+      description: 'Update an poet',
+    },
+  },
+  responses: {
+    200: {
+      description: 'Poet updated',
+      content: {
+        'application/json': {
+          schema: z.object({
+            id: z.number(),
+            name: z.string(),
+            biography: z.string().nullable(),
+            links: z.string().nullable(),
+            image_url: z.string().nullable(),
+            created_at: z.string(),
+            updated_at: z.string(),
+          }),
+        },
+      },
+    },
+    404: { description: 'Poet not found' },
+  },
+});
+router.openapi(updatePoetRoute, async (c) => {
+  const { id } = c.req.valid('param');
+  const rawPayload = c.req.valid('json');
+  const payload = convertKeysToCamelCase(rawPayload);
+  const { poetUseCases } = getUseCases(c.env);
+  const updated = await poetUseCases.updatePoet(id, payload);
+  if (!updated) {
+    return c.json({ error: 'Poet not found' }, 404);
+  }
+  return c.json(convertPoetToSnakeCase(updated));
+});
 
-// const deletePoetRoute = createRoute({
-//   method: 'delete',
-//   tags: ['poets'],
-//   path: '/{id}',
-//   request: {
-//     params: idParamSchema,
-//   },
-//   responses: {
-//     200: {
-//       description: 'Poet deleted',
-//       content: {
-//         'application/json': {
-//           schema: z.object({
-//             id: z.number(),
-//             message: z.string(),
-//           }),
-//         },
-//       },
-//     },
-//     404: { description: 'Poet not found' },
-//   },
-// });
-// router.openapi(deletePoetRoute, async (c) => {
-//   const { id } = c.req.valid('param');
-//   const { poetUseCases } = getUseCases(c.env);
-//   const success = await poetUseCases.deletePoet(id);
-//   if (!success) {
-//     return c.json({ error: 'Poet not found' }, 404);
-//   }
-//   return c.json({ id, message: 'Poet deleted successfully' });
-// });
+const deletePoetRoute = createRoute({
+  method: 'delete',
+  tags: ['poets'],
+  path: '/{id}',
+  request: {
+    params: idParamSchema,
+  },
+  responses: {
+    200: {
+      description: 'Poet deleted',
+      content: {
+        'application/json': {
+          schema: z.object({
+            id: z.number(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    404: { description: 'Poet not found' },
+  },
+});
+router.openapi(deletePoetRoute, async (c) => {
+  const { id } = c.req.valid('param');
+  const { poetUseCases } = getUseCases(c.env);
+  const success = await poetUseCases.deletePoet(id);
+  if (!success) {
+    return c.json({ error: 'Poet not found' }, 404);
+  }
+  return c.json({ id, message: 'Poet deleted successfully' });
+});
 
 const getPoetHaikuMonumentsRoute = createRoute({
   method: 'get',

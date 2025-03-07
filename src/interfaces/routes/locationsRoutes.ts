@@ -151,125 +151,125 @@ router.openapi(getLocationByIdRoute, async (c) => {
   return c.json(location);
 });
 
-// const createLocationRoute = createRoute({
-//   method: 'post',
-//   tags: ['locations'],
-//   path: '/',
-//   request: {
-//     body: {
-//       content: {
-//         'application/json': {
-//           schema: createLocationSchema,
-//         },
-//       },
-//       required: true,
-//       description: 'Create a location',
-//     },
-//   },
-//   responses: {
-//     201: {
-//       description: 'Location created',
-//       content: {
-//         'application/json': {
-//           schema: z.object({
-//             id: z.number(),
-//             prefecture: z.string(),
-//             region: z.string().nullable(),
-//             address: z.string().nullable(),
-//             latitude: z.number().nullable(),
-//             longitude: z.number().nullable(),
-//             name: z.string().nullable(),
-//           }),
-//         },
-//       },
-//     },
-//   },
-// });
-// router.openapi(createLocationRoute, async (c) => {
-//   const payload = c.req.valid('json');
-//   const { locationUseCases } = getUseCases(c.env);
-//   const created = await locationUseCases.createLocation(payload);
-//   return c.json(created, 201);
-// });
+const createLocationRoute = createRoute({
+  method: 'post',
+  tags: ['locations'],
+  path: '/',
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: createLocationSchema,
+        },
+      },
+      required: true,
+      description: 'Create a location',
+    },
+  },
+  responses: {
+    201: {
+      description: 'Location created',
+      content: {
+        'application/json': {
+          schema: z.object({
+            id: z.number(),
+            prefecture: z.string(),
+            region: z.string().nullable(),
+            address: z.string().nullable(),
+            latitude: z.number().nullable(),
+            longitude: z.number().nullable(),
+            name: z.string().nullable(),
+          }),
+        },
+      },
+    },
+  },
+});
+router.openapi(createLocationRoute, async (c) => {
+  const payload = c.req.valid('json');
+  const { locationUseCases } = getUseCases(c.env);
+  const created = await locationUseCases.createLocation(payload);
+  return c.json(created, 201);
+});
 
-// const updateLocationRoute = createRoute({
-//   method: 'put',
-//   tags: ['locations'],
-//   path: '/{id}',
-//   request: {
-//     params: idParamSchema,
-//     body: {
-//       content: {
-//         'application/json': {
-//           schema: updateLocationSchema,
-//         },
-//       },
-//       required: true,
-//       description: 'Update a location',
-//     },
-//   },
-//   responses: {
-//     200: {
-//       description: 'Location updated',
-//       content: {
-//         'application/json': {
-//           schema: z.object({
-//             id: z.number(),
-//             prefecture: z.string(),
-//             region: z.string().nullable(),
-//             address: z.string().nullable(),
-//             latitude: z.number().nullable(),
-//             longitude: z.number().nullable(),
-//             name: z.string().nullable(),
-//           }),
-//         },
-//       },
-//     },
-//     404: { description: 'Location not found' },
-//   },
-// });
-// router.openapi(updateLocationRoute, async (c) => {
-//   const { id } = c.req.valid('param');
-//   const payload = c.req.valid('json');
-//   const { locationUseCases } = getUseCases(c.env);
-//   const updated = await locationUseCases.updateLocation(id, payload);
-//   if (!updated) {
-//     return c.json({ error: 'Location not found' }, 404);
-//   }
-//   return c.json(updated);
-// });
+const updateLocationRoute = createRoute({
+  method: 'put',
+  tags: ['locations'],
+  path: '/{id}',
+  request: {
+    params: idParamSchema,
+    body: {
+      content: {
+        'application/json': {
+          schema: updateLocationSchema,
+        },
+      },
+      required: true,
+      description: 'Update a location',
+    },
+  },
+  responses: {
+    200: {
+      description: 'Location updated',
+      content: {
+        'application/json': {
+          schema: z.object({
+            id: z.number(),
+            prefecture: z.string(),
+            region: z.string().nullable(),
+            address: z.string().nullable(),
+            latitude: z.number().nullable(),
+            longitude: z.number().nullable(),
+            name: z.string().nullable(),
+          }),
+        },
+      },
+    },
+    404: { description: 'Location not found' },
+  },
+});
+router.openapi(updateLocationRoute, async (c) => {
+  const { id } = c.req.valid('param');
+  const payload = c.req.valid('json');
+  const { locationUseCases } = getUseCases(c.env);
+  const updated = await locationUseCases.updateLocation(id, payload);
+  if (!updated) {
+    return c.json({ error: 'Location not found' }, 404);
+  }
+  return c.json(updated);
+});
 
-// const deleteLocationRoute = createRoute({
-//   method: 'delete',
-//   tags: ['locations'],
-//   path: '/{id}',
-//   request: {
-//     params: idParamSchema,
-//   },
-//   responses: {
-//     200: {
-//       description: 'Location deleted',
-//       content: {
-//         'application/json': {
-//           schema: z.object({
-//             id: z.number(),
-//             message: z.string(),
-//           }),
-//         },
-//       },
-//     },
-//     404: { description: 'Location not found' },
-//   },
-// });
-// router.openapi(deleteLocationRoute, async (c) => {
-//   const { id } = c.req.valid('param');
-//   const { locationUseCases } = getUseCases(c.env);
-//   const success = await locationUseCases.deleteLocation(id);
-//   if (!success) {
-//     return c.json({ error: 'Location not found' }, 404);
-//   }
-//   return c.json({ id, message: 'Location deleted successfully' });
-// });
+const deleteLocationRoute = createRoute({
+  method: 'delete',
+  tags: ['locations'],
+  path: '/{id}',
+  request: {
+    params: idParamSchema,
+  },
+  responses: {
+    200: {
+      description: 'Location deleted',
+      content: {
+        'application/json': {
+          schema: z.object({
+            id: z.number(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    404: { description: 'Location not found' },
+  },
+});
+router.openapi(deleteLocationRoute, async (c) => {
+  const { id } = c.req.valid('param');
+  const { locationUseCases } = getUseCases(c.env);
+  const success = await locationUseCases.deleteLocation(id);
+  if (!success) {
+    return c.json({ error: 'Location not found' }, 404);
+  }
+  return c.json({ id, message: 'Location deleted successfully' });
+});
 
 const getHaikuMonumentsRoute = createRoute({
   method: 'get',
