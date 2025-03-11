@@ -1,9 +1,9 @@
-import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi'
-import type { Env } from '../../types/env'
+import { createRoute, z } from '@hono/zod-openapi'
 import type { HaikuMonument } from '../../domain/entities/HaikuMonument'
 import { createUseCases } from './createUseCases'
 import { convertKeysToCamelCase } from '../../utils/convertKeysToCamelCase'
 import { parseQueryParams } from '../../utils/parseQueryParams'
+import { createRouter } from './commonRouter'
 
 const idParamSchema = z
   .object({
@@ -263,7 +263,7 @@ const convertHaikuMonument = (monument: HaikuMonument) => ({
   locations: monument.location ? [convertLocation(monument.location)] : []
 })
 
-const router = new OpenAPIHono<{ Bindings: Env }>()
+const router = createRouter()
 
 router.openapi(
   createRoute({
