@@ -21,8 +21,8 @@ export type HaikuMonument = {
   location?: Location | null;
   commentary: string | null;
   imageUrl?: string | null;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: string | null;
+  updatedAt: string | null;
 }
 
 export type HaikuMonumentInput = {
