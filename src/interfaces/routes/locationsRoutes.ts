@@ -1,11 +1,8 @@
-import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi';
-import type { Env } from '../../types/env';
-import { LocationUseCases } from '../../domain/usecases/LocationUseCases';
-import { LocationRepository } from '../../infrastructure/repositories/LocationRepository';
-import { HaikuMonumentRepository } from '../../infrastructure/repositories/HaikuMonumentRepository';
-import { HaikuMonumentUseCases } from '../../domain/usecases/HaikuMonumentUseCases';
+import { createRoute, z } from '@hono/zod-openapi';
 import { parseQueryParams } from '../../utils/parseQueryParams';
 import { convertKeysToSnakeCase } from '../../utils/convertKeysToSnakeCase';
+import { createRouter } from './commonRouter';
+import { createUseCases } from './createUseCases';
 
 const createLocationSchema = z.object({
   address: z.string().min(1, 'Address is required').max(255, 'Address is too long'),
@@ -39,12 +36,9 @@ const idParamSchema = z
   });
 
 const orderingSchema = z
-  .preprocess((arg) => {
-    if (typeof arg === 'string') {
-      return [arg];
-    }
-    return arg;
-  }, z.array(z.enum(["-prefecture", "-region", "prefecture", "region"])))
+  .preprocess((arg) => (typeof arg === 'string' ? [arg] : arg), 
+    z.array(z.enum(["-prefecture", "-region", "prefecture", "region"]))
+  )
   .optional()
   .openapi({
     param: {
@@ -74,18 +68,8 @@ const locationsQuerySchema = z.object({
   }),
 });
 
-const getUseCases = (env: Env) => {
-  const locationRepo = new LocationRepository(env.DB);
-  const monumentRepo = new HaikuMonumentRepository(env.DB);
-  return {
-    locationUseCases: new LocationUseCases(locationRepo),
-    monumentUseCases: new HaikuMonumentUseCases(monumentRepo),
-  };
-};
+const router = createRouter();
 
-const router = new OpenAPIHono<{ Bindings: Env }>();
-
-// GET: 全Locationsの取得
 const getAllLocationsRoute = createRoute({
   method: 'get',
   tags: ['locations'],
@@ -114,12 +98,11 @@ const getAllLocationsRoute = createRoute({
 });
 router.openapi(getAllLocationsRoute, async (c) => {
   const queryParams = parseQueryParams(new URLSearchParams(c.req.query()));
-  const { locationUseCases } = getUseCases(c.env);
+  const { locationUseCases } = createUseCases(c.env, 'locations');
   const locations = await locationUseCases.getAllLocations(queryParams);
   return c.json(locations);
 });
 
-// GET: ID指定のLocation取得
 const getLocationByIdRoute = createRoute({
   method: 'get',
   tags: ['locations'],
@@ -147,7 +130,7 @@ const getLocationByIdRoute = createRoute({
 });
 router.openapi(getLocationByIdRoute, async (c) => {
   const { id } = c.req.valid('param');
-  const { locationUseCases } = getUseCases(c.env);
+  const { locationUseCases } = createUseCases(c.env, 'locations');
   const location = await locationUseCases.getLocationById(id);
   if (!location) {
     return c.json({ error: 'Location not found' }, 404);
@@ -155,7 +138,6 @@ router.openapi(getLocationByIdRoute, async (c) => {
   return c.json(location);
 });
 
-// POST: Location作成
 const createLocationRoute = createRoute({
   method: 'post',
   tags: ['locations'],
@@ -188,12 +170,11 @@ const createLocationRoute = createRoute({
 });
 router.openapi(createLocationRoute, async (c) => {
   const payload = c.req.valid('json');
-  const { locationUseCases } = getUseCases(c.env);
+  const { locationUseCases } = createUseCases(c.env, 'locations');
   const created = await locationUseCases.createLocation(payload);
   return c.json(created, 201);
 });
 
-// PUT: Location更新
 const updateLocationRoute = createRoute({
   method: 'put',
   tags: ['locations'],
@@ -229,7 +210,7 @@ const updateLocationRoute = createRoute({
 router.openapi(updateLocationRoute, async (c) => {
   const { id } = c.req.valid('param');
   const payload = c.req.valid('json');
-  const { locationUseCases } = getUseCases(c.env);
+  const { locationUseCases } = createUseCases(c.env, 'locations');
   const updated = await locationUseCases.updateLocation(id, payload);
   if (!updated) {
     return c.json({ error: 'Location not found' }, 404);
@@ -237,7 +218,6 @@ router.openapi(updateLocationRoute, async (c) => {
   return c.json(updated);
 });
 
-// DELETE: Location削除
 const deleteLocationRoute = createRoute({
   method: 'delete',
   tags: ['locations'],
@@ -260,7 +240,7 @@ const deleteLocationRoute = createRoute({
 });
 router.openapi(deleteLocationRoute, async (c) => {
   const { id } = c.req.valid('param');
-  const { locationUseCases } = getUseCases(c.env);
+  const { locationUseCases } = createUseCases(c.env, 'locations');
   const success = await locationUseCases.deleteLocation(id);
   if (!success) {
     return c.json({ error: 'Location not found' }, 404);
@@ -268,7 +248,6 @@ router.openapi(deleteLocationRoute, async (c) => {
   return c.json({ id, message: 'Location deleted successfully' });
 });
 
-// GET: 指定Locationに属するHaiku Monument一覧取得
 const getHaikuMonumentsRoute = createRoute({
   method: 'get',
   tags: ['locations'],
@@ -298,9 +277,8 @@ const getHaikuMonumentsRoute = createRoute({
 });
 router.openapi(getHaikuMonumentsRoute, async (c) => {
   const { id } = c.req.valid('param');
-  const { monumentUseCases } = getUseCases(c.env);
+  const { monumentUseCases } = createUseCases(c.env, 'haikuMonuments');
   const monuments = await monumentUseCases.getHaikuMonumentsByLocation(id);
-  // 除外すべきキーを除いた後、スネークケースへ変換
   const cleaned = monuments.map(({ poetId, sourceId, locationId, ...rest }) => rest);
   return c.json(convertKeysToSnakeCase(cleaned));
 });

@@ -1,26 +1,40 @@
-import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi';
-import type { Env } from '../../types/env';
-import { PoetRepository } from '../../infrastructure/repositories/PoetRepository';
-import { HaikuMonumentRepository } from '../../infrastructure/repositories/HaikuMonumentRepository';
-import { PoetUseCases } from '../../domain/usecases/PoetUseCases';
-import { HaikuMonumentUseCases } from '../../domain/usecases/HaikuMonumentUseCases';
+import { createRoute, z } from '@hono/zod-openapi';
 import { parseQueryParams } from '../../utils/parseQueryParams';
 import { convertKeysToCamelCase } from '../../utils/convertKeysToCamelCase';
-import { convertKeysToSnakeCase } from '../../utils/convertKeysToSnakeCase';
+import type { Poet } from '../../domain/entities/Poet';
+import type { HaikuMonument } from '../../domain/entities/HaikuMonument';
+import type { PoetResponse } from '../dtos/PoetResponse';
+import type { HaikuMonumentResponse } from '../dtos/HaikuMonumentResponse';
+import { createRouter } from './commonRouter';
+import { createUseCases } from './createUseCases';
 
-const createPoetSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(255, 'Name is too long'),
-  biography: z.string().optional().nullable(),
-  links: z.string().optional().nullable(),
-  image_url: z.string().optional().nullable(),
+const convertPoetToSnakeCase = (poet: Poet): PoetResponse => ({
+  id: poet.id,
+  name: poet.name,
+  biography: poet.biography !== undefined ? poet.biography : null,
+  links: poet.links !== undefined ? poet.links : null,
+  image_url: poet.imageUrl !== undefined ? poet.imageUrl : null,
+  created_at: poet.createdAt !== null ? poet.createdAt : '',
+  updated_at: poet.updatedAt !== null ? poet.updatedAt : '',
 });
 
-const updatePoetSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(255, 'Name is too long').optional(),
-  biography: z.string().optional().nullable(),
-  links: z.string().optional().nullable(),
-  image_url: z.string().optional().nullable(),
+const convertPoetsToSnakeCase = (poets: Poet[]): PoetResponse[] =>
+  poets.map(convertPoetToSnakeCase);
+
+const convertHaikuMonumentToSnakeCase = (
+  monument: HaikuMonument
+): HaikuMonumentResponse => ({
+  id: monument.id,
+  text: monument.text,
+  established_date: monument.establishedDate,
+  commentary: monument.commentary ?? null,
+  image_url: monument.imageUrl ?? null,
+  created_at: monument.createdAt,
+  updated_at: monument.updatedAt,
 });
+
+const convertHaikuMonumentsToSnakeCase = (monuments: HaikuMonument[]) =>
+  monuments.map(convertHaikuMonumentToSnakeCase);
 
 const idParamSchema = z
   .object({
@@ -99,52 +113,21 @@ const PoetsQuerySchema = z.object({
   }),
 });
 
-const convertPoetToSnakeCase = (poet: {
-  id: number;
-  name: string;
-  biography?: string | null;
-  links?: string | null;
-  imageUrl?: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}): {
-  id: number;
-  name: string;
-  biography: string | null;
-  links: string | null;
-  image_url: string | null;
-  created_at: string;
-  updated_at: string;
-} => ({
-  id: poet.id,
-  name: poet.name,
-  biography: poet.biography ?? null,
-  links: poet.links ?? null,
-  image_url: poet.imageUrl ?? null,
-  created_at: poet.createdAt ?? '',
-  updated_at: poet.updatedAt ?? '',
+const createPoetSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(255, 'Name is too long'),
+  biography: z.string().optional().nullable(),
+  links: z.string().optional().nullable(),
+  image_url: z.string().optional().nullable(),
 });
 
-const convertPoetsToSnakeCase = (poets: Array<{
-  id: number;
-  name: string;
-  biography?: string | null;
-  links?: string | null;
-  imageUrl?: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}>) => poets.map(convertPoetToSnakeCase);
+const updatePoetSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(255, 'Name is too long').optional(),
+  biography: z.string().optional().nullable(),
+  links: z.string().optional().nullable(),
+  image_url: z.string().optional().nullable(),
+});
 
-const getUseCases = (env: Env) => {
-  const poetRepo = new PoetRepository(env.DB);
-  const monumentRepo = new HaikuMonumentRepository(env.DB);
-  return {
-    poetUseCases: new PoetUseCases(poetRepo),
-    monumentUseCases: new HaikuMonumentUseCases(monumentRepo),
-  };
-};
-
-const router = new OpenAPIHono<{ Bindings: Env }>();
+const router = createRouter();
 
 const getAllPoetsRoute = createRoute({
   method: 'get',
@@ -174,8 +157,8 @@ const getAllPoetsRoute = createRoute({
 });
 router.openapi(getAllPoetsRoute, async (c) => {
   const queryParams = parseQueryParams(new URLSearchParams(c.req.query()));
-  const { poetUseCases } = getUseCases(c.env);
-  const poets = await poetUseCases.getAllPoets(queryParams);
+  const { poetUseCases } = createUseCases(c.env, 'poets');
+  const poets: Poet[] = await poetUseCases.getAllPoets(queryParams);
   return c.json(convertPoetsToSnakeCase(poets));
 });
 
@@ -206,8 +189,8 @@ const getPoetByIdRoute = createRoute({
 });
 router.openapi(getPoetByIdRoute, async (c) => {
   const { id } = c.req.valid('param');
-  const { poetUseCases } = getUseCases(c.env);
-  const poet = await poetUseCases.getPoetById(id);
+  const { poetUseCases } = createUseCases(c.env, 'poets');
+  const poet: Poet | null = await poetUseCases.getPoetById(id);
   if (!poet) {
     return c.json({ error: 'Poet not found' }, 404);
   }
@@ -222,7 +205,7 @@ const createPoetRoute = createRoute({
     body: {
       content: { 'application/json': { schema: createPoetSchema } },
       required: true,
-      description: 'Create an poet',
+      description: 'Create a poet',
     },
   },
   responses: {
@@ -247,8 +230,8 @@ const createPoetRoute = createRoute({
 router.openapi(createPoetRoute, async (c) => {
   const rawPayload = c.req.valid('json');
   const payload = convertKeysToCamelCase(rawPayload);
-  const { poetUseCases } = getUseCases(c.env);
-  const created = await poetUseCases.createPoet(payload);
+  const { poetUseCases } = createUseCases(c.env, 'poets');
+  const created: Poet = await poetUseCases.createPoet(payload);
   return c.json(convertPoetToSnakeCase(created), 201);
 });
 
@@ -261,7 +244,7 @@ const updatePoetRoute = createRoute({
     body: {
       content: { 'application/json': { schema: updatePoetSchema } },
       required: true,
-      description: 'Update an poet',
+      description: 'Update a poet',
     },
   },
   responses: {
@@ -288,8 +271,8 @@ router.openapi(updatePoetRoute, async (c) => {
   const { id } = c.req.valid('param');
   const rawPayload = c.req.valid('json');
   const payload = convertKeysToCamelCase(rawPayload);
-  const { poetUseCases } = getUseCases(c.env);
-  const updated = await poetUseCases.updatePoet(id, payload);
+  const { poetUseCases } = createUseCases(c.env, 'poets');
+  const updated: Poet | null = await poetUseCases.updatePoet(id, payload);
   if (!updated) {
     return c.json({ error: 'Poet not found' }, 404);
   }
@@ -318,8 +301,8 @@ const deletePoetRoute = createRoute({
 });
 router.openapi(deletePoetRoute, async (c) => {
   const { id } = c.req.valid('param');
-  const { poetUseCases } = getUseCases(c.env);
-  const success = await poetUseCases.deletePoet(id);
+  const { poetUseCases } = createUseCases(c.env, 'poets');
+  const success: boolean = await poetUseCases.deletePoet(id);
   if (!success) {
     return c.json({ error: 'Poet not found' }, 404);
   }
@@ -333,7 +316,7 @@ const getPoetHaikuMonumentsRoute = createRoute({
   request: { params: idParamSchema },
   responses: {
     200: {
-      description: 'Haiku monuments for an poet',
+      description: 'Haiku monuments for a poet',
       content: {
         'application/json': {
           schema: z.array(
@@ -355,10 +338,9 @@ const getPoetHaikuMonumentsRoute = createRoute({
 });
 router.openapi(getPoetHaikuMonumentsRoute, async (c) => {
   const { id } = c.req.valid('param');
-  const { monumentUseCases } = getUseCases(c.env);
-  const monuments = await monumentUseCases.getHaikuMonumentsByPoet(id);
-  const cleaned = monuments.map(({ poetId, sourceId, locationId, ...rest }) => rest);
-  return c.json(convertKeysToSnakeCase(cleaned));
+  const { monumentUseCases } =  createUseCases(c.env, 'haikuMonuments');
+  const monuments: HaikuMonument[] = await monumentUseCases.getHaikuMonumentsByPoet(id);
+  return c.json(convertHaikuMonumentsToSnakeCase(monuments));
 });
 
 export default router;

@@ -1,77 +1,16 @@
-import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi';
-import type { Env } from '../../types/env';
-import { SourceUseCases } from '../../domain/usecases/SourceUseCases';
-import { SourceRepository } from '../../infrastructure/repositories/SourceRepository';
-import { HaikuMonumentRepository } from '../../infrastructure/repositories/HaikuMonumentRepository';
-import { HaikuMonumentUseCases } from '../../domain/usecases/HaikuMonumentUseCases';
+import { createRoute, z } from '@hono/zod-openapi';
 import { convertKeysToCamelCase } from '../../utils/convertKeysToCamelCase';
-import { parseQueryParams } from '../../utils/parseQueryParams';
 import { convertKeysToSnakeCase } from '../../utils/convertKeysToSnakeCase';
-
-const convertSourceToSnakeCase = (source: {
-  id: number;
-  title: string;
-  author?: string | null;
-  year?: number | null;
-  url?: string | null;
-  publisher?: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}): {
-  id: number;
-  title: string;
-  author: string | null;
-  year: number | null;
-  url: string | null;
-  publisher: string | null;
-  created_at: string;
-  updated_at: string;
-} => ({
-  id: source.id,
-  title: source.title,
-  author: source.author ?? null,
-  year: source.year ?? null,
-  url: source.url ?? null,
-  publisher: source.publisher ?? null,
-  created_at: source.createdAt as string,
-  updated_at: source.updatedAt as string,
-});
-
-const convertSourcesToSnakeCase = (
-  sources: Array<{
-    id: number;
-    title: string;
-    author?: string | null;
-    year?: number | null;
-    url?: string | null;
-    publisher?: string | null;
-    createdAt: string | null;
-    updatedAt: string | null;
-  }>
-) => sources.map(convertSourceToSnakeCase);
-
-const createSourceSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(255, 'Title is too long'),
-  author: z.string().optional().nullable(),
-  year: z.number().optional().nullable(),
-  url: z.string().optional().nullable(),
-  publisher: z.string().optional().nullable(),
-});
-const updateSourceSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(255, 'Title is too long').optional(),
-  author: z.string().optional().nullable(),
-  year: z.number().optional().nullable(),
-  url: z.string().optional().nullable(),
-  publisher: z.string().optional().nullable(),
-});
+import { parseQueryParams } from '../../utils/parseQueryParams';
+import type { SourceResponse } from '../dtos/SourceResponse';
+import { createRouter } from './commonRouter';
+import { createUseCases } from './createUseCases';
 
 const idParamSchema = z
   .object({
     id: z.string().regex(/^\d+$/, 'Invalid ID').transform(Number),
   })
-  .openapi({
-    param: { name: 'id', in: 'path' },
-  });
+  .openapi({ param: { name: 'id', in: 'path' } });
 
 const sourcesQuerySchema = z.object({
   limit: z.coerce.number().optional().openapi({
@@ -87,18 +26,18 @@ const sourcesQuerySchema = z.object({
       (arg) => (typeof arg === 'string' ? [arg] : arg),
       z.array(
         z.enum([
-          "-title",
-          "-author",
-          "-year",
-          "-publisher",
-          "-created_at",
-          "-updated_at",
-          "title",
-          "author",
-          "year",
-          "publisher",
-          "created_at",
-          "updated_at",
+          '-title',
+          '-author',
+          '-year',
+          '-publisher',
+          '-created_at',
+          '-updated_at',
+          'title',
+          'author',
+          'year',
+          'publisher',
+          'created_at',
+          'updated_at',
         ])
       )
     )
@@ -123,16 +62,23 @@ const sourcesQuerySchema = z.object({
   }),
 });
 
-const getUseCases = (env: Env) => {
-  const sourceRepo = new SourceRepository(env.DB);
-  const monumentRepo = new HaikuMonumentRepository(env.DB);
-  return {
-    sourceUseCases: new SourceUseCases(sourceRepo),
-    monumentUseCases: new HaikuMonumentUseCases(monumentRepo),
-  };
-};
+const createSourceSchema = z.object({
+  title: z.string().min(1, 'Title is required').max(255, 'Title is too long'),
+  author: z.string().optional().nullable(),
+  year: z.number().optional().nullable(),
+  url: z.string().optional().nullable(),
+  publisher: z.string().optional().nullable(),
+});
 
-const router = new OpenAPIHono<{ Bindings: Env }>();
+const updateSourceSchema = z.object({
+  title: z.string().min(1, 'Title is required').max(255, 'Title is too long').optional(),
+  author: z.string().optional().nullable(),
+  year: z.number().optional().nullable(),
+  url: z.string().optional().nullable(),
+  publisher: z.string().optional().nullable(),
+});
+
+const router = createRouter();
 
 const getAllSourcesRoute = createRoute({
   method: 'get',
@@ -163,9 +109,10 @@ const getAllSourcesRoute = createRoute({
 });
 router.openapi(getAllSourcesRoute, async (c) => {
   const queryParams = parseQueryParams(new URLSearchParams(c.req.query()));
-  const { sourceUseCases } = getUseCases(c.env);
+  const { sourceUseCases } = createUseCases(c.env, 'sources');
   const sources = await sourceUseCases.getAllSources(queryParams);
-  return c.json(convertSourcesToSnakeCase(sources));
+  const snakeSources = convertKeysToSnakeCase(sources) as unknown as SourceResponse[];
+  return c.json(snakeSources);
 });
 
 const getSourceByIdRoute = createRoute({
@@ -196,12 +143,11 @@ const getSourceByIdRoute = createRoute({
 });
 router.openapi(getSourceByIdRoute, async (c) => {
   const { id } = c.req.valid('param');
-  const { sourceUseCases } = getUseCases(c.env);
+  const { sourceUseCases } = createUseCases(c.env, 'sources');
   const source = await sourceUseCases.getSourceById(id);
-  if (!source) {
-    return c.json({ error: 'Source not found' }, 404);
-  }
-  return c.json(convertSourceToSnakeCase(source));
+  if (!source) return c.json({ error: 'Source not found' }, 404);
+  const snakeSource = convertKeysToSnakeCase(source) as unknown as SourceResponse;
+  return c.json(snakeSource);
 });
 
 const createSourceRoute = createRoute({
@@ -238,9 +184,10 @@ const createSourceRoute = createRoute({
 router.openapi(createSourceRoute, async (c) => {
   const rawPayload = c.req.valid('json');
   const payload = convertKeysToCamelCase(rawPayload);
-  const { sourceUseCases } = getUseCases(c.env);
+  const { sourceUseCases } = createUseCases(c.env, 'sources');
   const created = await sourceUseCases.createSource(payload);
-  return c.json(convertSourceToSnakeCase(created), 201);
+  const snakeCreated = convertKeysToSnakeCase(created) as unknown as SourceResponse;
+  return c.json(snakeCreated, 201);
 });
 
 const updateSourceRoute = createRoute({
@@ -280,12 +227,11 @@ router.openapi(updateSourceRoute, async (c) => {
   const { id } = c.req.valid('param');
   const rawPayload = c.req.valid('json');
   const payload = convertKeysToCamelCase(rawPayload);
-  const { sourceUseCases } = getUseCases(c.env);
+  const { sourceUseCases } = createUseCases(c.env, 'sources');
   const updated = await sourceUseCases.updateSource(id, payload);
-  if (!updated) {
-    return c.json({ error: 'Source not found' }, 404);
-  }
-  return c.json(convertSourceToSnakeCase(updated));
+  if (!updated) return c.json({ error: 'Source not found' }, 404);
+  const snakeUpdated = convertKeysToSnakeCase(updated) as unknown as SourceResponse;
+  return c.json(snakeUpdated);
 });
 
 const deleteSourceRoute = createRoute({
@@ -310,11 +256,9 @@ const deleteSourceRoute = createRoute({
 });
 router.openapi(deleteSourceRoute, async (c) => {
   const { id } = c.req.valid('param');
-  const { sourceUseCases } = getUseCases(c.env);
+  const { sourceUseCases } = createUseCases(c.env, 'sources');
   const success = await sourceUseCases.deleteSource(id);
-  if (!success) {
-    return c.json({ error: 'Source not found' }, 404);
-  }
+  if (!success) return c.json({ error: 'Source not found' }, 404);
   return c.json({ id, message: 'Source deleted successfully' });
 });
 
@@ -347,7 +291,7 @@ const getSourceHaikuMonumentsRoute = createRoute({
 });
 router.openapi(getSourceHaikuMonumentsRoute, async (c) => {
   const { id } = c.req.valid('param');
-  const { monumentUseCases } = getUseCases(c.env);
+  const { monumentUseCases } = createUseCases(c.env, 'haikuMonuments');
   const monuments = await monumentUseCases.getHaikuMonumentsBySource(id);
   const cleaned = monuments.map(({ poetId, sourceId, locationId, ...rest }) => rest);
   return c.json(convertKeysToSnakeCase(cleaned));

@@ -1,10 +1,9 @@
-import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi'
-import type { Env } from '../../types/env'
+import { createRoute, z } from '@hono/zod-openapi'
 import type { HaikuMonument } from '../../domain/entities/HaikuMonument'
-import { HaikuMonumentUseCases } from '../../domain/usecases/HaikuMonumentUseCases'
-import { HaikuMonumentRepository } from '../../infrastructure/repositories/HaikuMonumentRepository'
+import { createUseCases } from './createUseCases'
 import { convertKeysToCamelCase } from '../../utils/convertKeysToCamelCase'
 import { parseQueryParams } from '../../utils/parseQueryParams'
+import { createRouter } from './commonRouter'
 
 const idParamSchema = z
   .object({
@@ -264,12 +263,7 @@ const convertHaikuMonument = (monument: HaikuMonument) => ({
   locations: monument.location ? [convertLocation(monument.location)] : []
 })
 
-const getUseCases = (env: Env): HaikuMonumentUseCases => {
-  const monumentRepo = new HaikuMonumentRepository(env.DB)
-  return new HaikuMonumentUseCases(monumentRepo)
-}
-
-const router = new OpenAPIHono<{ Bindings: Env }>()
+const router = createRouter()
 
 router.openapi(
   createRoute({
@@ -290,8 +284,8 @@ router.openapi(
   }),
   async (c) => {
     const queryParams = parseQueryParams(new URLSearchParams(c.req.query()))
-    const useCases = getUseCases(c.env)
-    const monuments = await useCases.getAllHaikuMonuments(queryParams)
+    const { monumentUseCases } = createUseCases(c.env, 'haikuMonuments')
+    const monuments = await monumentUseCases.getAllHaikuMonuments(queryParams)
     return c.json({ haiku_monuments: monuments.map(convertHaikuMonument) })
   }
 )
@@ -316,8 +310,8 @@ router.openapi(
   }),
   async (c) => {
     const { id } = c.req.valid('param')
-    const useCases = getUseCases(c.env)
-    const monument = await useCases.getHaikuMonumentById(id)
+    const { monumentUseCases } = createUseCases(c.env, 'haikuMonuments')
+    const monument = await monumentUseCases.getHaikuMonumentById(id)
     if (!monument) {
       return c.json({ error: 'Haiku Monument not found' }, 404)
     }
@@ -351,8 +345,8 @@ router.openapi(
   async (c) => {
     const rawPayload = c.req.valid('json')
     const payload = convertKeysToCamelCase(rawPayload)
-    const useCases = getUseCases(c.env)
-    const created = await useCases.createHaikuMonument(payload)
+    const { monumentUseCases } = createUseCases(c.env, 'haikuMonuments')
+    const created = await monumentUseCases.createHaikuMonument(payload)
     return c.json({ haiku_monument: convertHaikuMonument(created) }, 201)
   }
 )
@@ -386,8 +380,8 @@ router.openapi(
     const { id } = c.req.valid('param')
     const rawPayload = c.req.valid('json')
     const payload = convertKeysToCamelCase(rawPayload)
-    const useCases = getUseCases(c.env)
-    const updated = await useCases.updateHaikuMonument(id, payload)
+    const { monumentUseCases } = createUseCases(c.env, 'haikuMonuments')
+    const updated = await monumentUseCases.updateHaikuMonument(id, payload)
     if (!updated) {
       return c.json({ error: 'Haiku Monument not found' }, 404)
     }
@@ -415,8 +409,8 @@ router.openapi(
   }),
   async (c) => {
     const { id } = c.req.valid('param')
-    const useCases = getUseCases(c.env)
-    const success = await useCases.deleteHaikuMonument(id)
+    const { monumentUseCases } = createUseCases(c.env, 'haikuMonuments')
+    const success = await monumentUseCases.deleteHaikuMonument(id)
     if (!success) {
       return c.json({ error: 'Haiku Monument not found' }, 404)
     }
