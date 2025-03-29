@@ -38,7 +38,7 @@ const convertHaikuMonumentsToSnakeCase = (monuments: HaikuMonument[]) =>
 
 const idParamSchema = z
   .object({
-    id: z.string().regex(/^\d+$/, 'Invalid ID').transform(Number),
+    id: z.string().regex(/^\d+$/, '無効なIDです').transform(Number),
   })
   .openapi({ param: { name: 'id', in: 'path' } });
 
@@ -48,7 +48,7 @@ const PoetsQuerySchema = z.object({
     type: 'integer',
   }),
   offset: z.coerce.number().optional().openapi({
-    param: { name: 'offset', description: '取得する位置', in: 'query', required: false },
+    param: { name: 'offset', description: '取得開始位置', in: 'query', required: false },
     type: 'integer',
   }),
   ordering: z
@@ -73,12 +73,12 @@ const PoetsQuerySchema = z.object({
     param: { name: 'name_contains', description: '名前に含まれる文字列', in: 'query', required: false },
   }),
   biography_contains: z.string().optional().openapi({
-    param: { name: 'biography_contains', description: '俳人の情報に含まれる文字列', in: 'query', required: false },
+    param: { name: 'biography_contains', description: '俳人情報に含まれる文字列', in: 'query', required: false },
   }),
   created_at_gt: z.string().optional().openapi({
     param: {
       name: 'created_at_gt',
-      description: "作成日時が指定した日時以降のもの\n例: 2025-01-01 00:00:00",
+      description: "作成日時が指定日時以降のもの\n例: 2025-01-01T00:00:00Z",
       in: 'query',
       required: false,
     },
@@ -87,7 +87,7 @@ const PoetsQuerySchema = z.object({
   created_at_lt: z.string().optional().openapi({
     param: {
       name: 'created_at_lt',
-      description: "作成日時が指定した日時以前のもの\n例: 2025-01-01 00:00:00",
+      description: "作成日時が指定日時以前のもの\n例: 2025-01-01T00:00:00Z",
       in: 'query',
       required: false,
     },
@@ -96,7 +96,7 @@ const PoetsQuerySchema = z.object({
   updated_at_gt: z.string().optional().openapi({
     param: {
       name: 'updated_at_gt',
-      description: "更新日時が指定した日時以降のもの\n例: 2025-01-01 00:00:00",
+      description: "更新日時が指定日時以降のもの\n例: 2025-01-01T00:00:00Z",
       in: 'query',
       required: false,
     },
@@ -105,7 +105,7 @@ const PoetsQuerySchema = z.object({
   updated_at_lt: z.string().optional().openapi({
     param: {
       name: 'updated_at_lt',
-      description: "更新日時が指定した日時以前のもの\n例: 2025-01-01 00:00:00",
+      description: "更新日時が指定日時以前のもの\n例: 2025-01-01T00:00:00Z",
       in: 'query',
       required: false,
     },
@@ -114,14 +114,14 @@ const PoetsQuerySchema = z.object({
 });
 
 const createPoetSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(255, 'Name is too long'),
+  name: z.string().min(1, '名前は必須です').max(255, '名前が長すぎます'),
   biography: z.string().optional().nullable(),
   links: z.string().optional().nullable(),
   image_url: z.string().optional().nullable(),
 });
 
 const updatePoetSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(255, 'Name is too long').optional(),
+  name: z.string().min(1, '名前は必須です').max(255, '名前が長すぎます').optional(),
   biography: z.string().optional().nullable(),
   links: z.string().optional().nullable(),
   image_url: z.string().optional().nullable(),
@@ -136,7 +136,7 @@ const getAllPoetsRoute = createRoute({
   request: { query: PoetsQuerySchema },
   responses: {
     200: {
-      description: 'Success operation',
+      description: '俳人一覧の取得に成功しました',
       content: {
         'application/json': {
           schema: z.array(
@@ -169,7 +169,7 @@ const getPoetByIdRoute = createRoute({
   request: { params: idParamSchema },
   responses: {
     200: {
-      description: 'Success operation',
+      description: '俳人詳細の取得に成功しました',
       content: {
         'application/json': {
           schema: z.object({
@@ -184,7 +184,7 @@ const getPoetByIdRoute = createRoute({
         },
       },
     },
-    404: { description: 'Poet not found' },
+    404: { description: '俳人が見つかりません' },
   },
 });
 router.openapi(getPoetByIdRoute, async (c) => {
@@ -192,7 +192,7 @@ router.openapi(getPoetByIdRoute, async (c) => {
   const { poetUseCases } = createUseCases(c.env, 'poets');
   const poet: Poet | null = await poetUseCases.getPoetById(id);
   if (!poet) {
-    return c.json({ error: 'Poet not found' }, 404);
+    return c.json({ error: '俳人が見つかりません' }, 404);
   }
   return c.json(convertPoetToSnakeCase(poet));
 });
@@ -205,12 +205,12 @@ const createPoetRoute = createRoute({
     body: {
       content: { 'application/json': { schema: createPoetSchema } },
       required: true,
-      description: 'Create a poet',
+      description: '俳人の作成',
     },
   },
   responses: {
     201: {
-      description: 'Poet created',
+      description: '俳人が作成されました',
       content: {
         'application/json': {
           schema: z.object({
@@ -244,12 +244,12 @@ const updatePoetRoute = createRoute({
     body: {
       content: { 'application/json': { schema: updatePoetSchema } },
       required: true,
-      description: 'Update a poet',
+      description: '俳人の更新',
     },
   },
   responses: {
     200: {
-      description: 'Poet updated',
+      description: '俳人が更新されました',
       content: {
         'application/json': {
           schema: z.object({
@@ -264,7 +264,7 @@ const updatePoetRoute = createRoute({
         },
       },
     },
-    404: { description: 'Poet not found' },
+    404: { description: '俳人が見つかりません' },
   },
 });
 router.openapi(updatePoetRoute, async (c) => {
@@ -274,7 +274,7 @@ router.openapi(updatePoetRoute, async (c) => {
   const { poetUseCases } = createUseCases(c.env, 'poets');
   const updated: Poet | null = await poetUseCases.updatePoet(id, payload);
   if (!updated) {
-    return c.json({ error: 'Poet not found' }, 404);
+    return c.json({ error: '俳人が見つかりません' }, 404);
   }
   return c.json(convertPoetToSnakeCase(updated));
 });
@@ -286,7 +286,7 @@ const deletePoetRoute = createRoute({
   request: { params: idParamSchema },
   responses: {
     200: {
-      description: 'Poet deleted',
+      description: '俳人が削除されました',
       content: {
         'application/json': {
           schema: z.object({
@@ -296,7 +296,7 @@ const deletePoetRoute = createRoute({
         },
       },
     },
-    404: { description: 'Poet not found' },
+    404: { description: '俳人が見つかりません' },
   },
 });
 router.openapi(deletePoetRoute, async (c) => {
@@ -304,9 +304,9 @@ router.openapi(deletePoetRoute, async (c) => {
   const { poetUseCases } = createUseCases(c.env, 'poets');
   const success: boolean = await poetUseCases.deletePoet(id);
   if (!success) {
-    return c.json({ error: 'Poet not found' }, 404);
+    return c.json({ error: '俳人が見つかりません' }, 404);
   }
-  return c.json({ id, message: 'Poet deleted successfully' });
+  return c.json({ id, message: '俳人が正常に削除されました' });
 });
 
 const getPoetHaikuMonumentsRoute = createRoute({
@@ -316,7 +316,7 @@ const getPoetHaikuMonumentsRoute = createRoute({
   request: { params: idParamSchema },
   responses: {
     200: {
-      description: 'Haiku monuments for a poet',
+      description: '俳人に関する句碑一覧の取得に成功しました',
       content: {
         'application/json': {
           schema: z.array(
@@ -333,12 +333,12 @@ const getPoetHaikuMonumentsRoute = createRoute({
         },
       },
     },
-    400: { description: 'Invalid ID' },
+    400: { description: '無効なIDです' },
   },
 });
 router.openapi(getPoetHaikuMonumentsRoute, async (c) => {
   const { id } = c.req.valid('param');
-  const { monumentUseCases } =  createUseCases(c.env, 'haikuMonuments');
+  const { monumentUseCases } = createUseCases(c.env, 'haikuMonuments');
   const monuments: HaikuMonument[] = await monumentUseCases.getHaikuMonumentsByPoet(id);
   return c.json(convertHaikuMonumentsToSnakeCase(monuments));
 });
