@@ -7,7 +7,7 @@ import { createRouter } from './commonRouter'
 
 const idParamSchema = z
   .object({
-    id: z.string().regex(/^\d+$/, 'Invalid ID').transform(Number)
+    id: z.string().regex(/^\d+$/, '無効なIDです').transform(Number)
   })
   .openapi({ param: { name: 'id', in: 'path' } })
 
@@ -48,8 +48,8 @@ const haikuMonumentsQuerySchema = z.object({
       param: {
         name: 'ordering',
         description: `並び替え
-* \`text\` - 俳句の昇順
-* \`-text\` - 俳句の降順
+* \`text\` - 句碑の内容（俳句）の昇順
+* \`-text\` - 句碑の内容（俳句）の降順
 * \`established_date\` - 建立日の昇順
 * \`-established_date\` - 建立日の降順
 * \`poet\` - 著者の昇順
@@ -69,19 +69,19 @@ const haikuMonumentsQuerySchema = z.object({
       }
     }),
   search: z.string().optional().openapi({
-    param: { name: 'search', description: '俳句と俳句の解説で検索', in: 'query', required: false }
+    param: { name: 'search', description: '句碑と解説文での検索', in: 'query', required: false }
   }),
   title_contains: z.string().optional().openapi({
-    param: { name: 'title_contains', description: '俳句に対する検索', in: 'query', required: false }
+    param: { name: 'title_contains', description: '句碑内容に含まれる文字列での検索', in: 'query', required: false }
   }),
   description_contains: z.string().optional().openapi({
-    param: { name: 'description_contains', description: '俳句の解説に対する検索', in: 'query', required: false }
+    param: { name: 'description_contains', description: '解説文に含まれる文字列での検索', in: 'query', required: false }
   }),
   name_contains: z.string().optional().openapi({
-    param: { name: 'name_contains', description: '著者に対する検索', in: 'query', required: false }
+    param: { name: 'name_contains', description: '著者名に含まれる文字列での検索', in: 'query', required: false }
   }),
   biography_contains: z.string().optional().openapi({
-    param: { name: 'biography_contains', description: '著者の解説に対する検索', in: 'query', required: false }
+    param: { name: 'biography_contains', description: '著者の解説に含まれる文字列での検索', in: 'query', required: false }
   }),
   prefecture: z.string().optional().openapi({
     param: { name: 'prefecture', description: '都道府県名での絞り込み', in: 'query', required: false }
@@ -90,38 +90,38 @@ const haikuMonumentsQuerySchema = z.object({
     param: { name: 'region', description: '地域名での絞り込み', in: 'query', required: false }
   }),
   created_at_gt: z.string().optional().openapi({
-    param: { name: 'created_at_gt', description: '作成日時が指定した日時以降のもの 例: 2025-01-01 00:00:00', in: 'query', required: false },
+    param: { name: 'created_at_gt', description: '作成日時が指定日時以降のもの 例: 2025-01-01T00:00:00Z', in: 'query', required: false },
     format: 'date-time'
   }),
   created_at_lt: z.string().optional().openapi({
-    param: { name: 'created_at_lt', description: '作成日時が指定した日時以前のもの 例: 2025-01-01 00:00:00', in: 'query', required: false },
+    param: { name: 'created_at_lt', description: '作成日時が指定日時以前のもの 例: 2025-01-01T00:00:00Z', in: 'query', required: false },
     format: 'date-time'
   }),
   updated_at_gt: z.string().optional().openapi({
-    param: { name: 'updated_at_gt', description: '更新日時が指定した日時以降のもの 例: 2025-01-01 00:00:00', in: 'query', required: false },
+    param: { name: 'updated_at_gt', description: '更新日時が指定日時以降のもの 例: 2025-01-01T00:00:00Z', in: 'query', required: false },
     format: 'date-time'
   }),
   updated_at_lt: z.string().optional().openapi({
-    param: { name: 'updated_at_lt', description: '更新日時が指定した日時以前のもの 例: 2025-01-01 00:00:00', in: 'query', required: false },
+    param: { name: 'updated_at_lt', description: '更新日時が指定日時以前のもの 例: 2025-01-01T00:00:00Z', in: 'query', required: false },
     format: 'date-time'
   })
 })
 
 const poetInputSchema = z.object({
-  name: z.string().min(1, 'Poet name is required').max(255, 'Poet name too long'),
+  name: z.string().min(1, '著者名は必須です').max(255),
   biography: z.string().nullable().optional(),
   links: z.string().nullable().optional(),
   image_url: z.string().nullable().optional()
 })
 const sourceInputSchema = z.object({
-  title: z.string().min(1, 'Source title is required').max(255, 'Source title too long'),
+  title: z.string().min(1, '出典タイトルは必須です').max(255),
   author: z.string().nullable().optional(),
   year: z.number().nullable().optional(),
   url: z.string().nullable().optional(),
   publisher: z.string().nullable().optional()
 })
 const locationInputSchema = z.object({
-  prefecture: z.string().min(1, 'Prefecture is required'),
+  prefecture: z.string().min(1, '都道府県は必須です'),
   region: z.string().nullable().default(null),
   address: z.string().nullable().default(null),
   latitude: z.number(),
@@ -130,7 +130,7 @@ const locationInputSchema = z.object({
 })
 
 const baseHaikuMonumentSchema = z.object({
-  text: z.string().min(1, 'Text is required'),
+  text: z.string().min(1, '句碑の内容は必須です'),
   established_date: z.string().nullable().optional(),
   commentary: z.string().nullable().optional(),
   image_url: z.string().nullable().optional(),
@@ -138,6 +138,7 @@ const baseHaikuMonumentSchema = z.object({
   sources: z.array(sourceInputSchema).nullable().optional(),
   locations: z.array(locationInputSchema).nullable().optional()
 })
+
 const transformMonumentInput = (data: z.infer<typeof baseHaikuMonumentSchema>) => ({
   text: data.text,
   establishedDate: data.established_date ?? null,
@@ -273,7 +274,7 @@ router.openapi(
     request: { query: haikuMonumentsQuerySchema },
     responses: {
       200: {
-        description: '句碑の一覧を取得',
+        description: '句碑の一覧を取得しました',
         content: {
           'application/json': {
             schema: z.object({ haiku_monuments: z.array(haikuMonumentResponseSchema) })
@@ -298,14 +299,14 @@ router.openapi(
     request: { params: idParamSchema },
     responses: {
       200: {
-        description: '句碑の詳細を取得',
+        description: '句碑の詳細を取得しました',
         content: {
           'application/json': {
             schema: z.object({ haiku_monument: haikuMonumentResponseSchema })
           }
         }
       },
-      404: { description: 'Haiku Monument not found' }
+      404: { description: '句碑が見つかりません' }
     }
   }),
   async (c) => {
@@ -313,7 +314,7 @@ router.openapi(
     const { monumentUseCases } = createUseCases(c.env, 'haikuMonuments')
     const monument = await monumentUseCases.getHaikuMonumentById(id)
     if (!monument) {
-      return c.json({ error: 'Haiku Monument not found' }, 404)
+      return c.json({ error: '句碑が見つかりません' }, 404)
     }
     return c.json({ haiku_monument: convertHaikuMonument(monument) })
   }
@@ -333,7 +334,7 @@ router.openapi(
     },
     responses: {
       201: {
-        description: '句碑の作成に成功',
+        description: '句碑の作成に成功しました',
         content: {
           'application/json': {
             schema: z.object({ haiku_monument: haikuMonumentResponseSchema })
@@ -366,14 +367,14 @@ router.openapi(
     },
     responses: {
       200: {
-        description: '句碑の更新に成功',
+        description: '句碑の更新に成功しました',
         content: {
           'application/json': {
             schema: z.object({ haiku_monument: haikuMonumentResponseSchema })
           }
         }
       },
-      404: { description: 'Haiku Monument not found' }
+      404: { description: '句碑が見つかりません' }
     }
   }),
   async (c) => {
@@ -383,7 +384,7 @@ router.openapi(
     const { monumentUseCases } = createUseCases(c.env, 'haikuMonuments')
     const updated = await monumentUseCases.updateHaikuMonument(id, payload)
     if (!updated) {
-      return c.json({ error: 'Haiku Monument not found' }, 404)
+      return c.json({ error: '句碑が見つかりません' }, 404)
     }
     return c.json({ haiku_monument: convertHaikuMonument(updated) })
   }
@@ -397,14 +398,14 @@ router.openapi(
     request: { params: idParamSchema },
     responses: {
       200: {
-        description: '句碑の削除に成功',
+        description: '句碑の削除に成功しました',
         content: {
           'application/json': {
             schema: z.object({ id: z.number(), message: z.string() })
           }
         }
       },
-      404: { description: 'Haiku Monument not found' }
+      404: { description: '句碑が見つかりません' }
     }
   }),
   async (c) => {
@@ -412,9 +413,9 @@ router.openapi(
     const { monumentUseCases } = createUseCases(c.env, 'haikuMonuments')
     const success = await monumentUseCases.deleteHaikuMonument(id)
     if (!success) {
-      return c.json({ error: 'Haiku Monument not found' }, 404)
+      return c.json({ error: '句碑が見つかりません' }, 404)
     }
-    return c.json({ message: 'Haiku Monument deleted successfully', id })
+    return c.json({ message: '句碑が正常に削除されました', id })
   }
 )
 

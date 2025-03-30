@@ -5,21 +5,21 @@ import { createRouter } from './commonRouter';
 import { createUseCases } from './createUseCases';
 
 const createLocationSchema = z.object({
-  address: z.string().min(1, 'Address is required').max(255, 'Address is too long'),
-  latitude: z.number().min(-90).max(90),
-  longitude: z.number().min(-180).max(180),
-  name: z.string().max(255, 'Name is too long').nullable().optional().default(null),
+  address: z.string().min(1, '住所は必須です').max(255),
+  latitude: z.number().min(-90, '緯度は-90以上でなければなりません').max(90, '緯度は90以下でなければなりません'),
+  longitude: z.number().min(-180, '経度は-180以上でなければなりません').max(180, '経度は180以下でなければなりません'),
+  name: z.string().max(255).nullable().optional().default(null),
   prefecture: z.string().default(''),
   region: z.string().nullable().default(null),
 });
 
 const updateLocationSchema = z.object({
-  address: z.string().nonempty().optional(),
+  address: z.string().nonempty('住所を入力してください').optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
   name: z
     .string()
-    .max(255, 'Name is too long')
+    .max(255)
     .nullable()
     .optional()
     .transform((val) => (val === "" ? null : val)),
@@ -29,14 +29,15 @@ const updateLocationSchema = z.object({
 
 const idParamSchema = z
   .object({
-    id: z.string().regex(/^\d+$/, 'Invalid ID').transform(Number),
+    id: z.string().regex(/^\d+$/, '無効なIDです').transform(Number),
   })
   .openapi({
     param: { name: 'id', in: 'path' },
   });
 
 const orderingSchema = z
-  .preprocess((arg) => (typeof arg === 'string' ? [arg] : arg), 
+  .preprocess(
+    (arg) => (typeof arg === 'string' ? [arg] : arg),
     z.array(z.enum(["-prefecture", "-region", "prefecture", "region"]))
   )
   .optional()
@@ -56,7 +57,7 @@ const locationsQuerySchema = z.object({
     type: 'integer',
   }),
   offset: z.coerce.number().optional().openapi({
-    param: { name: 'offset', description: '取得する位置', in: 'query', required: false },
+    param: { name: 'offset', description: '取得開始位置', in: 'query', required: false },
     type: 'integer',
   }),
   ordering: orderingSchema,
@@ -77,7 +78,7 @@ const getAllLocationsRoute = createRoute({
   request: { query: locationsQuerySchema },
   responses: {
     200: {
-      description: 'List of locations',
+      description: '句碑の場所一覧',
       content: {
         'application/json': {
           schema: z.array(
@@ -110,7 +111,7 @@ const getLocationByIdRoute = createRoute({
   request: { params: idParamSchema },
   responses: {
     200: {
-      description: 'Location detail',
+      description: '句碑の場所の詳細',
       content: {
         'application/json': {
           schema: z.object({
@@ -125,7 +126,7 @@ const getLocationByIdRoute = createRoute({
         },
       },
     },
-    404: { description: 'Location not found' },
+    404: { description: '句碑の場所が見つかりません' },
   },
 });
 router.openapi(getLocationByIdRoute, async (c) => {
@@ -133,7 +134,7 @@ router.openapi(getLocationByIdRoute, async (c) => {
   const { locationUseCases } = createUseCases(c.env, 'locations');
   const location = await locationUseCases.getLocationById(id);
   if (!location) {
-    return c.json({ error: 'Location not found' }, 404);
+    return c.json({ error: '句碑の場所が見つかりません' }, 404);
   }
   return c.json(location);
 });
@@ -146,12 +147,12 @@ const createLocationRoute = createRoute({
     body: {
       content: { 'application/json': { schema: createLocationSchema } },
       required: true,
-      description: 'Create a location',
+      description: '句碑の場所を作成',
     },
   },
   responses: {
     201: {
-      description: 'Location created',
+      description: '句碑の場所が作成されました',
       content: {
         'application/json': {
           schema: z.object({
@@ -184,12 +185,12 @@ const updateLocationRoute = createRoute({
     body: {
       content: { 'application/json': { schema: updateLocationSchema } },
       required: true,
-      description: 'Update a location',
+      description: '句碑の場所を更新',
     },
   },
   responses: {
     200: {
-      description: 'Location updated',
+      description: '句碑の場所が更新されました',
       content: {
         'application/json': {
           schema: z.object({
@@ -204,7 +205,7 @@ const updateLocationRoute = createRoute({
         },
       },
     },
-    404: { description: 'Location not found' },
+    404: { description: '句碑の場所が見つかりません' },
   },
 });
 router.openapi(updateLocationRoute, async (c) => {
@@ -213,7 +214,7 @@ router.openapi(updateLocationRoute, async (c) => {
   const { locationUseCases } = createUseCases(c.env, 'locations');
   const updated = await locationUseCases.updateLocation(id, payload);
   if (!updated) {
-    return c.json({ error: 'Location not found' }, 404);
+    return c.json({ error: '句碑の場所が見つかりません' }, 404);
   }
   return c.json(updated);
 });
@@ -225,7 +226,7 @@ const deleteLocationRoute = createRoute({
   request: { params: idParamSchema },
   responses: {
     200: {
-      description: 'Location deleted',
+      description: '句碑の場所の削除に成功しました',
       content: {
         'application/json': {
           schema: z.object({
@@ -235,7 +236,7 @@ const deleteLocationRoute = createRoute({
         },
       },
     },
-    404: { description: 'Location not found' },
+    404: { description: '句碑の場所が見つかりません' },
   },
 });
 router.openapi(deleteLocationRoute, async (c) => {
@@ -243,9 +244,9 @@ router.openapi(deleteLocationRoute, async (c) => {
   const { locationUseCases } = createUseCases(c.env, 'locations');
   const success = await locationUseCases.deleteLocation(id);
   if (!success) {
-    return c.json({ error: 'Location not found' }, 404);
+    return c.json({ error: '句碑の場所が見つかりません' }, 404);
   }
-  return c.json({ id, message: 'Location deleted successfully' });
+  return c.json({ id, message: '句碑の場所が正常に削除されました' });
 });
 
 const getHaikuMonumentsRoute = createRoute({
@@ -255,7 +256,7 @@ const getHaikuMonumentsRoute = createRoute({
   request: { params: idParamSchema },
   responses: {
     200: {
-      description: 'Haiku monuments for a location',
+      description: '場所に関する句碑一覧の取得に成功しました',
       content: {
         'application/json': {
           schema: z.array(
@@ -272,7 +273,7 @@ const getHaikuMonumentsRoute = createRoute({
         },
       },
     },
-    400: { description: 'Invalid ID' },
+    400: { description: '無効なIDです' },
   },
 });
 router.openapi(getHaikuMonumentsRoute, async (c) => {

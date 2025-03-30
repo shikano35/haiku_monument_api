@@ -8,7 +8,7 @@ import { createUseCases } from './createUseCases';
 
 const idParamSchema = z
   .object({
-    id: z.string().regex(/^\d+$/, 'Invalid ID').transform(Number),
+    id: z.string().regex(/^\d+$/, '無効なIDです').transform(Number),
   })
   .openapi({ param: { name: 'id', in: 'path' } });
 
@@ -18,7 +18,7 @@ const sourcesQuerySchema = z.object({
     type: 'integer',
   }),
   offset: z.coerce.number().optional().openapi({
-    param: { name: 'offset', description: '取得する位置', in: 'query', required: false },
+    param: { name: 'offset', description: '取得開始位置', in: 'query', required: false },
     type: 'integer',
   }),
   ordering: z
@@ -63,7 +63,7 @@ const sourcesQuerySchema = z.object({
 });
 
 const createSourceSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(255, 'Title is too long'),
+  title: z.string().min(1, 'タイトルは必須です').max(255, 'タイトルが長すぎます'),
   author: z.string().optional().nullable(),
   year: z.number().optional().nullable(),
   url: z.string().optional().nullable(),
@@ -71,7 +71,7 @@ const createSourceSchema = z.object({
 });
 
 const updateSourceSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(255, 'Title is too long').optional(),
+  title: z.string().min(1, 'タイトルは必須です').max(255, 'タイトルが長すぎます').optional(),
   author: z.string().optional().nullable(),
   year: z.number().optional().nullable(),
   url: z.string().optional().nullable(),
@@ -87,7 +87,7 @@ const getAllSourcesRoute = createRoute({
   request: { query: sourcesQuerySchema },
   responses: {
     200: {
-      description: 'Success operation',
+      description: '情報源一覧の取得に成功しました',
       content: {
         'application/json': {
           schema: z.array(
@@ -122,7 +122,7 @@ const getSourceByIdRoute = createRoute({
   request: { params: idParamSchema },
   responses: {
     200: {
-      description: 'Success operation',
+      description: '情報源詳細の取得に成功しました',
       content: {
         'application/json': {
           schema: z.object({
@@ -138,14 +138,14 @@ const getSourceByIdRoute = createRoute({
         },
       },
     },
-    404: { description: 'Source not found' },
+    404: { description: '情報源が見つかりません' },
   },
 });
 router.openapi(getSourceByIdRoute, async (c) => {
   const { id } = c.req.valid('param');
   const { sourceUseCases } = createUseCases(c.env, 'sources');
   const source = await sourceUseCases.getSourceById(id);
-  if (!source) return c.json({ error: 'Source not found' }, 404);
+  if (!source) return c.json({ error: '情報源が見つかりません' }, 404);
   const snakeSource = convertKeysToSnakeCase(source) as unknown as SourceResponse;
   return c.json(snakeSource);
 });
@@ -158,12 +158,12 @@ const createSourceRoute = createRoute({
     body: {
       content: { 'application/json': { schema: createSourceSchema } },
       required: true,
-      description: 'Create a source',
+      description: '情報源の作成',
     },
   },
   responses: {
     201: {
-      description: 'Source created',
+      description: '情報源が作成されました',
       content: {
         'application/json': {
           schema: z.object({
@@ -199,12 +199,12 @@ const updateSourceRoute = createRoute({
     body: {
       content: { 'application/json': { schema: updateSourceSchema } },
       required: true,
-      description: 'Update a source',
+      description: '情報源の更新',
     },
   },
   responses: {
     200: {
-      description: 'Source updated',
+      description: '情報源が更新されました',
       content: {
         'application/json': {
           schema: z.object({
@@ -220,7 +220,7 @@ const updateSourceRoute = createRoute({
         },
       },
     },
-    404: { description: 'Source not found' },
+    404: { description: '情報源が見つかりません' },
   },
 });
 router.openapi(updateSourceRoute, async (c) => {
@@ -229,7 +229,7 @@ router.openapi(updateSourceRoute, async (c) => {
   const payload = convertKeysToCamelCase(rawPayload);
   const { sourceUseCases } = createUseCases(c.env, 'sources');
   const updated = await sourceUseCases.updateSource(id, payload);
-  if (!updated) return c.json({ error: 'Source not found' }, 404);
+  if (!updated) return c.json({ error: '情報源が見つかりません' }, 404);
   const snakeUpdated = convertKeysToSnakeCase(updated) as unknown as SourceResponse;
   return c.json(snakeUpdated);
 });
@@ -241,7 +241,7 @@ const deleteSourceRoute = createRoute({
   request: { params: idParamSchema },
   responses: {
     200: {
-      description: 'Source deleted',
+      description: '情報源が削除されました',
       content: {
         'application/json': {
           schema: z.object({
@@ -251,15 +251,15 @@ const deleteSourceRoute = createRoute({
         },
       },
     },
-    404: { description: 'Source not found' },
+    404: { description: '句碑の情報源が見つかりません' },
   },
 });
 router.openapi(deleteSourceRoute, async (c) => {
   const { id } = c.req.valid('param');
   const { sourceUseCases } = createUseCases(c.env, 'sources');
   const success = await sourceUseCases.deleteSource(id);
-  if (!success) return c.json({ error: 'Source not found' }, 404);
-  return c.json({ id, message: 'Source deleted successfully' });
+  if (!success) return c.json({ error: '句碑の情報源が見つかりません' }, 404);
+  return c.json({ id, message: '句碑の情報源が正常に削除されました' });
 });
 
 const getSourceHaikuMonumentsRoute = createRoute({
@@ -269,7 +269,7 @@ const getSourceHaikuMonumentsRoute = createRoute({
   request: { params: idParamSchema },
   responses: {
     200: {
-      description: 'Haiku monuments for a source',
+      description: '情報源に関する句碑一覧の取得に成功しました',
       content: {
         'application/json': {
           schema: z.array(
@@ -286,7 +286,7 @@ const getSourceHaikuMonumentsRoute = createRoute({
         },
       },
     },
-    400: { description: 'Invalid ID' },
+    400: { description: '無効なIDです' },
   },
 });
 router.openapi(getSourceHaikuMonumentsRoute, async (c) => {
