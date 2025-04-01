@@ -5,7 +5,7 @@ import type { QueryParams } from '../common/QueryParams';
 export class PoetUseCases {
   constructor(private readonly poetRepo: IPoetRepository) {}
 
-  async getAllPoets(queryParams?: QueryParams): Promise<Poet[]> {
+  async getAllPoets(queryParams: QueryParams): Promise<Poet[]> {
     return this.poetRepo.getAll(queryParams);
   }
 

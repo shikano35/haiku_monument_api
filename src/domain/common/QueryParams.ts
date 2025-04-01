@@ -1,27 +1,27 @@
-export interface PaginationParams {
-  limit?: number;
-  offset?: number;
+interface PaginationParams {
+  limit: number | null;
+  offset: number | null;
 }
 
-export interface OrderingParams {
-  ordering?: string[];
+interface OrderingParams {
+  ordering: string[] | null;
 }
 
-export interface DateFilterParams {
-  created_at_gt?: string;
-  created_at_lt?: string;
-  updated_at_gt?: string;
-  updated_at_lt?: string;
+interface DateFilterParams {
+  created_at_gt: string | null;
+  created_at_lt: string | null;
+  updated_at_gt: string | null;
+  updated_at_lt: string | null;
 }
 
-export interface SearchParams {
-  search?: string;
-  title_contains?: string;
-  description_contains?: string;
-  name_contains?: string;
-  biography_contains?: string;
-  prefecture?: string;
-  region?: string;
+interface SearchParams {
+  search: string | null;
+  title_contains: string | null;
+  description_contains: string | null;
+  name_contains: string | null;
+  biography_contains: string | null;
+  prefecture: string | null;
+  region: string | null;
 }
 
 export interface QueryParams

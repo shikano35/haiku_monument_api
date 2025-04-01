@@ -13,7 +13,7 @@ export class PoetRepository implements IPoetRepository {
     return getDB(this.dbBinding);
   }
 
-  async getAll(queryParams?: QueryParams): Promise<Poet[]> {
+  async getAll(queryParams: QueryParams): Promise<Poet[]> {
     let query = this.db.select().from(poets);
 
     if (queryParams) {

@@ -5,7 +5,7 @@ import type { IHaikuMonumentRepository } from '../repositories/IHaikuMonumentRep
 export class HaikuMonumentUseCases {
   constructor(private readonly monumentRepo: IHaikuMonumentRepository) {}
 
-  async getAllHaikuMonuments(queryParams?: QueryParams): Promise<HaikuMonument[]> {
+  async getAllHaikuMonuments(queryParams: QueryParams): Promise<HaikuMonument[]> {
     return this.monumentRepo.getAll(queryParams);
   }
 

@@ -22,7 +22,7 @@ export class SourceRepository implements ISourceRepository {
     return getDB(this.dbBinding);
   }
 
-  async getAll(queryParams?: QueryParams): Promise<Source[]> {
+  async getAll(queryParams: QueryParams): Promise<Source[]> {
     let query = this.db.select().from(sources);
 
     if (queryParams) {

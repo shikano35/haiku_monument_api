@@ -4,6 +4,6 @@ export type HaikuMonumentResponse = {
   established_date: string | null;
   commentary: string | null;
   image_url: string | null;
-  created_at: string | null;
-  updated_at: string | null;
+  created_at: string;
+  updated_at: string;
 };
