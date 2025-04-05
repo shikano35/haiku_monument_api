@@ -49,7 +49,6 @@ app.route('/locations', locationsRoutes);
 app.route('/poets', poetsRoutes);
 app.route('/sources', sourcesRoutes);
 app.route('/haiku-monuments', haikuMonumentRoutes);
-// app.route('/users', usersRoutes);
 
 app.doc('/docs/json', openApiSpec);
 app.get('/docs', swaggerUI({ url: '/docs/json' }));
