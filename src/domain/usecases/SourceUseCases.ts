@@ -5,7 +5,7 @@ import type { ISourceRepository } from '../repositories/ISourceRepository';
 export class SourceUseCases {
   constructor(private readonly sourceRepo: ISourceRepository) {}
 
-  async getAllSources(queryParams?: QueryParams): Promise<Source[]> {
+  async getAllSources(queryParams: QueryParams): Promise<Source[]> {
     return this.sourceRepo.getAll(queryParams);
   }
 

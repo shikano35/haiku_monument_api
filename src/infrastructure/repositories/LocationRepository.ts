@@ -13,7 +13,7 @@ export class LocationRepository implements ILocationRepository {
     return getDB(this.dbBinding);
   }
 
-  async getAll(queryParams?: QueryParams): Promise<Location[]> {
+  async getAll(queryParams: QueryParams): Promise<Location[]> {
     let query = this.db.select().from(locations);
 
     if (queryParams) {

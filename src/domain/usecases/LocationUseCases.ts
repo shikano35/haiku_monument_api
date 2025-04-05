@@ -5,7 +5,7 @@ import type { ILocationRepository } from '../repositories/ILocationRepository';
 export class LocationUseCases {
   constructor(private readonly locationRepo: ILocationRepository) {}
 
-  async getAllLocations(queryParams?: QueryParams): Promise<Location[]> {
+  async getAllLocations(queryParams: QueryParams): Promise<Location[]> {
     return this.locationRepo.getAll(queryParams);
   }
 

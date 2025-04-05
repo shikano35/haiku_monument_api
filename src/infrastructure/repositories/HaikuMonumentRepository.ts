@@ -22,7 +22,7 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
     return getDB(this.dbBinding);
   }
 
-  async getAll(queryParams?: QueryParams): Promise<HaikuMonument[]> {
+  async getAll(queryParams: QueryParams): Promise<HaikuMonument[]> {
     let query = this.db
       .select({
         id: haikuMonuments.id,
@@ -175,6 +175,7 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
       .where(eq(haikuMonuments.id, id))
       .limit(1)
       .all();
+
     return result.length > 0 ? result[0] : null;
   }
 

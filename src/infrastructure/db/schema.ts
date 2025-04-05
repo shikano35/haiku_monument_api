@@ -51,17 +51,3 @@ export const haikuMonuments = sqliteTable("haiku_monuments", {
   createdAt: text("created_at").default(sql`(DATETIME('now','localtime'))`),
   updatedAt: text("updated_at").default(sql`(DATETIME('now','localtime'))`),
 });
-
-// Users テーブル
-export const users = sqliteTable("users", {
-  id: integer("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  email: text("email").notNull().unique(),
-  hashedPassword: text("hashed_password").notNull(),
-  displayName: text("display_name"),
-  role: text("role").notNull().default("user"),
-  createdAt: text("created_at").default(sql`(DATETIME('now','localtime'))`),
-  updatedAt: text("updated_at").default(sql`(DATETIME('now','localtime'))`),
-  lastLoginAt: text("last_login_at"),
-  status: text("status").notNull().default("active"),
-});

@@ -2,7 +2,7 @@ import type { QueryParams } from '../common/QueryParams';
 import type { CreateHaikuMonumentInput, HaikuMonument, UpdateHaikuMonumentInput } from '../entities/HaikuMonument';
 
 export type IHaikuMonumentRepository = {
-  getAll(queryParams?: QueryParams): Promise<HaikuMonument[]>;
+  getAll(queryParams: QueryParams): Promise<HaikuMonument[]>;
   getById(id: number): Promise<HaikuMonument | null>;
   create(monument: CreateHaikuMonumentInput): Promise<HaikuMonument>;
   update(id: number, monumentData: UpdateHaikuMonumentInput): Promise<HaikuMonument | null>;
