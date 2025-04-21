@@ -362,6 +362,7 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
       poetId,
       sourceId,
       locationId,
+      updatedAt: new Date().toISOString(),
     };
 
     const [updated] = await this.db

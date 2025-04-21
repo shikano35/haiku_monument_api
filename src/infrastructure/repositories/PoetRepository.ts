@@ -124,7 +124,10 @@ export class PoetRepository implements IPoetRepository {
     if (!exists) return null;
     const [updated] = await this.db
       .update(poets)
-      .set(poetData)
+      .set({
+        ...poetData,
+        updatedAt: new Date().toISOString(),
+      })
       .where(eq(poets.id, id))
       .returning({
         id: poets.id,
