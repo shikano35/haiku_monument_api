@@ -1,5 +1,5 @@
 CREATE TABLE `haiku_monuments` (
-	`id` integer PRIMARY KEY NOT NULL,
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`text` text NOT NULL,
 	`poet_id` integer,
 	`source_id` integer,
@@ -15,7 +15,7 @@ CREATE TABLE `haiku_monuments` (
 );
 --> statement-breakpoint
 CREATE TABLE `locations` (
-	`id` integer PRIMARY KEY NOT NULL,
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`prefecture` text NOT NULL,
 	`region` text,
 	`address` text,
@@ -25,7 +25,7 @@ CREATE TABLE `locations` (
 );
 --> statement-breakpoint
 CREATE TABLE `poets` (
-	`id` integer PRIMARY KEY NOT NULL,
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
 	`biography` text,
 	`links` text,
@@ -35,7 +35,7 @@ CREATE TABLE `poets` (
 );
 --> statement-breakpoint
 CREATE TABLE `sources` (
-	`id` integer PRIMARY KEY NOT NULL,
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`title` text NOT NULL,
 	`author` text,
 	`year` integer,
@@ -44,19 +44,3 @@ CREATE TABLE `sources` (
 	`created_at` text DEFAULT (DATETIME('now','localtime')),
 	`updated_at` text DEFAULT (DATETIME('now','localtime'))
 );
---> statement-breakpoint
-CREATE TABLE `users` (
-	`id` integer PRIMARY KEY NOT NULL,
-	`username` text NOT NULL,
-	`email` text NOT NULL,
-	`hashed_password` text NOT NULL,
-	`display_name` text,
-	`role` text DEFAULT 'user' NOT NULL,
-	`created_at` text DEFAULT (DATETIME('now','localtime')),
-	`updated_at` text DEFAULT (DATETIME('now','localtime')),
-	`last_login_at` text,
-	`status` text DEFAULT 'active' NOT NULL
-);
---> statement-breakpoint
-CREATE UNIQUE INDEX `users_username_unique` ON `users` (`username`);--> statement-breakpoint
-CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);
