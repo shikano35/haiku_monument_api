@@ -124,7 +124,10 @@ export class SourceRepository implements ISourceRepository {
     if (!exists) return null;
     const [updated] = await this.db
       .update(sources)
-      .set(sourceData)
+      .set({
+        ...sourceData,
+        updatedAt: new Date().toISOString(),
+      })
       .where(eq(sources.id, id))
       .returning();
     return updated;

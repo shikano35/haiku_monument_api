@@ -3,7 +3,7 @@ import { sql } from "drizzle-orm";
 
 // Poets テーブル
 export const poets = sqliteTable("poets", {
-  id: integer("id").primaryKey(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   biography: text("biography"),
   links: text("links"),
@@ -14,7 +14,7 @@ export const poets = sqliteTable("poets", {
 
 // Sources テーブル
 export const sources = sqliteTable("sources", {
-  id: integer("id").primaryKey(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   title: text("title").notNull(),
   author: text("author"),
   year: integer("year"),
@@ -26,7 +26,7 @@ export const sources = sqliteTable("sources", {
 
 // Locations テーブル
 export const locations = sqliteTable("locations", {
-  id: integer("id").primaryKey(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   prefecture: text("prefecture").notNull(),
   region: text("region"),
   address: text("address"),
@@ -37,7 +37,7 @@ export const locations = sqliteTable("locations", {
 
 // Haiku Monument テーブル
 export const haikuMonuments = sqliteTable("haiku_monuments", {
-  id: integer("id").primaryKey(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   text: text("text").notNull(),
   poetId: integer("poet_id")
     .references(() => poets.id, { onDelete: "restrict" }),
