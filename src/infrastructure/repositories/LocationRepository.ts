@@ -13,6 +13,28 @@ export class LocationRepository implements ILocationRepository {
     return getDB(this.dbBinding);
   }
 
+  private convertToLocation(data: {
+    id: number;
+    region: string;
+    prefecture: string;
+    municipality: string | null;
+    address: string | null;
+    placeName: string | null;
+    latitude: number | null;
+    longitude: number | null;
+  }): Location {
+    return {
+      id: data.id,
+      region: data.region,
+      prefecture: data.prefecture,
+      municipality: data.municipality,
+      address: data.address,
+      placeName: data.placeName,
+      latitude: data.latitude,
+      longitude: data.longitude
+    };
+  }
+
   async getAll(queryParams: QueryParams): Promise<Location[]> {
     let query = this.db.select().from(locations);
 
@@ -57,7 +79,8 @@ export class LocationRepository implements ILocationRepository {
       }
     }
 
-    return await query.all();
+    const results = await query.all();
+    return results.map(this.convertToLocation);
   }
 
   async getById(id: number): Promise<Location | null> {
@@ -67,7 +90,7 @@ export class LocationRepository implements ILocationRepository {
       .where(eq(locations.id, id))
       .limit(1)
       .all();
-    return result.length > 0 ? result[0] : null;
+    return result.length > 0 ? this.convertToLocation(result[0]) : null;
   }
 
   async create(locationData: CreateLocationInput): Promise<Location> {
@@ -75,7 +98,7 @@ export class LocationRepository implements ILocationRepository {
       .insert(locations)
       .values(locationData)
       .returning();
-    return inserted;
+    return this.convertToLocation(inserted);
   }
 
   async update(id: number, locationData: Partial<Location>): Promise<Location | null> {
@@ -86,7 +109,7 @@ export class LocationRepository implements ILocationRepository {
       .set(locationData)
       .where(eq(locations.id, id))
       .returning();
-    return updated;
+    return this.convertToLocation(updated);
   }
 
   async delete(id: number): Promise<boolean> {

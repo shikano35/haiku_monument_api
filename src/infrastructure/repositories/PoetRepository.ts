@@ -1,10 +1,34 @@
 import type { IPoetRepository } from '../../domain/repositories/IPoetRepository';
-import type { Poet, CreatePoetInput } from '../../domain/entities/Poet';
+import type { CreatePoetInput, Poet } from '../../domain/entities/Poet';
 import { getDB } from '../db/db';
 import { poets } from '../db/schema';
-import { eq, like, gt, lt, or, asc, desc } from 'drizzle-orm/expressions';
+import { and, asc, desc, eq, gt, like, lt, or } from 'drizzle-orm/expressions';
 import type { D1Database } from '@cloudflare/workers-types';
 import type { QueryParams } from '../../domain/common/QueryParams';
+
+const ensureString = (value: string | null): string => {
+  return value || "";
+};
+
+const convertToPoet = (dbPoet: {
+  id: number;
+  name: string;
+  biography: string | null;
+  linkUrl: string | null;
+  imageUrl: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}): Poet => {
+  return {
+    id: dbPoet.id,
+    name: dbPoet.name,
+    biography: dbPoet.biography,
+    linkUrl: dbPoet.linkUrl,
+    imageUrl: dbPoet.imageUrl,
+    createdAt: ensureString(dbPoet.createdAt),
+    updatedAt: ensureString(dbPoet.updatedAt),
+  };
+};
 
 export class PoetRepository implements IPoetRepository {
   constructor(private readonly dbBinding: D1Database) {}
@@ -81,7 +105,7 @@ export class PoetRepository implements IPoetRepository {
           }
         }
       }
-
+      
       if (typeof queryParams.limit === 'number') {
         query = query.limit(queryParams.limit) as typeof query;
       }
@@ -90,7 +114,8 @@ export class PoetRepository implements IPoetRepository {
       }
     }
 
-    return await query.all();
+    const results = await query.all();
+    return results.map(convertToPoet);
   }
 
   async getById(id: number): Promise<Poet | null> {
@@ -100,45 +125,29 @@ export class PoetRepository implements IPoetRepository {
       .where(eq(poets.id, id))
       .limit(1)
       .all();
-    return result.length > 0 ? result[0] : null;
+    
+    return result.length > 0 ? convertToPoet(result[0]) : null;
   }
 
   async create(poetData: CreatePoetInput): Promise<Poet> {
     const [inserted] = await this.db
       .insert(poets)
       .values(poetData)
-      .returning({
-        id: poets.id,
-        name: poets.name,
-        biography: poets.biography,
-        links: poets.links,
-        imageUrl: poets.imageUrl,
-        createdAt: poets.createdAt,
-        updatedAt: poets.updatedAt,
-      });
-    return inserted;
+      .returning();
+    
+    return convertToPoet(inserted);
   }
 
   async update(id: number, poetData: Partial<Poet>): Promise<Poet | null> {
-    const exists = await this.getById(id);
-    if (!exists) return null;
+    if (!(await this.getById(id))) return null;
+    
     const [updated] = await this.db
       .update(poets)
-      .set({
-        ...poetData,
-        updatedAt: new Date().toISOString(),
-      })
+      .set(poetData)
       .where(eq(poets.id, id))
-      .returning({
-        id: poets.id,
-        name: poets.name,
-        biography: poets.biography,
-        links: poets.links,
-        imageUrl: poets.imageUrl,
-        createdAt: poets.createdAt,
-        updatedAt: poets.updatedAt,
-      });
-    return updated;
+      .returning();
+    
+    return convertToPoet(updated);
   }
 
   async delete(id: number): Promise<boolean> {
