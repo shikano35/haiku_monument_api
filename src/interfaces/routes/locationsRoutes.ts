@@ -3,28 +3,31 @@ import { parseQueryParams } from '../../utils/parseQueryParams';
 import { createRouter } from './commonRouter';
 import { createUseCases } from './createUseCases';
 import type { HaikuMonument } from '../../domain/entities/HaikuMonument';
+import type { Location } from '../../domain/entities/Location';
 
 const createLocationSchema = z.object({
+  region: z.string().default(''),
+  prefecture: z.string().default(''),
+  municipality: z.string().nullable().optional().default(null),
   address: z.string().min(1, '住所は必須です').max(255),
+  place_name: z.string().max(255).nullable().optional().default(null),
   latitude: z.number().min(-90, '緯度は-90以上でなければなりません').max(90, '緯度は90以下でなければなりません'),
   longitude: z.number().min(-180, '経度は-180以上でなければなりません').max(180, '経度は180以下でなければなりません'),
-  name: z.string().max(255).nullable().optional().default(null),
-  prefecture: z.string().default(''),
-  region: z.string().nullable().default(null),
 });
 
 const updateLocationSchema = z.object({
+  region: z.string().optional(),
+  prefecture: z.string().optional(),
+  municipality: z.string().nullable().optional(),
   address: z.string().nonempty('住所を入力してください').optional(),
+  place_name: z
+  .string()
+  .max(255)
+  .nullable()
+  .optional()
+  .transform((val) => (val === "" ? null : val)),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
-  name: z
-    .string()
-    .max(255)
-    .nullable()
-    .optional()
-    .transform((val) => (val === "" ? null : val)),
-  prefecture: z.string().optional(),
-  region: z.string().nullable().optional(),
 });
 
 const idParamSchema = z
@@ -71,6 +74,17 @@ const locationsQuerySchema = z.object({
 
 const router = createRouter();
 
+const convertLocationToApiResponse = (location: Location) => ({
+  id: location.id,
+  region: location.region,
+  prefecture: location.prefecture,
+  municipality: location.municipality,
+  address: location.address,
+  place_name: location.placeName,
+  latitude: location.latitude,
+  longitude: location.longitude,
+});
+
 const getAllLocationsRoute = createRoute({
   method: 'get',
   tags: ['locations'],
@@ -84,12 +98,13 @@ const getAllLocationsRoute = createRoute({
           schema: z.array(
             z.object({
               id: z.number(),
+              region: z.string(),
               prefecture: z.string(),
-              region: z.string().nullable(),
+              municipality: z.string().nullable(),
               address: z.string().nullable(),
+              place_name: z.string().nullable(),
               latitude: z.number().nullable(),
               longitude: z.number().nullable(),
-              name: z.string().nullable(),
             })
           ),
         },
@@ -101,7 +116,7 @@ router.openapi(getAllLocationsRoute, async (c) => {
   const queryParams = parseQueryParams(new URLSearchParams(c.req.query()));
   const { locationUseCases } = createUseCases(c.env, 'locations');
   const locations = await locationUseCases.getAllLocations(queryParams);
-  return c.json(locations);
+  return c.json(locations.map(convertLocationToApiResponse));
 });
 
 const getLocationByIdRoute = createRoute({
@@ -116,12 +131,13 @@ const getLocationByIdRoute = createRoute({
         'application/json': {
           schema: z.object({
             id: z.number(),
+            region: z.string(),
             prefecture: z.string(),
-            region: z.string().nullable(),
+            municipality: z.string().nullable(),
             address: z.string().nullable(),
+            place_name: z.string().nullable(),
             latitude: z.number().nullable(),
             longitude: z.number().nullable(),
-            name: z.string().nullable(),
           }),
         },
       },
@@ -136,7 +152,7 @@ router.openapi(getLocationByIdRoute, async (c) => {
   if (!location) {
     return c.json({ error: '句碑の場所が見つかりません' }, 404);
   }
-  return c.json(location);
+  return c.json(convertLocationToApiResponse(location));
 });
 
 // const createLocationRoute = createRoute({
@@ -157,8 +173,9 @@ router.openapi(getLocationByIdRoute, async (c) => {
 //         'application/json': {
 //           schema: z.object({
 //             id: z.number(),
+//             region: z.string(),
 //             prefecture: z.string(),
-//             region: z.string().nullable(),
+//             municipality: z.string().nullable(),
 //             address: z.string().nullable(),
 //             latitude: z.number().nullable(),
 //             longitude: z.number().nullable(),
@@ -195,8 +212,9 @@ router.openapi(getLocationByIdRoute, async (c) => {
 //         'application/json': {
 //           schema: z.object({
 //             id: z.number(),
+//             region: z.string(),
 //             prefecture: z.string(),
-//             region: z.string().nullable(),
+//             municipality: z.string().nullable(),
 //             address: z.string().nullable(),
 //             latitude: z.number().nullable(),
 //             longitude: z.number().nullable(),
@@ -280,7 +298,7 @@ const getHaikuMonumentsRoute = createRoute({
               photo_url: z.string().nullable(),
               photo_date: z.string().nullable(),
               photographer: z.string().nullable(),
-              model3d_url: z.string().nullable(),
+              model_3d_url: z.string().nullable(),
               remarks: z.string().nullable(),
               created_at: z.string(),
               updated_at: z.string(),
@@ -288,7 +306,7 @@ const getHaikuMonumentsRoute = createRoute({
                 id: z.number(),
                 name: z.string(),
                 biography: z.string().nullable(),
-                links: z.string().nullable(),
+                link_url: z.string().nullable(),
                 image_url: z.string().nullable(),
                 created_at: z.string(),
                 updated_at: z.string()
@@ -298,17 +316,18 @@ const getHaikuMonumentsRoute = createRoute({
                 title: z.string(),
                 author: z.string().nullable(),
                 publisher: z.string().nullable(),
-                year: z.number().nullable(),
+                source_year: z.number().nullable(),
                 url: z.string().nullable(),
                 created_at: z.string(),
                 updated_at: z.string()
               })),
               locations: z.array(z.object({
                 id: z.number(),
+                region: z.string(),
                 prefecture: z.string(),
-                region: z.string().nullable(),
+                municipality: z.string().nullable(),
                 address: z.string().nullable(),
-                name: z.string().nullable(),
+                place_name: z.string().nullable(),
                 latitude: z.number(),
                 longitude: z.number()
               }))
@@ -345,7 +364,7 @@ router.openapi(getHaikuMonumentsRoute, async (c) => {
     photo_url: monument.photoUrl,
     photo_date: monument.photoDate,
     photographer: monument.photographer,
-    model3d_url: monument.model3dUrl,
+    model_3d_url: monument.model3dUrl,
     remarks: monument.remarks,
     created_at: monument.createdAt ?? '',
     updated_at: monument.updatedAt ?? '',
@@ -353,7 +372,7 @@ router.openapi(getHaikuMonumentsRoute, async (c) => {
       id: monument.poet.id,
       name: monument.poet.name,
       biography: monument.poet.biography ?? null,
-      links: monument.poet.links ?? null,
+      link_url: monument.poet.linkUrl ?? null,
       image_url: monument.poet.imageUrl ?? null,
       created_at: monument.poet.createdAt ?? '',
       updated_at: monument.poet.updatedAt ?? ''
@@ -363,17 +382,18 @@ router.openapi(getHaikuMonumentsRoute, async (c) => {
       title: monument.source.title,
       author: monument.source.author ?? null,
       publisher: monument.source.publisher ?? null,
-      year: monument.source.year ?? null,
+      source_year: monument.source.sourceYear ?? null,
       url: monument.source.url ?? null,
       created_at: monument.source.createdAt ?? '',
       updated_at: monument.source.updatedAt ?? ''
     }] : [],
     locations: monument.location ? [{
       id: monument.location.id,
+      region: monument.location.region,
       prefecture: monument.location.prefecture,
-      region: monument.location.region ?? null,
+      municipality: monument.location.municipality ?? null,
       address: monument.location.address ?? null,
-      name: monument.location.name ?? null,
+      place_name: monument.location.placeName ?? null,
       latitude: monument.location.latitude ?? 0,
       longitude: monument.location.longitude ?? 0
     }] : []

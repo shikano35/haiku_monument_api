@@ -66,7 +66,7 @@ const sourcesQuerySchema = z.object({
 const createSourceSchema = z.object({
   title: z.string().min(1, 'タイトルは必須です').max(255, 'タイトルが長すぎます'),
   author: z.string().optional().nullable(),
-  year: z.number().optional().nullable(),
+  source_year: z.number().optional().nullable(),
   url: z.string().optional().nullable(),
   publisher: z.string().optional().nullable(),
 });
@@ -74,7 +74,7 @@ const createSourceSchema = z.object({
 const updateSourceSchema = z.object({
   title: z.string().min(1, 'タイトルは必須です').max(255, 'タイトルが長すぎます').optional(),
   author: z.string().optional().nullable(),
-  year: z.number().optional().nullable(),
+  source_year: z.number().optional().nullable(),
   url: z.string().optional().nullable(),
   publisher: z.string().optional().nullable(),
 });
@@ -96,7 +96,7 @@ const getAllSourcesRoute = createRoute({
               id: z.number(),
               title: z.string(),
               author: z.string().nullable(),
-              year: z.number().nullable(),
+              source_year: z.number().nullable(),
               url: z.string().nullable(),
               publisher: z.string().nullable(),
               created_at: z.string(),
@@ -130,7 +130,7 @@ const getSourceByIdRoute = createRoute({
             id: z.number(),
             title: z.string(),
             author: z.string().nullable(),
-            year: z.number().nullable(),
+            source_year: z.number().nullable(),
             url: z.string().nullable(),
             publisher: z.string().nullable(),
             created_at: z.string(),
@@ -367,7 +367,7 @@ router.openapi(getSourceHaikuMonumentsRoute, async (c) => {
       id: monument.poet.id,
       name: monument.poet.name,
       biography: monument.poet.biography ?? null,
-      links: monument.poet.links ?? null,
+      link_url: monument.poet.linkUrl ?? null,
       image_url: monument.poet.imageUrl ?? null,
       created_at: monument.poet.createdAt ?? '',
       updated_at: monument.poet.updatedAt ?? ''
@@ -377,7 +377,7 @@ router.openapi(getSourceHaikuMonumentsRoute, async (c) => {
       title: monument.source.title,
       author: monument.source.author ?? null,
       publisher: monument.source.publisher ?? null,
-      year: monument.source.year ?? null,
+      source_year: monument.source.sourceYear ?? null,
       url: monument.source.url ?? null,
       created_at: monument.source.createdAt ?? '',
       updated_at: monument.source.updatedAt ?? ''
@@ -387,7 +387,7 @@ router.openapi(getSourceHaikuMonumentsRoute, async (c) => {
       prefecture: monument.location.prefecture,
       region: monument.location.region ?? null,
       address: monument.location.address ?? null,
-      name: monument.location.name ?? null,
+      place_name: monument.location.placeName ?? null,
       latitude: monument.location.latitude ?? 0,
       longitude: monument.location.longitude ?? 0
     }] : []

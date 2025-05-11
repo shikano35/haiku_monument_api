@@ -11,7 +11,7 @@ const convertPoetToSnakeCase = (poet: Poet): PoetResponse => ({
   id: poet.id,
   name: poet.name,
   biography: poet.biography ?? null,
-  links: poet.links ?? null,
+  link_url: poet.linkUrl ?? null,
   image_url: poet.imageUrl ?? null,
   created_at: poet.createdAt ?? '',
   updated_at: poet.updatedAt ?? '',
@@ -123,14 +123,14 @@ const PoetsQuerySchema = z.object({
 const createPoetSchema = z.object({
   name: z.string().min(1, '名前は必須です').max(255, '名前が長すぎます'),
   biography: z.string().optional().nullable(),
-  links: z.string().optional().nullable(),
+  link_url: z.string().optional().nullable(),
   image_url: z.string().optional().nullable(),
 });
 
 const updatePoetSchema = z.object({
   name: z.string().min(1, '名前は必須です').max(255, '名前が長すぎます').optional(),
   biography: z.string().optional().nullable(),
-  links: z.string().optional().nullable(),
+  link_url: z.string().optional().nullable(),
   image_url: z.string().optional().nullable(),
 });
 
@@ -138,7 +138,7 @@ const poetResponseSchema = z.object({
   id: z.number(),
   name: z.string(),
   biography: z.string().nullable(),
-  links: z.string().nullable(),
+  link_url: z.string().nullable(),
   image_url: z.string().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
@@ -319,7 +319,7 @@ const haikuMonumentSimpleResponseSchema = z.object({
   photo_url: z.string().nullable(),
   photo_date: z.string().nullable(),
   photographer: z.string().nullable(),
-  model3d_url: z.string().nullable(),
+  model_3d_url: z.string().nullable(),
   remarks: z.string().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
@@ -327,7 +327,7 @@ const haikuMonumentSimpleResponseSchema = z.object({
     id: z.number(),
     name: z.string(),
     biography: z.string().nullable(),
-    links: z.string().nullable(),
+    link_url: z.string().nullable(),
     image_url: z.string().nullable(),
     created_at: z.string(),
     updated_at: z.string()
@@ -337,17 +337,18 @@ const haikuMonumentSimpleResponseSchema = z.object({
     title: z.string(),
     author: z.string().nullable(),
     publisher: z.string().nullable(),
-    year: z.number().nullable(),
+    source_year: z.number().nullable(),
     url: z.string().nullable(),
     created_at: z.string(),
     updated_at: z.string()
   })),
   locations: z.array(z.object({
     id: z.number(),
-    prefecture: z.string(),
     region: z.string().nullable(),
+    prefecture: z.string(),
+    municipality: z.string().nullable(),
     address: z.string().nullable(),
-    name: z.string().nullable(),
+    place_name: z.string().nullable(),
     latitude: z.number(),
     longitude: z.number()
   }))
@@ -396,7 +397,7 @@ router.openapi(getPoetHaikuMonumentsRoute, async (c) => {
     photo_url: monument.photoUrl,
     photo_date: monument.photoDate,
     photographer: monument.photographer,
-    model3d_url: monument.model3dUrl,
+    model_3d_url: monument.model3dUrl,
     remarks: monument.remarks,
     created_at: monument.createdAt ?? '',
     updated_at: monument.updatedAt ?? '',
@@ -404,7 +405,7 @@ router.openapi(getPoetHaikuMonumentsRoute, async (c) => {
       id: monument.poet.id,
       name: monument.poet.name,
       biography: monument.poet.biography ?? null,
-      links: monument.poet.links ?? null,
+      link_url: monument.poet.linkUrl ?? null,
       image_url: monument.poet.imageUrl ?? null,
       created_at: monument.poet.createdAt ?? '',
       updated_at: monument.poet.updatedAt ?? ''
@@ -414,17 +415,18 @@ router.openapi(getPoetHaikuMonumentsRoute, async (c) => {
       title: monument.source.title,
       author: monument.source.author ?? null,
       publisher: monument.source.publisher ?? null,
-      year: monument.source.year ?? null,
+      source_year: monument.source.sourceYear ?? null,
       url: monument.source.url ?? null,
       created_at: monument.source.createdAt ?? '',
       updated_at: monument.source.updatedAt ?? ''
     }] : [],
     locations: monument.location ? [{
       id: monument.location.id,
+      region: monument.location.region,
       prefecture: monument.location.prefecture,
-      region: monument.location.region ?? null,
+      municipality: monument.location.municipality ?? null,
       address: monument.location.address ?? null,
-      name: monument.location.name ?? null,
+      place_name: monument.location.placeName ?? null,
       latitude: monument.location.latitude ?? 0,
       longitude: monument.location.longitude ?? 0
     }] : []

@@ -1,10 +1,16 @@
 import { createRoute, z } from '@hono/zod-openapi'
 import type { HaikuMonument } from '../../domain/entities/HaikuMonument'
+import type { Poet } from '../../domain/entities/Poet'
+import type { Source } from '../../domain/entities/Source'
+import type { Location } from '../../domain/entities/Location'
 import { createUseCases } from './createUseCases'
 import { convertKeysToCamelCase } from '../../utils/convertKeysToCamelCase'
 import { parseQueryParams } from '../../utils/parseQueryParams'
 import { createRouter } from './commonRouter'
 import type { HaikuMonumentResponseWithRelations } from '../dtos/HaikuMonumentResponse'
+import type { PoetResponse } from '../dtos/PoetResponse'
+import type { SourceResponse } from '../dtos/SourceResponse'
+import type { LocationResponse } from '../dtos/LocationResponse'
 
 const idParamSchema = z
   .object({
@@ -57,10 +63,10 @@ const haikuMonumentsQuerySchema = z.object({
 * \`-poet\` - 著者の降順
 * \`source\` - 出典の昇順
 * \`-source\` - 出典の降順
-* \`prefecture\` - 都道府県の昇順
-* \`-prefecture\` - 都道府県の降順
 * \`region\` - 地域の昇順
 * \`-region\` - 地域の降順
+* \`prefecture\` - 都道府県の昇順
+* \`-prefecture\` - 都道府県の降順
 * \`created_at\` - 作成日時の昇順
 * \`-created_at\` - 作成日時の降順
 * \`updated_at\` - 更新日時の昇順
@@ -111,23 +117,24 @@ const haikuMonumentsQuerySchema = z.object({
 const poetInputSchema = z.object({
   name: z.string().min(1, '著者名は必須です').max(255),
   biography: z.string().nullable().optional(),
-  links: z.string().nullable().optional(),
+  link_url: z.string().nullable().optional(),
   image_url: z.string().nullable().optional()
 })
 const sourceInputSchema = z.object({
   title: z.string().min(1, '出典タイトルは必須です').max(255),
   author: z.string().nullable().optional(),
-  year: z.number().nullable().optional(),
+  source_year: z.number().nullable().optional(),
   url: z.string().nullable().optional(),
   publisher: z.string().nullable().optional()
 })
 const locationInputSchema = z.object({
-  prefecture: z.string().min(1, '都道府県は必須です'),
   region: z.string().nullable().default(null),
+  prefecture: z.string().min(1, '都道府県は必須です'),
+  municipality: z.string().nullable().default(null),
   address: z.string().nullable().default(null),
+  place_name: z.string().nullable().default(null),
   latitude: z.number(),
   longitude: z.number(),
-  name: z.string().nullable().default(null)
 })
 
 const baseHaikuMonumentSchema = z.object({
@@ -172,7 +179,7 @@ const haikuMonumentResponseSchema = z.object({
   photo_url: z.string().nullable(),
   photo_date: z.string().nullable(),
   photographer: z.string().nullable(),
-  model3d_url: z.string().nullable(),
+  model_3d_url: z.string().nullable(),
   remarks: z.string().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
@@ -183,7 +190,7 @@ const haikuMonumentResponseSchema = z.object({
     id: z.number(),
     name: z.string(),
     biography: z.string().nullable(),
-    links: z.string().nullable(),
+    link_url: z.string().nullable(),
     image_url: z.string().nullable(),
     created_at: z.string(),
     updated_at: z.string()
@@ -193,76 +200,53 @@ const haikuMonumentResponseSchema = z.object({
     title: z.string(),
     author: z.string().nullable(),
     publisher: z.string().nullable(),
-    year: z.number().nullable(),
+    source_year: z.number().nullable(),
     url: z.string().nullable(),
     created_at: z.string(),
     updated_at: z.string()
   })),
   locations: z.array(z.object({
     id: z.number(),
+    region: z.string(),
     prefecture: z.string(),
-    region: z.string().nullable(),
+    municipality: z.string().nullable(),
     address: z.string().nullable(),
-    name: z.string().nullable(),
+    place_name: z.string().nullable(),
     latitude: z.number(),
     longitude: z.number(),
   }))
 })
 
-const convertPoet = (poet: {
-  id: number
-  name: string
-  biography?: string | null
-  links?: string | null
-  imageUrl?: string | null
-  createdAt: string | null
-  updatedAt: string | null
-}) => ({
+const convertPoetToApiResponse = (poet: Poet): PoetResponse => ({
   id: poet.id,
   name: poet.name,
   biography: poet.biography ?? null,
-  links: poet.links ?? null,
+  link_url: poet.linkUrl ?? null,
   image_url: poet.imageUrl ?? null,
-  created_at: poet.createdAt ?? '',
-  updated_at: poet.updatedAt ?? ''
+  created_at: poet.createdAt,
+  updated_at: poet.updatedAt
 })
 
-const convertSource = (source: {
-  id: number
-  title: string
-  author?: string | null
-  publisher?: string | null
-  year?: number | null
-  url?: string | null
-  createdAt: string | null
-  updatedAt: string | null
-}) => ({
+const convertSourceToApiResponse = (source: Source): SourceResponse => ({
   id: source.id,
   title: source.title,
   author: source.author ?? null,
   publisher: source.publisher ?? null,
-  year: source.year ?? null,
+  source_year: source.sourceYear ?? null,
   url: source.url ?? null,
-  created_at: source.createdAt ?? '',
-  updated_at: source.updatedAt ?? ''
+  created_at: source.createdAt,
+  updated_at: source.updatedAt
 })
 
-const convertLocation = (location: {
-  id: number
-  prefecture: string
-  region?: string | null
-  address?: string | null
-  name?: string | null
-  latitude: number | null
-  longitude: number | null
-}) => ({
+const convertLocationToApiResponse = (location: Location): LocationResponse => ({
   id: location.id,
   prefecture: location.prefecture,
-  region: location.region ?? null,
+  region: location.region,
+  municipality: location.municipality ?? null,
   address: location.address ?? null,
-  name: location.name ?? null,
-  latitude: location.latitude ?? 0,
-  longitude: location.longitude ?? 0
+  place_name: location.placeName ?? null,
+  latitude: location.latitude ?? null,
+  longitude: location.longitude ?? null
 })
 
 const convertHaikuMonumentToResponse = (monument: HaikuMonument): HaikuMonumentResponseWithRelations => ({
@@ -292,12 +276,12 @@ const convertHaikuMonumentToResponse = (monument: HaikuMonument): HaikuMonumentR
   locationId: monument.locationId,
   createdAt: monument.createdAt,
   updatedAt: monument.updatedAt,
-  poet: monument.poet ? convertPoet(monument.poet) : null,
-  source: monument.source ? convertSource(monument.source) : null,
-  location: monument.location ? convertLocation(monument.location) : null
+  poet: monument.poet ? convertPoetToApiResponse(monument.poet) : null,
+  source: monument.source ? convertSourceToApiResponse(monument.source) : null,
+  location: monument.location ? convertLocationToApiResponse(monument.location) : null
 })
 
-const convertHaikuMonumentToApiResponse = (monument: HaikuMonumentResponseWithRelations) => ({
+const convertToApiResponseFormat = (monument: HaikuMonumentResponseWithRelations) => ({
   id: monument.id,
   inscription: monument.inscription,
   commentary: monument.commentary,
@@ -317,7 +301,7 @@ const convertHaikuMonumentToApiResponse = (monument: HaikuMonumentResponseWithRe
   photo_url: monument.photoUrl,
   photo_date: monument.photoDate,
   photographer: monument.photographer,
-  model3d_url: monument.model3dUrl,
+  model_3d_url: monument.model3dUrl,
   remarks: monument.remarks,
   created_at: monument.createdAt ?? '',
   updated_at: monument.updatedAt ?? '',
@@ -327,28 +311,29 @@ const convertHaikuMonumentToApiResponse = (monument: HaikuMonumentResponseWithRe
   poets: monument.poet ? [{
     id: monument.poet.id,
     name: monument.poet.name,
-    biography: monument.poet.biography,
-    links: monument.poet.links,
-    image_url: monument.poet.image_url,
+    biography: monument.poet.biography ?? null,
+    link_url: monument.poet.link_url ?? null,
+    image_url: monument.poet.image_url ?? null,
     created_at: monument.poet.created_at,
     updated_at: monument.poet.updated_at
   }] : [],
   sources: monument.source ? [{
     id: monument.source.id,
     title: monument.source.title,
-    author: monument.source.author,
-    publisher: monument.source.publisher,
-    year: monument.source.year,
-    url: monument.source.url,
+    author: monument.source.author ?? null,
+    publisher: monument.source.publisher ?? null,
+    source_year: monument.source.source_year ?? null,
+    url: monument.source.url ?? null,
     created_at: monument.source.created_at,
     updated_at: monument.source.updated_at
   }] : [],
   locations: monument.location ? [{
     id: monument.location.id,
-    prefecture: monument.location.prefecture,
     region: monument.location.region,
-    address: monument.location.address,
-    name: monument.location.name,
+    prefecture: monument.location.prefecture,
+    municipality: monument.location.municipality ?? null,
+    address: monument.location.address ?? null,
+    place_name: monument.location.place_name ?? null,
     latitude: monument.location.latitude ?? 0,
     longitude: monument.location.longitude ?? 0,
   }] : []
@@ -378,7 +363,7 @@ router.openapi(
     const { monumentUseCases } = createUseCases(c.env, 'haikuMonuments')
     const monuments = await monumentUseCases.getAllHaikuMonuments(queryParams)
     const responseData = monuments.map(monument => 
-      convertHaikuMonumentToApiResponse(convertHaikuMonumentToResponse(monument))
+      convertToApiResponseFormat(convertHaikuMonumentToResponse(monument))
     )
     return c.json({ haiku_monuments: responseData })
   }
@@ -410,7 +395,7 @@ router.openapi(
       return c.json({ error: '句碑が見つかりません' }, 404)
     }
     return c.json({ 
-      haiku_monument: convertHaikuMonumentToApiResponse(convertHaikuMonumentToResponse(monument)) 
+      haiku_monument: convertToApiResponseFormat(convertHaikuMonumentToResponse(monument)) 
     })
   }
 )
@@ -444,7 +429,7 @@ router.openapi(
 //     const { monumentUseCases } = createUseCases(c.env, 'haikuMonuments')
 //     const created = await monumentUseCases.createHaikuMonument(payload)
 //     return c.json({ 
-//       haiku_monument: convertHaikuMonumentToApiResponse(convertHaikuMonumentToResponse(created)) 
+//       haiku_monument: convertToApiResponseFormat(convertHaikuMonumentToResponse(created)) 
 //     }, 201)
 //   }
 // )
@@ -484,7 +469,7 @@ router.openapi(
 //       return c.json({ error: '句碑が見つかりません' }, 404)
 //     }
 //     return c.json({ 
-//       haiku_monument: convertHaikuMonumentToApiResponse(convertHaikuMonumentToResponse(updated)) 
+//       haiku_monument: convertToApiResponseFormat(convertHaikuMonumentToResponse(updated)) 
 //     })
 //   }
 // )
