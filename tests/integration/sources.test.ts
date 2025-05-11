@@ -29,8 +29,8 @@ describe("Sources API GET Endpoints", () => {
         year: 1702,
         url: "https://example.com/okuno-hosomichi",
         publisher: "江戸出版",
-        created_at: "2025-03-05 23:25:51",
-        updated_at: "2025-03-05 23:25:51",
+        created_at: "2025-05-11 10:41:34",
+        updated_at: "2025-05-11 10:41:34",
       },
       {
         id: 2,
@@ -39,8 +39,8 @@ describe("Sources API GET Endpoints", () => {
         year: 1819,
         url: "https://example.com/oraga-haru",
         publisher: "江戸出版",
-        created_at: "2025-03-05 23:25:51",
-        updated_at: "2025-03-05 23:25:51",
+        created_at: "2025-05-11 10:41:34",
+        updated_at: "2025-05-11 10:41:34",
       },
       {
         id: 3,
@@ -49,8 +49,8 @@ describe("Sources API GET Endpoints", () => {
         year: 1775,
         url: "https://example.com/buson-kushu",
         publisher: "江戸出版",
-        created_at: "2025-03-05 23:25:51",
-        updated_at: "2025-03-05 23:25:51",
+        created_at: "2025-05-11 10:41:34",
+        updated_at: "2025-05-11 10:41:34",
       },
       {
         id: 4,
@@ -59,8 +59,8 @@ describe("Sources API GET Endpoints", () => {
         year: 1893,
         url: "https://example.com/haiku-kakushin",
         publisher: "明治出版社",
-        created_at: "2025-03-05 23:25:51",
-        updated_at: "2025-03-05 23:25:51",
+        created_at: "2025-05-11 10:41:34",
+        updated_at: "2025-05-11 10:41:34",
       },
       {
         id: 5,
@@ -69,8 +69,8 @@ describe("Sources API GET Endpoints", () => {
         year: 1897,
         url: "https://example.com/hototogisu",
         publisher: "明治出版社",
-        created_at: "2025-03-05 23:25:51",
-        updated_at: "2025-03-05 23:25:51",
+        created_at: "2025-05-11 10:41:34",
+        updated_at: "2025-05-11 10:41:34",
       },
     ]);
   });
@@ -89,8 +89,8 @@ describe("Sources API GET Endpoints", () => {
       year: 1702,
       url: "https://example.com/okuno-hosomichi",
       publisher: "江戸出版",
-      created_at: "2025-03-05 23:25:51",
-      updated_at: "2025-03-05 23:25:51",
+      created_at: "2025-05-11 10:41:34",
+      updated_at: "2025-05-11 10:41:34",
     });
   });
 });

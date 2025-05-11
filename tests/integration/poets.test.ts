@@ -28,8 +28,8 @@ describe("Poets API GET Endpoints", () => {
         biography: "江戸時代の俳人。奥の細道の著者。",
         links: "https://example.com/basho",
         image_url: "https://example.com/basho.jpg",
-        created_at: "2025-03-05 23:25:51",
-        updated_at: "2025-03-05 23:25:51",
+        created_at: "2025-05-11 10:41:34",
+        updated_at: "2025-05-11 10:41:34"
       },
       {
         id: 2,
@@ -37,8 +37,8 @@ describe("Poets API GET Endpoints", () => {
         biography: "江戸時代後期の俳人。自然や日常を詠んだ。",
         links: "https://example.com/issa",
         image_url: "https://example.com/issa.jpg",
-        created_at: "2025-03-05 23:25:51",
-        updated_at: "2025-03-05 23:25:51",
+        created_at: "2025-05-11 10:41:34",
+        updated_at: "2025-05-11 10:41:34",
       },
       {
         id: 3,
@@ -46,8 +46,8 @@ describe("Poets API GET Endpoints", () => {
         biography: "江戸時代中期の俳人、画家。",
         links: "https://example.com/buson",
         image_url: "https://example.com/buson.jpg",
-        created_at: "2025-03-05 23:25:51",
-        updated_at: "2025-03-05 23:25:51",
+        created_at: "2025-05-11 10:41:34",
+        updated_at: "2025-05-11 10:41:34",
       },
       {
         id: 4,
@@ -55,8 +55,8 @@ describe("Poets API GET Endpoints", () => {
         biography: "明治時代の俳人。俳句改革を行った。",
         links: "https://example.com/shiki",
         image_url: "https://example.com/shiki.jpg",
-        created_at: "2025-03-05 23:25:51",
-        updated_at: "2025-03-05 23:25:51",
+        created_at: "2025-05-11 10:41:34",
+        updated_at: "2025-05-11 10:41:34",
       },
       {
         id: 5,
@@ -64,8 +64,8 @@ describe("Poets API GET Endpoints", () => {
         biography: "正岡子規の弟子で俳壇の指導者。",
         links: "https://example.com/kyooshi",
         image_url: "https://example.com/kyooshi.jpg",
-        created_at: "2025-03-05 23:25:51",
-        updated_at: "2025-03-05 23:25:51",
+        created_at: "2025-05-11 10:41:34",
+        updated_at: "2025-05-11 10:41:34",
       },
     ]);
   });
@@ -83,8 +83,8 @@ describe("Poets API GET Endpoints", () => {
       biography: "江戸時代の俳人。奥の細道の著者。",
       links: "https://example.com/basho",
       image_url: "https://example.com/basho.jpg",
-      created_at: "2025-03-05 23:25:51",
-      updated_at: "2025-03-05 23:25:51",
+      created_at: "2025-05-11 10:41:34",
+      updated_at: "2025-05-11 10:41:34",
     });
   });
 });
