@@ -15,6 +15,16 @@ import {
 import type { D1Database } from '@cloudflare/workers-types';
 import type { QueryParams } from '../../domain/common/QueryParams';
 
+const convertToBoolean = (value: number | null): boolean | null => {
+  if (value === null) return null;
+  return value === 1;
+};
+
+const convertToNumber = (value: boolean | null): number | null => {
+  if (value === null) return null;
+  return value ? 1 : 0;
+};
+
 export class HaikuMonumentRepository implements IHaikuMonumentRepository {
   constructor(private readonly dbBinding: D1Database) {}
 
@@ -24,21 +34,37 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
 
   async getAll(queryParams: QueryParams): Promise<HaikuMonument[]> {
     let query = this.db
-      .select({
-        id: haikuMonuments.id,
-        text: haikuMonuments.text,
-        establishedDate: haikuMonuments.establishedDate,
-        commentary: haikuMonuments.commentary,
-        imageUrl: haikuMonuments.imageUrl,
-        createdAt: haikuMonuments.createdAt,
-        updatedAt: haikuMonuments.updatedAt,
-        poetId: haikuMonuments.poetId,
-        sourceId: haikuMonuments.sourceId,
-        locationId: haikuMonuments.locationId,
-        poet: poets,
-        source: sources,
-        location: locations,
-      })
+    .select({
+      id: haikuMonuments.id,
+      inscription: haikuMonuments.inscription,
+      commentary: haikuMonuments.commentary,
+      kigo: haikuMonuments.kigo,
+      season: haikuMonuments.season,
+      isReliable: haikuMonuments.isReliable,
+      hasReverseInscription: haikuMonuments.hasReverseInscription,
+      material: haikuMonuments.material,
+      totalHeight: haikuMonuments.totalHeight,
+      width: haikuMonuments.width,
+      depth: haikuMonuments.depth,
+      establishedDate: haikuMonuments.establishedDate,
+      establishedYear: haikuMonuments.establishedYear,
+      founder: haikuMonuments.founder,
+      monumentType: haikuMonuments.monumentType,
+      designationStatus: haikuMonuments.designationStatus,
+      photoUrl: haikuMonuments.photoUrl,
+      photoDate: haikuMonuments.photoDate,
+      photographer: haikuMonuments.photographer,
+      model3dUrl: haikuMonuments.model3dUrl,
+      remarks: haikuMonuments.remarks,
+      poetId: haikuMonuments.poetId,
+      sourceId: haikuMonuments.sourceId,
+      locationId: haikuMonuments.locationId,
+      poet: poets,
+      source: sources,
+      location: locations,
+      createdAt: haikuMonuments.createdAt,
+      updatedAt: haikuMonuments.updatedAt,
+    })
       .from(haikuMonuments)
       .leftJoin(poets, eq(haikuMonuments.poetId, poets.id))
       .leftJoin(sources, eq(haikuMonuments.sourceId, sources.id))
@@ -50,7 +76,7 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
       if (queryParams.search) {
         conditions.push(
           or(
-            like(haikuMonuments.text, `%${queryParams.search}%`),
+            like(haikuMonuments.inscription, `%${queryParams.search}%`),
             like(haikuMonuments.commentary, `%${queryParams.search}%`)
           )
         );
@@ -107,10 +133,10 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
                 return direction === 'asc'
                   ? asc(haikuMonuments.establishedDate)
                   : desc(haikuMonuments.establishedDate);
-              case 'text':
+              case 'inscription':
                 return direction === 'asc'
-                  ? asc(haikuMonuments.text)
-                  : desc(haikuMonuments.text);
+                  ? asc(haikuMonuments.inscription)
+                  : desc(haikuMonuments.inscription);
               case 'poet':
               case 'poet_name':
                 return direction === 'asc'
@@ -148,26 +174,51 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
       }
     }
 
-    return await query.all();
+    const result = await query.all();
+    
+    return result.map(item => ({
+      ...item,
+      isReliable: convertToBoolean(item.isReliable),
+      hasReverseInscription: convertToBoolean(item.hasReverseInscription),
+      poetId: item.poetId || null,
+      sourceId: item.sourceId || null,
+      locationId: item.locationId || null,
+    }));
   }
 
   async getById(id: number): Promise<HaikuMonument | null> {
     const result = await this.db
-      .select({
-        id: haikuMonuments.id,
-        text: haikuMonuments.text,
-        establishedDate: haikuMonuments.establishedDate,
-        commentary: haikuMonuments.commentary,
-        imageUrl: haikuMonuments.imageUrl,
-        createdAt: haikuMonuments.createdAt,
-        updatedAt: haikuMonuments.updatedAt,
-        poetId: haikuMonuments.poetId,
-        sourceId: haikuMonuments.sourceId,
-        locationId: haikuMonuments.locationId,
-        poet: poets,
-        source: sources,
-        location: locations,
-      })
+    .select({
+      id: haikuMonuments.id,
+      inscription: haikuMonuments.inscription,
+      commentary: haikuMonuments.commentary,
+      kigo: haikuMonuments.kigo,
+      season: haikuMonuments.season,
+      isReliable: haikuMonuments.isReliable,
+      hasReverseInscription: haikuMonuments.hasReverseInscription,
+      material: haikuMonuments.material,
+      totalHeight: haikuMonuments.totalHeight,
+      width: haikuMonuments.width,
+      depth: haikuMonuments.depth,
+      establishedDate: haikuMonuments.establishedDate,
+      establishedYear: haikuMonuments.establishedYear,
+      founder: haikuMonuments.founder,
+      monumentType: haikuMonuments.monumentType,
+      designationStatus: haikuMonuments.designationStatus,
+      photoUrl: haikuMonuments.photoUrl,
+      photoDate: haikuMonuments.photoDate,
+      photographer: haikuMonuments.photographer,
+      model3dUrl: haikuMonuments.model3dUrl,
+      remarks: haikuMonuments.remarks,
+      poetId: haikuMonuments.poetId,
+      sourceId: haikuMonuments.sourceId,
+      locationId: haikuMonuments.locationId,
+      poet: poets,
+      source: sources,
+      location: locations,
+      createdAt: haikuMonuments.createdAt,
+      updatedAt: haikuMonuments.updatedAt,
+    })
       .from(haikuMonuments)
       .leftJoin(poets, eq(haikuMonuments.poetId, poets.id))
       .leftJoin(sources, eq(haikuMonuments.sourceId, sources.id))
@@ -176,7 +227,14 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
       .limit(1)
       .all();
 
-    return result.length > 0 ? result[0] : null;
+    if (result.length === 0) return null;
+    
+    const monument = result[0];
+    return {
+      ...monument,
+      isReliable: convertToBoolean(monument.isReliable),
+      hasReverseInscription: convertToBoolean(monument.hasReverseInscription),
+    };
   }
 
   async create(monumentData: CreateHaikuMonumentInput): Promise<HaikuMonument> {
@@ -238,10 +296,26 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
     }
 
     const monumentToInsert = {
-      text: monumentData.text,
+      inscription: monumentData.inscription,
       establishedDate: monumentData.establishedDate,
       commentary: monumentData.commentary,
-      imageUrl: monumentData.imageUrl,
+      kigo: monumentData.kigo,
+      season: monumentData.season,
+      isReliable: convertToNumber(monumentData.isReliable ?? null),
+      hasReverseInscription: convertToNumber(monumentData.hasReverseInscription ?? null),
+      material: monumentData.material,
+      totalHeight: monumentData.totalHeight,
+      width: monumentData.width,
+      depth: monumentData.depth,
+      establishedYear: monumentData.establishedYear,
+      founder: monumentData.founder,
+      monumentType: monumentData.monumentType,
+      designationStatus: monumentData.designationStatus,
+      photoUrl: monumentData.photoUrl,
+      photoDate: monumentData.photoDate,
+      photographer: monumentData.photographer,
+      model3dUrl: monumentData.model3dUrl,
+      remarks: monumentData.remarks,
       poetId,
       sourceId,
       locationId,
@@ -252,13 +326,29 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
       .values(monumentToInsert)
       .returning();
 
-      const fullRecord = await this.db
+    const fullRecord = await this.db
     .select({
       id: haikuMonuments.id,
-      text: haikuMonuments.text,
-      establishedDate: haikuMonuments.establishedDate,
+      inscription: haikuMonuments.inscription,
       commentary: haikuMonuments.commentary,
-      imageUrl: haikuMonuments.imageUrl,
+      kigo: haikuMonuments.kigo,
+      season: haikuMonuments.season,
+      isReliable: haikuMonuments.isReliable,
+      hasReverseInscription: haikuMonuments.hasReverseInscription,
+      material: haikuMonuments.material,
+      totalHeight: haikuMonuments.totalHeight,
+      width: haikuMonuments.width,
+      depth: haikuMonuments.depth,
+      establishedDate: haikuMonuments.establishedDate,
+      establishedYear: haikuMonuments.establishedYear,
+      founder: haikuMonuments.founder,
+      monumentType: haikuMonuments.monumentType,
+      designationStatus: haikuMonuments.designationStatus,
+      photoUrl: haikuMonuments.photoUrl,
+      photoDate: haikuMonuments.photoDate,
+      photographer: haikuMonuments.photographer,
+      model3dUrl: haikuMonuments.model3dUrl,
+      remarks: haikuMonuments.remarks,
       createdAt: haikuMonuments.createdAt,
       updatedAt: haikuMonuments.updatedAt,
       poetId: haikuMonuments.poetId,
@@ -276,7 +366,12 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
     .limit(1)
     .all();
 
-  return fullRecord[0];
+    const monument = fullRecord[0];
+    return {
+      ...monument,
+      isReliable: convertToBoolean(monument.isReliable),
+      hasReverseInscription: convertToBoolean(monument.hasReverseInscription),
+    };
   }
 
   async update(id: number, monumentData: UpdateHaikuMonumentInput): Promise<HaikuMonument | null> {
@@ -353,12 +448,45 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
     }
 
     const monumentToUpdate = {
-      text: monumentData.text ?? exists.text,
+      inscription: monumentData.inscription ?? exists.inscription,
       establishedDate:
         monumentData.establishedDate !== undefined ? monumentData.establishedDate : exists.establishedDate,
       commentary:
         monumentData.commentary !== undefined ? monumentData.commentary : exists.commentary,
-      imageUrl: monumentData.imageUrl !== undefined ? monumentData.imageUrl : exists.imageUrl,
+      kigo: 
+        monumentData.kigo !== undefined ? monumentData.kigo : exists.kigo,
+      season:
+        monumentData.season !== undefined ? monumentData.season : exists.season,
+      isReliable:
+        monumentData.isReliable !== undefined ? convertToNumber(monumentData.isReliable ?? null) : convertToNumber(exists.isReliable),
+      hasReverseInscription:
+        monumentData.hasReverseInscription !== undefined ? convertToNumber(monumentData.hasReverseInscription ?? null) : convertToNumber(exists.hasReverseInscription),
+      material:
+        monumentData.material !== undefined ? monumentData.material : exists.material,
+      totalHeight:
+        monumentData.totalHeight !== undefined ? monumentData.totalHeight : exists.totalHeight,
+      width:
+        monumentData.width !== undefined ? monumentData.width : exists.width,
+      depth:
+        monumentData.depth !== undefined ? monumentData.depth : exists.depth,
+      establishedYear:
+        monumentData.establishedYear !== undefined ? monumentData.establishedYear : exists.establishedYear,
+      founder:
+        monumentData.founder !== undefined ? monumentData.founder : exists.founder,
+      monumentType:
+        monumentData.monumentType !== undefined ? monumentData.monumentType : exists.monumentType,
+      designationStatus:
+        monumentData.designationStatus !== undefined ? monumentData.designationStatus : exists.designationStatus,
+      photoUrl: 
+        monumentData.photoUrl !== undefined ? monumentData.photoUrl : exists.photoUrl,
+      photoDate:
+        monumentData.photoDate !== undefined ? monumentData.photoDate : exists.photoDate,
+      photographer:
+        monumentData.photographer !== undefined ? monumentData.photographer : exists.photographer,
+      model3dUrl:
+        monumentData.model3dUrl !== undefined ? monumentData.model3dUrl : exists.model3dUrl,
+      remarks:
+        monumentData.remarks !== undefined ? monumentData.remarks : exists.remarks,
       poetId,
       sourceId,
       locationId,
@@ -370,7 +498,12 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
       .set(monumentToUpdate)
       .where(eq(haikuMonuments.id, id))
       .returning();
-    return updated;
+      
+    return {
+      ...updated,
+      isReliable: convertToBoolean(updated.isReliable),
+      hasReverseInscription: convertToBoolean(updated.hasReverseInscription),
+    };
   }
 
   async delete(id: number): Promise<boolean> {
@@ -385,10 +518,26 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
     const result = await this.db
       .select({
         id: haikuMonuments.id,
-        text: haikuMonuments.text,
-        establishedDate: haikuMonuments.establishedDate,
+        inscription: haikuMonuments.inscription,
         commentary: haikuMonuments.commentary,
-        imageUrl: haikuMonuments.imageUrl,
+        kigo: haikuMonuments.kigo,
+        season: haikuMonuments.season,
+        isReliable: haikuMonuments.isReliable,
+        hasReverseInscription: haikuMonuments.hasReverseInscription,
+        material: haikuMonuments.material,
+        totalHeight: haikuMonuments.totalHeight,
+        width: haikuMonuments.width,
+        depth: haikuMonuments.depth,
+        establishedDate: haikuMonuments.establishedDate,
+        establishedYear: haikuMonuments.establishedYear,
+        founder: haikuMonuments.founder,
+        monumentType: haikuMonuments.monumentType,
+        designationStatus: haikuMonuments.designationStatus,
+        photoUrl: haikuMonuments.photoUrl,
+        photoDate: haikuMonuments.photoDate,
+        photographer: haikuMonuments.photographer,
+        model3dUrl: haikuMonuments.model3dUrl,
+        remarks: haikuMonuments.remarks,
         createdAt: haikuMonuments.createdAt,
         updatedAt: haikuMonuments.updatedAt,
         poetId: haikuMonuments.poetId,
@@ -407,6 +556,8 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
   
     return result.map(item => ({
       ...item,
+      isReliable: convertToBoolean(item.isReliable),
+      hasReverseInscription: convertToBoolean(item.hasReverseInscription),
       poetId: item.poetId || null,
       sourceId: item.sourceId || null,
       locationId: item.locationId || null,
@@ -417,10 +568,26 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
     const result = await this.db
       .select({
         id: haikuMonuments.id,
-        text: haikuMonuments.text,
-        establishedDate: haikuMonuments.establishedDate,
+        inscription: haikuMonuments.inscription,
         commentary: haikuMonuments.commentary,
-        imageUrl: haikuMonuments.imageUrl,
+        kigo: haikuMonuments.kigo,
+        season: haikuMonuments.season,
+        isReliable: haikuMonuments.isReliable,
+        hasReverseInscription: haikuMonuments.hasReverseInscription,
+        material: haikuMonuments.material,
+        totalHeight: haikuMonuments.totalHeight,
+        width: haikuMonuments.width,
+        depth: haikuMonuments.depth,
+        establishedDate: haikuMonuments.establishedDate,
+        establishedYear: haikuMonuments.establishedYear,
+        founder: haikuMonuments.founder,
+        monumentType: haikuMonuments.monumentType,
+        designationStatus: haikuMonuments.designationStatus,
+        photoUrl: haikuMonuments.photoUrl,
+        photoDate: haikuMonuments.photoDate,
+        photographer: haikuMonuments.photographer,
+        model3dUrl: haikuMonuments.model3dUrl,
+        remarks: haikuMonuments.remarks,
         createdAt: haikuMonuments.createdAt,
         updatedAt: haikuMonuments.updatedAt,
         poetId: haikuMonuments.poetId,
@@ -439,6 +606,8 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
   
       return result.map(item => ({
         ...item,
+        isReliable: convertToBoolean(item.isReliable),
+        hasReverseInscription: convertToBoolean(item.hasReverseInscription),
         poetId: item.poetId || null,
         sourceId: item.sourceId || null,
         locationId: item.locationId || null,
@@ -449,10 +618,26 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
     const result = await this.db
       .select({
         id: haikuMonuments.id,
-        text: haikuMonuments.text,
-        establishedDate: haikuMonuments.establishedDate,
+        inscription: haikuMonuments.inscription,
         commentary: haikuMonuments.commentary,
-        imageUrl: haikuMonuments.imageUrl,
+        kigo: haikuMonuments.kigo,
+        season: haikuMonuments.season,
+        isReliable: haikuMonuments.isReliable,
+        hasReverseInscription: haikuMonuments.hasReverseInscription,
+        material: haikuMonuments.material,
+        totalHeight: haikuMonuments.totalHeight,
+        width: haikuMonuments.width,
+        depth: haikuMonuments.depth,
+        establishedDate: haikuMonuments.establishedDate,
+        establishedYear: haikuMonuments.establishedYear,
+        founder: haikuMonuments.founder,
+        monumentType: haikuMonuments.monumentType,
+        designationStatus: haikuMonuments.designationStatus,
+        photoUrl: haikuMonuments.photoUrl,
+        photoDate: haikuMonuments.photoDate,
+        photographer: haikuMonuments.photographer,
+        model3dUrl: haikuMonuments.model3dUrl,
+        remarks: haikuMonuments.remarks,
         createdAt: haikuMonuments.createdAt,
         updatedAt: haikuMonuments.updatedAt,
         poetId: haikuMonuments.poetId,
@@ -471,6 +656,8 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
   
       return result.map(item => ({
         ...item,
+        isReliable: convertToBoolean(item.isReliable),
+        hasReverseInscription: convertToBoolean(item.hasReverseInscription),
         poetId: item.poetId || null,
         sourceId: item.sourceId || null,
         locationId: item.locationId || null,
