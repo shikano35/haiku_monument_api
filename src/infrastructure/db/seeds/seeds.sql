@@ -1,5 +1,5 @@
 -- Poets テーブルのデータ
-INSERT INTO poets (name, biography, links, image_url)
+INSERT INTO poets (name, biography, link_url, image_url)
 VALUES
   ('松尾芭蕉', '江戸時代の俳人。奥の細道の著者。', 'https://example.com/basho', 'https://example.com/basho.jpg'),
   ('小林一茶', '江戸時代後期の俳人。自然や日常を詠んだ。', 'https://example.com/issa', 'https://example.com/issa.jpg'),
@@ -8,7 +8,7 @@ VALUES
   ('高浜虚子', '正岡子規の弟子で俳壇の指導者。', 'https://example.com/kyooshi', 'https://example.com/kyooshi.jpg');
 
 -- Sources テーブルのデータ
-INSERT INTO sources (title, author, year, url, publisher)
+INSERT INTO sources (title, author, source_year, url, publisher)
 VALUES
   ('奥の細道', '松尾芭蕉', 1702, 'https://example.com/okuno-hosomichi', '江戸出版'),
   ('おらが春', '小林一茶', 1819, 'https://example.com/oraga-haru', '江戸出版'),
@@ -17,13 +17,13 @@ VALUES
   ('ホトトギス', '高浜虚子', 1897, 'https://example.com/hototogisu', '明治出版社');
 
 -- Locations テーブルのデータ
-INSERT INTO locations (prefecture, region, address, name, latitude, longitude)
+INSERT INTO locations (region, prefecture, address, place_name, latitude, longitude)
 VALUES
-  ('東京都', '関東', '東京都台東区上野公園', '上野恩賜公園', 35.715298, 139.773037),
-  ('長野県', '中部', '長野県長野市', '一茶記念館', 36.648583, 138.194953),
-  ('京都府', '近畿', '京都府京都市中京区', '与謝蕪村の句碑', 35.011564, 135.768149),
-  ('愛媛県', '四国', '愛媛県松山市', '子規記念館', 33.839157, 132.765575),
-  ('兵庫県', '近畿', '兵庫県神戸市', '高浜虚子の句碑', 34.690084, 135.195510);
+  ('関東', '東京都', '東京都台東区上野公園', '上野恩賜公園', 35.715298, 139.773037),
+  ('中部', '長野県', '長野県長野市', '一茶記念館', 36.648583, 138.194953),
+  ('近畿', '京都府', '京都府京都市中京区', '与謝蕪村の句碑', 35.011564, 135.768149),
+  ('四国', '愛媛県', '愛媛県松山市', '子規記念館', 33.839157, 132.765575),
+  ('近畿', '兵庫県', '兵庫県神戸市', '高浜虚子の句碑', 34.690084, 135.195510);
 
 -- Haiku Monuments テーブルのデータ
 INSERT INTO haiku_monuments (
@@ -45,7 +45,7 @@ INSERT INTO haiku_monuments (
   photo_url,
   photo_date,
   photographer,
-  model3d_url,
+  model_3d_url,
   remarks,
   poet_id,
   source_id,
