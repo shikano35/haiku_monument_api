@@ -1,4 +1,4 @@
-import { sqliteTable, integer, text, real } from "drizzle-orm/sqlite-core";
+import { sqliteTable, integer, text, real, integer as bool } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
 // Poets テーブル
@@ -17,9 +17,9 @@ export const sources = sqliteTable("sources", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   title: text("title").notNull(),
   author: text("author"),
+  publisher: text("publisher"),
   year: integer("year"),
   url: text("url"),
-  publisher: text("publisher"),
   createdAt: text("created_at").default(sql`(DATETIME('now','localtime'))`),
   updatedAt: text("updated_at").default(sql`(DATETIME('now','localtime'))`),
 });
@@ -30,24 +30,42 @@ export const locations = sqliteTable("locations", {
   prefecture: text("prefecture").notNull(),
   region: text("region"),
   address: text("address"),
+  name: text("name"),
   latitude: real("latitude"),
   longitude: real("longitude"),
-  name: text("name"),
 });
 
 // Haiku Monument テーブル
 export const haikuMonuments = sqliteTable("haiku_monuments", {
   id: integer("id").primaryKey({ autoIncrement: true }),
-  text: text("text").notNull(),
+  inscription: text("inscription").notNull(),
+  commentary: text("commentary"),
+  kigo: text("kigo"),
+  season: text("season"),
+  isReliable: bool("is_reliable").default(0),
+  hasReverseInscription: bool("has_reverse_inscription").default(0),
+  material: text("material"),
+  totalHeight: real("total_height"),
+  width: real("width"),
+  depth: real("depth"),
+  establishedDate: text("established_date"),
+  establishedYear: integer("established_year"),
+  founder: text("founder"),
+  monumentType: text("monument_type"),
+  designationStatus: text("designation_status"),
+  photoUrl: text("photo_url"),
+  photoDate: text("photo_date"),
+  photographer: text("photographer"),
+  model3dUrl: text("model3d_url"),
+  remarks: text("remarks"),
+
   poetId: integer("poet_id")
     .references(() => poets.id, { onDelete: "restrict" }),
   sourceId: integer("source_id")
     .references(() => sources.id, { onDelete: "restrict" }),
-  establishedDate: text("established_date"),
   locationId: integer("location_id")
     .references(() => locations.id, { onDelete: "restrict" }),
-  commentary: text("commentary"),
-  imageUrl: text("image_url"),
+  
   createdAt: text("created_at").default(sql`(DATETIME('now','localtime'))`),
   updatedAt: text("updated_at").default(sql`(DATETIME('now','localtime'))`),
 });

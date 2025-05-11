@@ -14,7 +14,7 @@ const openApiSpec = {
   openapi: "3.0.3",
   info: {
     title: "句碑 API",
-    version: "1.0.0",
+    version: "1.0.1",
     description: `このAPIは句碑の情報を提供します。
 
 APIの概要については、[句碑APIドキュメント](https://developers.kuhiapi.com)をご参照ください。`,
@@ -23,10 +23,6 @@ APIの概要については、[句碑APIドキュメント](https://developers.k
     {
       url: "https://api.kuhiapi.com",
       description: "Production server",
-    },
-    {
-      url: "http://localhost:8787",
-      description: "Local server",
     },
   ],
   tags: [

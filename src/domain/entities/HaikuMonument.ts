@@ -11,25 +11,60 @@ type HaikuMonumentLocationInput = { id: number } | CreateLocationInput;
 
 export type HaikuMonument = {
   id: number;
-  text: string;
+  inscription: string;
+  commentary: string | null;
+  kigo: string | null;
+  season: string | null;
+  isReliable: boolean | null;
+  hasReverseInscription: boolean | null;
+  material: string | null;
+  totalHeight: number | null;
+  width: number | null;
+  depth: number | null;
+  establishedDate: string | null;
+  establishedYear: number | null;
+  founder: string | null;
+  monumentType: string | null;
+  designationStatus: string | null;
+  photoUrl: string | null;
+  photoDate: string | null;
+  photographer: string | null;
+  model3dUrl: string | null;
+  remarks: string | null;
+
   poetId: number | null;
   poet?: Poet | null;
   sourceId: number | null;
   source?: Source | null;
-  establishedDate: string | null;
   locationId: number | null;
   location?: Location | null;
-  commentary: string | null;
-  imageUrl?: string | null;
+
   createdAt: string | null;
   updatedAt: string | null;
 }
 
 export type HaikuMonumentInput = {
-  text: string;
-  establishedDate: string | null;
-  commentary: string | null;
-  imageUrl?: string | null;
+  inscription: string;
+  commentary?: string | null;
+  kigo?: string | null;
+  season?: string | null;
+  isReliable?: boolean | null;
+  hasReverseInscription?: boolean | null;
+  material?: string | null;
+  totalHeight?: number | null;
+  width?: number | null;
+  depth?: number | null;
+  establishedDate?: string | null;
+  establishedYear?: number | null;
+  founder?: string | null;
+  monumentType?: string | null;
+  designationStatus?: string | null;
+  photoUrl?: string | null;
+  photoDate?: string | null;
+  photographer?: string | null;
+  model3dUrl?: string | null;
+  remarks?: string | null;
+
   poet?: HaikuMonumentPoetInput | null;
   source?: HaikuMonumentSourceInput | null;
   location?: HaikuMonumentLocationInput | null;
