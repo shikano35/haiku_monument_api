@@ -18,6 +18,30 @@ import {
 import type { D1Database } from '@cloudflare/workers-types';
 import type { QueryParams } from '../../domain/common/QueryParams';
 
+type DbPoet = typeof poets.$inferSelect;
+type DbSource = typeof sources.$inferSelect;
+type DbLocation = typeof locations.$inferSelect;
+type DbHaikuMonument = typeof haikuMonuments.$inferSelect;
+
+interface HaikuMonumentQueryResult extends DbHaikuMonument {
+  poet: DbPoet | null;
+  source: DbSource | null;
+  location: DbLocation | null;
+}
+
+function isHaikuMonumentQueryResult(obj: unknown): obj is HaikuMonumentQueryResult {
+  if (typeof obj !== 'object' || obj === null) return false;
+  
+  const item = obj as Record<string, unknown>;
+  return (
+    typeof item.id === 'number' &&
+    typeof item.inscription === 'string' &&
+    'poet' in item &&
+    'source' in item &&
+    'location' in item
+  );
+}
+
 const convertToBoolean = (value: number | null): boolean | null => {
   if (value === null) return null;
   return value === 1;
@@ -38,78 +62,78 @@ const ensureNumberOrNull = (value: unknown): number | null => {
   return isNaN(num) ? null : num;
 };
 
-const convertToPoet = (dbPoet: Record<string, unknown> | null): Poet | null => {
+const convertToPoet = (dbPoet: DbPoet | null): Poet | null => {
   if (!dbPoet) return null;
   return {
-    id: Number(dbPoet.id),
-    name: String(dbPoet.name),
-    biography: dbPoet.biography as string | null,
-    linkUrl: dbPoet.linkUrl as string | null,
-    imageUrl: dbPoet.imageUrl as string | null,
-    createdAt: ensureString(dbPoet.createdAt as string | null),
-    updatedAt: ensureString(dbPoet.updatedAt as string | null),
+    id: dbPoet.id,
+    name: dbPoet.name,
+    biography: dbPoet.biography,
+    linkUrl: dbPoet.linkUrl,
+    imageUrl: dbPoet.imageUrl,
+    createdAt: ensureString(dbPoet.createdAt),
+    updatedAt: ensureString(dbPoet.updatedAt),
   };
 };
 
-const convertToSource = (dbSource: Record<string, unknown> | null): Source | null => {
+const convertToSource = (dbSource: DbSource | null): Source | null => {
   if (!dbSource) return null;
   return {
-    id: Number(dbSource.id),
-    title: String(dbSource.title),
-    author: dbSource.author as string | null,
-    publisher: dbSource.publisher as string | null,
-    sourceYear: ensureNumberOrNull(dbSource.sourceYear),
-    url: dbSource.url as string | null,
-    createdAt: ensureString(dbSource.createdAt as string | null),
-    updatedAt: ensureString(dbSource.updatedAt as string | null),
+    id: dbSource.id,
+    title: dbSource.title,
+    author: dbSource.author,
+    publisher: dbSource.publisher,
+    sourceYear: dbSource.sourceYear,
+    url: dbSource.url,
+    createdAt: ensureString(dbSource.createdAt),
+    updatedAt: ensureString(dbSource.updatedAt),
   };
 };
 
-const convertToLocation = (dbLocation: Record<string, unknown> | null): Location | null => {
+const convertToLocation = (dbLocation: DbLocation | null): Location | null => {
   if (!dbLocation) return null;
   return {
-    id: Number(dbLocation.id),
-    region: String(dbLocation.region),
-    prefecture: String(dbLocation.prefecture),
-    municipality: dbLocation.municipality as string | null,
-    address: dbLocation.address as string | null,
-    placeName: dbLocation.placeName as string | null,
-    latitude: dbLocation.latitude as number | null,
-    longitude: dbLocation.longitude as number | null,
+    id: dbLocation.id,
+    region: dbLocation.region,
+    prefecture: dbLocation.prefecture,
+    municipality: dbLocation.municipality,
+    address: dbLocation.address,
+    placeName: dbLocation.placeName,
+    latitude: dbLocation.latitude,
+    longitude: dbLocation.longitude,
   };
 };
 
-const convertToHaikuMonument = (dbMonument: Record<string, unknown>): HaikuMonument => {
+const convertToHaikuMonument = (dbMonument: HaikuMonumentQueryResult): HaikuMonument => {
   return {
-    id: Number(dbMonument.id),
-    inscription: String(dbMonument.inscription),
-    commentary: dbMonument.commentary as string | null,
-    kigo: dbMonument.kigo as string | null,
-    season: dbMonument.season as string | null,
-    isReliable: convertToBoolean(dbMonument.isReliable as number | null),
-    hasReverseInscription: convertToBoolean(dbMonument.hasReverseInscription as number | null),
-    material: dbMonument.material as string | null,
-    totalHeight: dbMonument.totalHeight as number | null,
-    width: dbMonument.width as number | null,
-    depth: dbMonument.depth as number | null,
-    establishedDate: dbMonument.establishedDate as string | null,
-    establishedYear: dbMonument.establishedYear as number | null,
-    founder: dbMonument.founder as string | null,
-    monumentType: dbMonument.monumentType as string | null,
-    designationStatus: dbMonument.designationStatus as string | null,
-    photoUrl: dbMonument.photoUrl as string | null,
-    photoDate: dbMonument.photoDate as string | null,
-    photographer: dbMonument.photographer as string | null,
-    model3dUrl: dbMonument.model3dUrl as string | null,
-    remarks: dbMonument.remarks as string | null,
-    poetId: dbMonument.poetId as number | null,
-    sourceId: dbMonument.sourceId as number | null,
-    locationId: dbMonument.locationId as number | null,
-    poet: convertToPoet(dbMonument.poet as Record<string, unknown> | null),
-    source: convertToSource(dbMonument.source as Record<string, unknown> | null),
-    location: convertToLocation(dbMonument.location as Record<string, unknown> | null),
-    createdAt: ensureString(dbMonument.createdAt as string | null),
-    updatedAt: ensureString(dbMonument.updatedAt as string | null),
+    id: dbMonument.id,
+    inscription: dbMonument.inscription,
+    commentary: dbMonument.commentary,
+    kigo: dbMonument.kigo,
+    season: dbMonument.season,
+    isReliable: convertToBoolean(dbMonument.isReliable),
+    hasReverseInscription: convertToBoolean(dbMonument.hasReverseInscription),
+    material: dbMonument.material,
+    totalHeight: dbMonument.totalHeight,
+    width: dbMonument.width,
+    depth: dbMonument.depth,
+    establishedDate: dbMonument.establishedDate,
+    establishedYear: dbMonument.establishedYear,
+    founder: dbMonument.founder,
+    monumentType: dbMonument.monumentType,
+    designationStatus: dbMonument.designationStatus,
+    photoUrl: dbMonument.photoUrl,
+    photoDate: dbMonument.photoDate,
+    photographer: dbMonument.photographer,
+    model3dUrl: dbMonument.model3dUrl,
+    remarks: dbMonument.remarks,
+    poetId: dbMonument.poetId,
+    sourceId: dbMonument.sourceId,
+    locationId: dbMonument.locationId,
+    poet: convertToPoet(dbMonument.poet),
+    source: convertToSource(dbMonument.source),
+    location: convertToLocation(dbMonument.location),
+    createdAt: ensureString(dbMonument.createdAt),
+    updatedAt: ensureString(dbMonument.updatedAt),
   };
 };
 
@@ -120,43 +144,53 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
     return getDB(this.dbBinding);
   }
 
-  async getAll(queryParams: QueryParams): Promise<HaikuMonument[]> {
-    let query = this.db
-    .select({
-      id: haikuMonuments.id,
-      inscription: haikuMonuments.inscription,
-      commentary: haikuMonuments.commentary,
-      kigo: haikuMonuments.kigo,
-      season: haikuMonuments.season,
-      isReliable: haikuMonuments.isReliable,
-      hasReverseInscription: haikuMonuments.hasReverseInscription,
-      material: haikuMonuments.material,
-      totalHeight: haikuMonuments.totalHeight,
-      width: haikuMonuments.width,
-      depth: haikuMonuments.depth,
-      establishedDate: haikuMonuments.establishedDate,
-      establishedYear: haikuMonuments.establishedYear,
-      founder: haikuMonuments.founder,
-      monumentType: haikuMonuments.monumentType,
-      designationStatus: haikuMonuments.designationStatus,
-      photoUrl: haikuMonuments.photoUrl,
-      photoDate: haikuMonuments.photoDate,
-      photographer: haikuMonuments.photographer,
-      model3dUrl: haikuMonuments.model3dUrl,
-      remarks: haikuMonuments.remarks,
-      poetId: haikuMonuments.poetId,
-      sourceId: haikuMonuments.sourceId,
-      locationId: haikuMonuments.locationId,
-      poet: poets,
-      source: sources,
-      location: locations,
-      createdAt: haikuMonuments.createdAt,
-      updatedAt: haikuMonuments.updatedAt,
-    })
+  private createBaseQuery() {
+    return this.db
+      .select({
+        id: haikuMonuments.id,
+        inscription: haikuMonuments.inscription,
+        commentary: haikuMonuments.commentary,
+        kigo: haikuMonuments.kigo,
+        season: haikuMonuments.season,
+        isReliable: haikuMonuments.isReliable,
+        hasReverseInscription: haikuMonuments.hasReverseInscription,
+        material: haikuMonuments.material,
+        totalHeight: haikuMonuments.totalHeight,
+        width: haikuMonuments.width,
+        depth: haikuMonuments.depth,
+        establishedDate: haikuMonuments.establishedDate,
+        establishedYear: haikuMonuments.establishedYear,
+        founder: haikuMonuments.founder,
+        monumentType: haikuMonuments.monumentType,
+        designationStatus: haikuMonuments.designationStatus,
+        photoUrl: haikuMonuments.photoUrl,
+        photoDate: haikuMonuments.photoDate,
+        photographer: haikuMonuments.photographer,
+        model3dUrl: haikuMonuments.model3dUrl,
+        remarks: haikuMonuments.remarks,
+        poetId: haikuMonuments.poetId,
+        sourceId: haikuMonuments.sourceId,
+        locationId: haikuMonuments.locationId,
+        poet: poets,
+        source: sources,
+        location: locations,
+        createdAt: haikuMonuments.createdAt,
+        updatedAt: haikuMonuments.updatedAt,
+      })
       .from(haikuMonuments)
       .leftJoin(poets, eq(haikuMonuments.poetId, poets.id))
       .leftJoin(sources, eq(haikuMonuments.sourceId, sources.id))
       .leftJoin(locations, eq(haikuMonuments.locationId, locations.id));
+  }
+
+  private convertResults(results: unknown[]): HaikuMonument[] {
+    return results
+      .filter(isHaikuMonumentQueryResult)
+      .map(convertToHaikuMonument);
+  }
+
+  async getAll(queryParams: QueryParams): Promise<HaikuMonument[]> {
+    let query = this.createBaseQuery();
 
     if (queryParams) {
       const conditions = [];
@@ -264,53 +298,23 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
 
     const result = await query.all();
     
-    return result.map(item => convertToHaikuMonument(item));
+    return this.convertResults(result);
   }
 
   async getById(id: number): Promise<HaikuMonument | null> {
-    const result = await this.db
-    .select({
-      id: haikuMonuments.id,
-      inscription: haikuMonuments.inscription,
-      commentary: haikuMonuments.commentary,
-      kigo: haikuMonuments.kigo,
-      season: haikuMonuments.season,
-      isReliable: haikuMonuments.isReliable,
-      hasReverseInscription: haikuMonuments.hasReverseInscription,
-      material: haikuMonuments.material,
-      totalHeight: haikuMonuments.totalHeight,
-      width: haikuMonuments.width,
-      depth: haikuMonuments.depth,
-      establishedDate: haikuMonuments.establishedDate,
-      establishedYear: haikuMonuments.establishedYear,
-      founder: haikuMonuments.founder,
-      monumentType: haikuMonuments.monumentType,
-      designationStatus: haikuMonuments.designationStatus,
-      photoUrl: haikuMonuments.photoUrl,
-      photoDate: haikuMonuments.photoDate,
-      photographer: haikuMonuments.photographer,
-      model3dUrl: haikuMonuments.model3dUrl,
-      remarks: haikuMonuments.remarks,
-      poetId: haikuMonuments.poetId,
-      sourceId: haikuMonuments.sourceId,
-      locationId: haikuMonuments.locationId,
-      poet: poets,
-      source: sources,
-      location: locations,
-      createdAt: haikuMonuments.createdAt,
-      updatedAt: haikuMonuments.updatedAt,
-    })
-      .from(haikuMonuments)
-      .leftJoin(poets, eq(haikuMonuments.poetId, poets.id))
-      .leftJoin(sources, eq(haikuMonuments.sourceId, sources.id))
-      .leftJoin(locations, eq(haikuMonuments.locationId, locations.id))
+    const result = await this.createBaseQuery()
       .where(eq(haikuMonuments.id, id))
       .limit(1)
       .all();
 
     if (result.length === 0) return null;
     
-    return convertToHaikuMonument(result[0]);
+    const monument = result[0];
+    if (!isHaikuMonumentQueryResult(monument)) {
+      return null;
+    }
+    
+    return convertToHaikuMonument(monument);
   }
 
   async create(monumentData: CreateHaikuMonumentInput): Promise<HaikuMonument> {
@@ -403,7 +407,12 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
       .values(monumentToInsert)
       .returning();
 
-    return this.getById(insertedMonument.id) as Promise<HaikuMonument>;
+    const monument = await this.getById(insertedMonument.id);
+    if (!monument) {
+      throw new Error(`Failed to retrieve created monument with ID ${insertedMonument.id}`);
+    }
+
+    return monument;
   }
 
   async update(id: number, monumentData: UpdateHaikuMonumentInput): Promise<HaikuMonument | null> {
@@ -543,131 +552,26 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
   }
 
   async getByPoetId(poetId: number): Promise<HaikuMonument[]> {
-    const result = await this.db
-      .select({
-        id: haikuMonuments.id,
-        inscription: haikuMonuments.inscription,
-        commentary: haikuMonuments.commentary,
-        kigo: haikuMonuments.kigo,
-        season: haikuMonuments.season,
-        isReliable: haikuMonuments.isReliable,
-        hasReverseInscription: haikuMonuments.hasReverseInscription,
-        material: haikuMonuments.material,
-        totalHeight: haikuMonuments.totalHeight,
-        width: haikuMonuments.width,
-        depth: haikuMonuments.depth,
-        establishedDate: haikuMonuments.establishedDate,
-        establishedYear: haikuMonuments.establishedYear,
-        founder: haikuMonuments.founder,
-        monumentType: haikuMonuments.monumentType,
-        designationStatus: haikuMonuments.designationStatus,
-        photoUrl: haikuMonuments.photoUrl,
-        photoDate: haikuMonuments.photoDate,
-        photographer: haikuMonuments.photographer,
-        model3dUrl: haikuMonuments.model3dUrl,
-        remarks: haikuMonuments.remarks,
-        createdAt: haikuMonuments.createdAt,
-        updatedAt: haikuMonuments.updatedAt,
-        poetId: haikuMonuments.poetId,
-        sourceId: haikuMonuments.sourceId,
-        locationId: haikuMonuments.locationId,
-        poet: poets,
-        source: sources,
-        location: locations,
-      })
-      .from(haikuMonuments)
-      .leftJoin(poets, eq(haikuMonuments.poetId, poets.id))
-      .leftJoin(sources, eq(haikuMonuments.sourceId, sources.id))
-      .leftJoin(locations, eq(haikuMonuments.locationId, locations.id))
+    const result = await this.createBaseQuery()
       .where(eq(haikuMonuments.poetId, poetId))
       .all();
   
-    return result.map(item => convertToHaikuMonument(item));
+    return this.convertResults(result);
   }
 
   async getByLocationId(locationId: number): Promise<HaikuMonument[]> {
-    const result = await this.db
-      .select({
-        id: haikuMonuments.id,
-        inscription: haikuMonuments.inscription,
-        commentary: haikuMonuments.commentary,
-        kigo: haikuMonuments.kigo,
-        season: haikuMonuments.season,
-        isReliable: haikuMonuments.isReliable,
-        hasReverseInscription: haikuMonuments.hasReverseInscription,
-        material: haikuMonuments.material,
-        totalHeight: haikuMonuments.totalHeight,
-        width: haikuMonuments.width,
-        depth: haikuMonuments.depth,
-        establishedDate: haikuMonuments.establishedDate,
-        establishedYear: haikuMonuments.establishedYear,
-        founder: haikuMonuments.founder,
-        monumentType: haikuMonuments.monumentType,
-        designationStatus: haikuMonuments.designationStatus,
-        photoUrl: haikuMonuments.photoUrl,
-        photoDate: haikuMonuments.photoDate,
-        photographer: haikuMonuments.photographer,
-        model3dUrl: haikuMonuments.model3dUrl,
-        remarks: haikuMonuments.remarks,
-        createdAt: haikuMonuments.createdAt,
-        updatedAt: haikuMonuments.updatedAt,
-        poetId: haikuMonuments.poetId,
-        sourceId: haikuMonuments.sourceId,
-        locationId: haikuMonuments.locationId,
-        poet: poets,
-        source: sources,
-        location: locations,
-      })
-      .from(haikuMonuments)
-      .leftJoin(poets, eq(haikuMonuments.poetId, poets.id))
-      .leftJoin(sources, eq(haikuMonuments.sourceId, sources.id))
-      .leftJoin(locations, eq(haikuMonuments.locationId, locations.id))
+    const result = await this.createBaseQuery()
       .where(eq(haikuMonuments.locationId, locationId))
       .all();
   
-    return result.map(item => convertToHaikuMonument(item));
+    return this.convertResults(result);
   }
 
   async getBySourceId(sourceId: number): Promise<HaikuMonument[]> {
-    const result = await this.db
-      .select({
-        id: haikuMonuments.id,
-        inscription: haikuMonuments.inscription,
-        commentary: haikuMonuments.commentary,
-        kigo: haikuMonuments.kigo,
-        season: haikuMonuments.season,
-        isReliable: haikuMonuments.isReliable,
-        hasReverseInscription: haikuMonuments.hasReverseInscription,
-        material: haikuMonuments.material,
-        totalHeight: haikuMonuments.totalHeight,
-        width: haikuMonuments.width,
-        depth: haikuMonuments.depth,
-        establishedDate: haikuMonuments.establishedDate,
-        establishedYear: haikuMonuments.establishedYear,
-        founder: haikuMonuments.founder,
-        monumentType: haikuMonuments.monumentType,
-        designationStatus: haikuMonuments.designationStatus,
-        photoUrl: haikuMonuments.photoUrl,
-        photoDate: haikuMonuments.photoDate,
-        photographer: haikuMonuments.photographer,
-        model3dUrl: haikuMonuments.model3dUrl,
-        remarks: haikuMonuments.remarks,
-        createdAt: haikuMonuments.createdAt,
-        updatedAt: haikuMonuments.updatedAt,
-        poetId: haikuMonuments.poetId,
-        sourceId: haikuMonuments.sourceId,
-        locationId: haikuMonuments.locationId,
-        poet: poets,
-        source: sources,
-        location: locations,
-      })
-      .from(haikuMonuments)
-      .leftJoin(poets, eq(haikuMonuments.poetId, poets.id))
-      .leftJoin(sources, eq(haikuMonuments.sourceId, sources.id))
-      .leftJoin(locations, eq(haikuMonuments.locationId, locations.id))
+    const result = await this.createBaseQuery()
       .where(eq(haikuMonuments.sourceId, sourceId))
       .all();
   
-    return result.map(item => convertToHaikuMonument(item));
+    return this.convertResults(result);
   }
 }
