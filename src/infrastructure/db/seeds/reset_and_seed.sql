@@ -1,3 +1,12 @@
+-- 既存データ削除
+DELETE FROM haiku_monuments;
+DELETE FROM locations;
+DELETE FROM poets;
+DELETE FROM sources;
+
+-- IDリセット（SQLiteの場合）
+DELETE FROM sqlite_sequence WHERE name IN ('haiku_monuments', 'locations', 'poets', 'sources');
+
 -- Poets テーブルのデータ
 INSERT INTO poets (name, biography, link_url, image_url)
 VALUES
@@ -175,4 +184,4 @@ INSERT INTO haiku_monuments (
     5,
     5,
     5
-  );
+  ); 

@@ -2,10 +2,10 @@ export type Poet = {
   id: number;
   name: string;
   biography?: string | null;
-  links?: string | null;
+  linkUrl?: string | null;
   imageUrl?: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
+  createdAt: string;
+  updatedAt: string;
+};
 
-export type CreatePoetInput = Omit<Poet, 'id' | 'createdAt' | 'updatedAt'>;
+export type CreatePoetInput = Omit<Poet, "id" | "createdAt" | "updatedAt">;

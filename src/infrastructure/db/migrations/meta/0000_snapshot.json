@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "976eca00-f3a9-43dd-888a-0fb0d69d5c23",
+  "id": "7881a1b0-982c-49f1-99ab-49dcbd00f61e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "haiku_monuments": {
@@ -142,8 +142,8 @@
           "notNull": false,
           "autoincrement": false
         },
-        "model3d_url": {
-          "name": "model3d_url",
+        "model_3d_url": {
+          "name": "model_3d_url",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -200,12 +200,8 @@
           "name": "haiku_monuments_poet_id_poets_id_fk",
           "tableFrom": "haiku_monuments",
           "tableTo": "poets",
-          "columnsFrom": [
-            "poet_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["poet_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -213,12 +209,8 @@
           "name": "haiku_monuments_source_id_sources_id_fk",
           "tableFrom": "haiku_monuments",
           "tableTo": "sources",
-          "columnsFrom": [
-            "source_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["source_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -226,12 +218,8 @@
           "name": "haiku_monuments_location_id_locations_id_fk",
           "tableFrom": "haiku_monuments",
           "tableTo": "locations",
-          "columnsFrom": [
-            "location_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["location_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -250,6 +238,13 @@
           "notNull": true,
           "autoincrement": true
         },
+        "region": {
+          "name": "region",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "prefecture": {
           "name": "prefecture",
           "type": "text",
@@ -257,8 +252,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "region": {
-          "name": "region",
+        "municipality": {
+          "name": "municipality",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -271,8 +266,8 @@
           "notNull": false,
           "autoincrement": false
         },
-        "name": {
-          "name": "name",
+        "place_name": {
+          "name": "place_name",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -323,8 +318,8 @@
           "notNull": false,
           "autoincrement": false
         },
-        "links": {
-          "name": "links",
+        "link_url": {
+          "name": "link_url",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -391,8 +386,8 @@
           "notNull": false,
           "autoincrement": false
         },
-        "year": {
-          "name": "year",
+        "source_year": {
+          "name": "source_year",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,

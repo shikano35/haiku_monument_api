@@ -5,7 +5,8 @@
     "deploy": "wrangler deploy --minify",
     "generate:migration": "drizzle-kit generate --config=src/infrastructure/db/drizzle.config.ts",
     "migrate": "drizzle-kit migrate --config=src/infrastructure/db/drizzle.config.ts",
-    "test": "vitest"
+    "test": "vitest",
+    "format": "biome format --write ."
   },
   "dependencies": {
     "@cloudflare/vitest-pool-workers": "^0.7.1",

@@ -18,7 +18,7 @@ CREATE TABLE `haiku_monuments` (
 	`photo_url` text,
 	`photo_date` text,
 	`photographer` text,
-	`model3d_url` text,
+	`model_3d_url` text,
 	`remarks` text,
 	`poet_id` integer,
 	`source_id` integer,
@@ -32,10 +32,11 @@ CREATE TABLE `haiku_monuments` (
 --> statement-breakpoint
 CREATE TABLE `locations` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`region` text NOT NULL,
 	`prefecture` text NOT NULL,
-	`region` text,
+	`municipality` text,
 	`address` text,
-	`name` text,
+	`place_name` text,
 	`latitude` real,
 	`longitude` real
 );
@@ -44,7 +45,7 @@ CREATE TABLE `poets` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
 	`biography` text,
-	`links` text,
+	`link_url` text,
 	`image_url` text,
 	`created_at` text DEFAULT (DATETIME('now','localtime')),
 	`updated_at` text DEFAULT (DATETIME('now','localtime'))
@@ -55,7 +56,7 @@ CREATE TABLE `sources` (
 	`title` text NOT NULL,
 	`author` text,
 	`publisher` text,
-	`year` integer,
+	`source_year` integer,
 	`url` text,
 	`created_at` text DEFAULT (DATETIME('now','localtime')),
 	`updated_at` text DEFAULT (DATETIME('now','localtime'))

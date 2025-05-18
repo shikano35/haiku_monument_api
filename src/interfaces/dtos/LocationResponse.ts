@@ -1,19 +1,21 @@
 export type LocationResponse = {
   id: number;
+  region: string;
   prefecture: string;
-  region: string | null;
+  municipality: string | null;
   address: string | null;
-  name: string | null;
+  place_name: string | null;
   latitude: number | null;
   longitude: number | null;
 };
 
 export type LocationEntityResponse = {
   id: number;
+  region: string;
   prefecture: string;
-  region: string | null;
+  municipality: string | null;
   address: string | null;
-  name: string | null;
+  place_name: string | null;
   latitude: number | null;
   longitude: number | null;
 };

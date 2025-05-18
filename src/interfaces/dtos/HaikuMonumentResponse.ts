@@ -1,6 +1,6 @@
-import { PoetResponse } from './PoetResponse';
-import { SourceResponse } from './SourceResponse';
-import { LocationResponse } from './LocationResponse';
+import { PoetResponse } from "./PoetResponse";
+import { SourceResponse } from "./SourceResponse";
+import { LocationResponse } from "./LocationResponse";
 
 export type HaikuMonumentResponse = {
   id: number;

@@ -1,11 +1,12 @@
 export type Location = {
   id: number;
+  region: string;
   prefecture: string;
-  region: string | null;
+  municipality: string | null;
   address: string | null;
+  placeName: string | null;
   latitude: number | null;
   longitude: number | null;
-  name: string | null;
-}
+};
 
-export type CreateLocationInput = Omit<Location, 'id'>;
+export type CreateLocationInput = Omit<Location, "id">;

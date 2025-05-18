@@ -1,4 +1,10 @@
-import { sqliteTable, integer, text, real, integer as bool } from "drizzle-orm/sqlite-core";
+import {
+  sqliteTable,
+  integer,
+  text,
+  real,
+  integer as bool,
+} from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
 // Poets テーブル
@@ -6,7 +12,7 @@ export const poets = sqliteTable("poets", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   biography: text("biography"),
-  links: text("links"),
+  linkUrl: text("link_url"),
   imageUrl: text("image_url"),
   createdAt: text("created_at").default(sql`(DATETIME('now','localtime'))`),
   updatedAt: text("updated_at").default(sql`(DATETIME('now','localtime'))`),
@@ -18,7 +24,7 @@ export const sources = sqliteTable("sources", {
   title: text("title").notNull(),
   author: text("author"),
   publisher: text("publisher"),
-  year: integer("year"),
+  sourceYear: integer("source_year"),
   url: text("url"),
   createdAt: text("created_at").default(sql`(DATETIME('now','localtime'))`),
   updatedAt: text("updated_at").default(sql`(DATETIME('now','localtime'))`),
@@ -27,10 +33,11 @@ export const sources = sqliteTable("sources", {
 // Locations テーブル
 export const locations = sqliteTable("locations", {
   id: integer("id").primaryKey({ autoIncrement: true }),
+  region: text("region").notNull(),
   prefecture: text("prefecture").notNull(),
-  region: text("region"),
+  municipality: text("municipality"),
   address: text("address"),
-  name: text("name"),
+  placeName: text("place_name"),
   latitude: real("latitude"),
   longitude: real("longitude"),
 });
@@ -56,16 +63,19 @@ export const haikuMonuments = sqliteTable("haiku_monuments", {
   photoUrl: text("photo_url"),
   photoDate: text("photo_date"),
   photographer: text("photographer"),
-  model3dUrl: text("model3d_url"),
+  model3dUrl: text("model_3d_url"),
   remarks: text("remarks"),
 
-  poetId: integer("poet_id")
-    .references(() => poets.id, { onDelete: "restrict" }),
-  sourceId: integer("source_id")
-    .references(() => sources.id, { onDelete: "restrict" }),
-  locationId: integer("location_id")
-    .references(() => locations.id, { onDelete: "restrict" }),
-  
+  poetId: integer("poet_id").references(() => poets.id, {
+    onDelete: "restrict",
+  }),
+  sourceId: integer("source_id").references(() => sources.id, {
+    onDelete: "restrict",
+  }),
+  locationId: integer("location_id").references(() => locations.id, {
+    onDelete: "restrict",
+  }),
+
   createdAt: text("created_at").default(sql`(DATETIME('now','localtime'))`),
   updatedAt: text("updated_at").default(sql`(DATETIME('now','localtime'))`),
 });

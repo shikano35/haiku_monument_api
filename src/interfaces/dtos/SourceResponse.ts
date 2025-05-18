@@ -3,7 +3,7 @@ export type SourceResponse = {
   title: string;
   author: string | null;
   publisher: string | null;
-  year: number | null;
+  source_year: number | null;
   url: string | null;
   created_at: string;
   updated_at: string;
@@ -14,7 +14,7 @@ export type SourceEntityResponse = {
   title: string;
   author: string | null;
   publisher: string | null;
-  year: number | null;
+  sourceYear: number | null;
   url: string | null;
   createdAt: string | null;
   updatedAt: string | null;
