@@ -6,6 +6,6 @@ export type Poet = {
   imageUrl?: string | null;
   createdAt: string;
   updatedAt: string;
-}
+};
 
-export type CreatePoetInput = Omit<Poet, 'id' | 'createdAt' | 'updatedAt'>;
+export type CreatePoetInput = Omit<Poet, "id" | "createdAt" | "updatedAt">;

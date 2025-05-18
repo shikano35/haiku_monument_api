@@ -1,6 +1,6 @@
-import type { Poet, CreatePoetInput } from '../entities/Poet';
-import type { IPoetRepository } from '../repositories/IPoetRepository';
-import type { QueryParams } from '../common/QueryParams';
+import type { Poet, CreatePoetInput } from "../entities/Poet";
+import type { IPoetRepository } from "../repositories/IPoetRepository";
+import type { QueryParams } from "../common/QueryParams";
 
 export class PoetUseCases {
   constructor(private readonly poetRepo: IPoetRepository) {}

@@ -7,6 +7,6 @@ export type Location = {
   placeName: string | null;
   latitude: number | null;
   longitude: number | null;
-}
+};
 
-export type CreateLocationInput = Omit<Location, 'id'>;
+export type CreateLocationInput = Omit<Location, "id">;

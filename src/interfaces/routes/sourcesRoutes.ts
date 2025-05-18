@@ -1,70 +1,113 @@
-import { createRoute, z } from '@hono/zod-openapi';
-import { convertKeysToCamelCase } from '../../utils/convertKeysToCamelCase';
-import { convertKeysToSnakeCase } from '../../utils/convertKeysToSnakeCase';
-import { parseQueryParams } from '../../utils/parseQueryParams';
-import type { SourceResponse } from '../dtos/SourceResponse';
-import { createRouter } from './commonRouter';
-import { createUseCases } from './createUseCases';
-import type { HaikuMonument } from '../../domain/entities/HaikuMonument';
+import { createRoute, z } from "@hono/zod-openapi";
+import { convertKeysToCamelCase } from "../../utils/convertKeysToCamelCase";
+import { convertKeysToSnakeCase } from "../../utils/convertKeysToSnakeCase";
+import { parseQueryParams } from "../../utils/parseQueryParams";
+import type { SourceResponse } from "../dtos/SourceResponse";
+import { createRouter } from "./commonRouter";
+import { createUseCases } from "./createUseCases";
+import type { HaikuMonument } from "../../domain/entities/HaikuMonument";
 
 const idParamSchema = z
   .object({
-    id: z.string().regex(/^\d+$/, '無効なIDです').transform(Number),
+    id: z.string().regex(/^\d+$/, "無効なIDです").transform(Number),
   })
-  .openapi({ param: { name: 'id', in: 'path' } });
+  .openapi({ param: { name: "id", in: "path" } });
 
 const sourcesQuerySchema = z.object({
-  limit: z.coerce.number().optional().openapi({
-    param: { name: 'limit', description: '取得する件数', in: 'query', required: false },
-    type: 'integer',
-  }),
-  offset: z.coerce.number().optional().openapi({
-    param: { name: 'offset', description: '取得開始位置', in: 'query', required: false },
-    type: 'integer',
-  }),
+  limit: z.coerce
+    .number()
+    .optional()
+    .openapi({
+      param: {
+        name: "limit",
+        description: "取得する件数",
+        in: "query",
+        required: false,
+      },
+      type: "integer",
+    }),
+  offset: z.coerce
+    .number()
+    .optional()
+    .openapi({
+      param: {
+        name: "offset",
+        description: "取得開始位置",
+        in: "query",
+        required: false,
+      },
+      type: "integer",
+    }),
   ordering: z
     .preprocess(
-      (arg) => (typeof arg === 'string' ? [arg] : arg),
+      (arg) => (typeof arg === "string" ? [arg] : arg),
       z.array(
         z.enum([
-          '-title',
-          '-author',
-          '-year',
-          '-publisher',
-          '-created_at',
-          '-updated_at',
-          'title',
-          'author',
-          'year',
-          'publisher',
-          'created_at',
-          'updated_at',
-        ])
-      )
+          "-title",
+          "-author",
+          "-year",
+          "-publisher",
+          "-created_at",
+          "-updated_at",
+          "title",
+          "author",
+          "year",
+          "publisher",
+          "created_at",
+          "updated_at",
+        ]),
+      ),
     )
     .optional()
     .openapi({
       param: {
-        name: 'ordering',
+        name: "ordering",
         description:
           "並び替え\n* `title` - タイトルの昇順\n* `-title` - タイトルの降順\n* `author` - 著者の昇順\n* `-author` - 著者の降順\n* `year` - 出版年の昇順\n* `-year` - 出版年の降順\n* `publisher` - 出版社の昇順\n* `-publisher` - 出版社の降順\n* `created_at` - 作成日時の昇順\n* `-created_at` - 作成日時の降順\n* `updated_at` - 更新日時の昇順\n* `-updated_at` - 更新日時の降順",
-        in: 'query',
+        in: "query",
         required: false,
       },
     }),
-  search: z.string().optional().openapi({
-    param: { name: 'search', description: '検索', in: 'query', required: false },
-  }),
-  title_contains: z.string().optional().openapi({
-    param: { name: 'title_contains', description: 'タイトルに含まれる文字列', in: 'query', required: false },
-  }),
-  name_contains: z.string().optional().openapi({
-    param: { name: 'name_contains', description: '著者に含まれる文字列', in: 'query', required: false },
-  }),
+  search: z
+    .string()
+    .optional()
+    .openapi({
+      param: {
+        name: "search",
+        description: "検索",
+        in: "query",
+        required: false,
+      },
+    }),
+  title_contains: z
+    .string()
+    .optional()
+    .openapi({
+      param: {
+        name: "title_contains",
+        description: "タイトルに含まれる文字列",
+        in: "query",
+        required: false,
+      },
+    }),
+  name_contains: z
+    .string()
+    .optional()
+    .openapi({
+      param: {
+        name: "name_contains",
+        description: "著者に含まれる文字列",
+        in: "query",
+        required: false,
+      },
+    }),
 });
 
 const createSourceSchema = z.object({
-  title: z.string().min(1, 'タイトルは必須です').max(255, 'タイトルが長すぎます'),
+  title: z
+    .string()
+    .min(1, "タイトルは必須です")
+    .max(255, "タイトルが長すぎます"),
   author: z.string().optional().nullable(),
   source_year: z.number().optional().nullable(),
   url: z.string().optional().nullable(),
@@ -72,7 +115,11 @@ const createSourceSchema = z.object({
 });
 
 const updateSourceSchema = z.object({
-  title: z.string().min(1, 'タイトルは必須です').max(255, 'タイトルが長すぎます').optional(),
+  title: z
+    .string()
+    .min(1, "タイトルは必須です")
+    .max(255, "タイトルが長すぎます")
+    .optional(),
   author: z.string().optional().nullable(),
   source_year: z.number().optional().nullable(),
   url: z.string().optional().nullable(),
@@ -82,15 +129,15 @@ const updateSourceSchema = z.object({
 const router = createRouter();
 
 const getAllSourcesRoute = createRoute({
-  method: 'get',
-  tags: ['sources'],
-  path: '/',
+  method: "get",
+  tags: ["sources"],
+  path: "/",
   request: { query: sourcesQuerySchema },
   responses: {
     200: {
-      description: '情報源一覧の取得に成功しました',
+      description: "情報源一覧の取得に成功しました",
       content: {
-        'application/json': {
+        "application/json": {
           schema: z.array(
             z.object({
               id: z.number(),
@@ -101,7 +148,7 @@ const getAllSourcesRoute = createRoute({
               publisher: z.string().nullable(),
               created_at: z.string(),
               updated_at: z.string(),
-            })
+            }),
           ),
         },
       },
@@ -110,22 +157,24 @@ const getAllSourcesRoute = createRoute({
 });
 router.openapi(getAllSourcesRoute, async (c) => {
   const queryParams = parseQueryParams(new URLSearchParams(c.req.query()));
-  const { sourceUseCases } = createUseCases(c.env, 'sources');
+  const { sourceUseCases } = createUseCases(c.env, "sources");
   const sources = await sourceUseCases.getAllSources(queryParams);
-  const snakeSources = convertKeysToSnakeCase(sources) as unknown as SourceResponse[];
+  const snakeSources = convertKeysToSnakeCase(
+    sources,
+  ) as unknown as SourceResponse[];
   return c.json(snakeSources);
 });
 
 const getSourceByIdRoute = createRoute({
-  method: 'get',
-  tags: ['sources'],
-  path: '/{id}',
+  method: "get",
+  tags: ["sources"],
+  path: "/{id}",
   request: { params: idParamSchema },
   responses: {
     200: {
-      description: '情報源詳細の取得に成功しました',
+      description: "情報源詳細の取得に成功しました",
       content: {
-        'application/json': {
+        "application/json": {
           schema: z.object({
             id: z.number(),
             title: z.string(),
@@ -139,15 +188,17 @@ const getSourceByIdRoute = createRoute({
         },
       },
     },
-    404: { description: '情報源が見つかりません' },
+    404: { description: "情報源が見つかりません" },
   },
 });
 router.openapi(getSourceByIdRoute, async (c) => {
-  const { id } = c.req.valid('param');
-  const { sourceUseCases } = createUseCases(c.env, 'sources');
+  const { id } = c.req.valid("param");
+  const { sourceUseCases } = createUseCases(c.env, "sources");
   const source = await sourceUseCases.getSourceById(id);
-  if (!source) return c.json({ error: '情報源が見つかりません' }, 404);
-  const snakeSource = convertKeysToSnakeCase(source) as unknown as SourceResponse;
+  if (!source) return c.json({ error: "情報源が見つかりません" }, 404);
+  const snakeSource = convertKeysToSnakeCase(
+    source,
+  ) as unknown as SourceResponse;
   return c.json(snakeSource);
 });
 
@@ -264,15 +315,15 @@ router.openapi(getSourceByIdRoute, async (c) => {
 // });
 
 const getSourceHaikuMonumentsRoute = createRoute({
-  method: 'get',
-  tags: ['sources'],
-  path: '/{id}/haiku-monuments',
+  method: "get",
+  tags: ["sources"],
+  path: "/{id}/haiku-monuments",
   request: { params: idParamSchema },
   responses: {
     200: {
-      description: '情報源に関する句碑一覧の取得に成功しました',
+      description: "情報源に関する句碑一覧の取得に成功しました",
       content: {
-        'application/json': {
+        "application/json": {
           schema: z.array(
             z.object({
               id: z.number(),
@@ -298,48 +349,55 @@ const getSourceHaikuMonumentsRoute = createRoute({
               remarks: z.string().nullable(),
               created_at: z.string(),
               updated_at: z.string(),
-              poets: z.array(z.object({
-                id: z.number(),
-                name: z.string(),
-                biography: z.string().nullable(),
-                links: z.string().nullable(),
-                image_url: z.string().nullable(),
-                created_at: z.string(),
-                updated_at: z.string()
-              })),
-              sources: z.array(z.object({
-                id: z.number(),
-                title: z.string(),
-                author: z.string().nullable(),
-                publisher: z.string().nullable(),
-                year: z.number().nullable(),
-                url: z.string().nullable(),
-                created_at: z.string(),
-                updated_at: z.string()
-              })),
-              locations: z.array(z.object({
-                id: z.number(),
-                prefecture: z.string(),
-                region: z.string().nullable(),
-                address: z.string().nullable(),
-                name: z.string().nullable(),
-                latitude: z.number(),
-                longitude: z.number()
-              }))
-            })
+              poets: z.array(
+                z.object({
+                  id: z.number(),
+                  name: z.string(),
+                  biography: z.string().nullable(),
+                  links: z.string().nullable(),
+                  image_url: z.string().nullable(),
+                  created_at: z.string(),
+                  updated_at: z.string(),
+                }),
+              ),
+              sources: z.array(
+                z.object({
+                  id: z.number(),
+                  title: z.string(),
+                  author: z.string().nullable(),
+                  publisher: z.string().nullable(),
+                  year: z.number().nullable(),
+                  url: z.string().nullable(),
+                  created_at: z.string(),
+                  updated_at: z.string(),
+                }),
+              ),
+              locations: z.array(
+                z.object({
+                  id: z.number(),
+                  prefecture: z.string(),
+                  region: z.string().nullable(),
+                  address: z.string().nullable(),
+                  name: z.string().nullable(),
+                  latitude: z.number(),
+                  longitude: z.number(),
+                }),
+              ),
+            }),
           ),
         },
       },
     },
-    400: { description: '無効なIDです' },
+    400: { description: "無効なIDです" },
   },
 });
 router.openapi(getSourceHaikuMonumentsRoute, async (c) => {
-  const { id } = c.req.valid('param');
-  const { monumentUseCases } = createUseCases(c.env, 'haikuMonuments');
-  const monuments: HaikuMonument[] = await monumentUseCases.getHaikuMonumentsBySource(id);
-  
-  const convertedMonuments = monuments.map(monument => ({
+  const { id } = c.req.valid("param");
+  const { monumentUseCases } = createUseCases(c.env, "haikuMonuments");
+  const monuments: HaikuMonument[] =
+    await monumentUseCases.getHaikuMonumentsBySource(id);
+
+  const convertedMonuments = monuments.map((monument) => ({
     id: monument.id,
     inscription: monument.inscription,
     commentary: monument.commentary,
@@ -361,38 +419,50 @@ router.openapi(getSourceHaikuMonumentsRoute, async (c) => {
     photographer: monument.photographer,
     model3d_url: monument.model3dUrl,
     remarks: monument.remarks,
-    created_at: monument.createdAt ?? '',
-    updated_at: monument.updatedAt ?? '',
-    poets: monument.poet ? [{
-      id: monument.poet.id,
-      name: monument.poet.name,
-      biography: monument.poet.biography ?? null,
-      link_url: monument.poet.linkUrl ?? null,
-      image_url: monument.poet.imageUrl ?? null,
-      created_at: monument.poet.createdAt ?? '',
-      updated_at: monument.poet.updatedAt ?? ''
-    }] : [],
-    sources: monument.source ? [{
-      id: monument.source.id,
-      title: monument.source.title,
-      author: monument.source.author ?? null,
-      publisher: monument.source.publisher ?? null,
-      source_year: monument.source.sourceYear ?? null,
-      url: monument.source.url ?? null,
-      created_at: monument.source.createdAt ?? '',
-      updated_at: monument.source.updatedAt ?? ''
-    }] : [],
-    locations: monument.location ? [{
-      id: monument.location.id,
-      prefecture: monument.location.prefecture,
-      region: monument.location.region ?? null,
-      address: monument.location.address ?? null,
-      place_name: monument.location.placeName ?? null,
-      latitude: monument.location.latitude ?? 0,
-      longitude: monument.location.longitude ?? 0
-    }] : []
+    created_at: monument.createdAt ?? "",
+    updated_at: monument.updatedAt ?? "",
+    poets: monument.poet
+      ? [
+          {
+            id: monument.poet.id,
+            name: monument.poet.name,
+            biography: monument.poet.biography ?? null,
+            link_url: monument.poet.linkUrl ?? null,
+            image_url: monument.poet.imageUrl ?? null,
+            created_at: monument.poet.createdAt ?? "",
+            updated_at: monument.poet.updatedAt ?? "",
+          },
+        ]
+      : [],
+    sources: monument.source
+      ? [
+          {
+            id: monument.source.id,
+            title: monument.source.title,
+            author: monument.source.author ?? null,
+            publisher: monument.source.publisher ?? null,
+            source_year: monument.source.sourceYear ?? null,
+            url: monument.source.url ?? null,
+            created_at: monument.source.createdAt ?? "",
+            updated_at: monument.source.updatedAt ?? "",
+          },
+        ]
+      : [],
+    locations: monument.location
+      ? [
+          {
+            id: monument.location.id,
+            prefecture: monument.location.prefecture,
+            region: monument.location.region ?? null,
+            address: monument.location.address ?? null,
+            place_name: monument.location.placeName ?? null,
+            latitude: monument.location.latitude ?? 0,
+            longitude: monument.location.longitude ?? 0,
+          },
+        ]
+      : [],
   }));
-  
+
   return c.json(convertedMonuments);
 });
 

@@ -67,8 +67,8 @@ describe("Locations API GET Endpoints", () => {
         address: "兵庫県神戸市",
         name: "高浜虚子の句碑",
         latitude: 34.690084,
-        longitude: 135.195510,
-      }
+        longitude: 135.19551,
+      },
     ]);
   });
 

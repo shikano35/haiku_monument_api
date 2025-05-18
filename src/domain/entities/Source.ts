@@ -7,6 +7,6 @@ export type Source = {
   url?: string | null;
   createdAt: string;
   updatedAt: string;
-}
+};
 
-export type CreateSourceInput = Omit<Source, 'id' | 'createdAt' | 'updatedAt'>;
+export type CreateSourceInput = Omit<Source, "id" | "createdAt" | "updatedAt">;

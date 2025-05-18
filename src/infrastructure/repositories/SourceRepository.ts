@@ -1,19 +1,10 @@
-import type { ISourceRepository } from '../../domain/repositories/ISourceRepository';
-import type { CreateSourceInput, Source } from '../../domain/entities/Source';
-import { getDB } from '../db/db';
-import { sources } from '../db/schema';
-import {
-  eq,
-  and,
-  or,
-  like,
-  asc,
-  desc,
-  gt,
-  lt,
-} from 'drizzle-orm/expressions';
-import type { D1Database } from '@cloudflare/workers-types';
-import type { QueryParams } from '../../domain/common/QueryParams';
+import type { ISourceRepository } from "../../domain/repositories/ISourceRepository";
+import type { CreateSourceInput, Source } from "../../domain/entities/Source";
+import { getDB } from "../db/db";
+import { sources } from "../db/schema";
+import { eq, and, or, like, asc, desc, gt, lt } from "drizzle-orm/expressions";
+import type { D1Database } from "@cloudflare/workers-types";
+import type { QueryParams } from "../../domain/common/QueryParams";
 
 const ensureNumberOrNull = (value: unknown): number | null => {
   if (value === null || value === undefined) return null;
@@ -69,8 +60,8 @@ export class SourceRepository implements ISourceRepository {
           or(
             like(sources.title, `%${queryParams.search}%`),
             like(sources.publisher, `%${queryParams.search}%`),
-            like(sources.author, `%${queryParams.search}%`)
-          )
+            like(sources.author, `%${queryParams.search}%`),
+          ),
         );
       }
       if (queryParams.name_contains) {
@@ -96,39 +87,56 @@ export class SourceRepository implements ISourceRepository {
       if (queryParams.ordering?.length) {
         const orderClauses = queryParams.ordering
           .map((order) => {
-            const direction = order.startsWith('-') ? 'desc' : 'asc';
-            const columnName = order.startsWith('-') ? order.substring(1) : order;
+            const direction = order.startsWith("-") ? "desc" : "asc";
+            const columnName = order.startsWith("-")
+              ? order.substring(1)
+              : order;
 
             switch (columnName) {
-              case 'title':
-                return direction === 'asc' ? asc(sources.title) : desc(sources.title);
-              case 'author':
-                return direction === 'asc' ? asc(sources.author) : desc(sources.author);
-              case 'year':
-                return direction === 'asc' ? asc(sources.sourceYear) : desc(sources.sourceYear);
-              case 'publisher':
-                return direction === 'asc' ? asc(sources.publisher) : desc(sources.publisher);
-              case 'created_at':
-              case 'createdAt':
-                return direction === 'asc' ? asc(sources.createdAt) : desc(sources.createdAt);
-              case 'updated_at':
-              case 'updatedAt':
-                return direction === 'asc' ? asc(sources.updatedAt) : desc(sources.updatedAt);
+              case "title":
+                return direction === "asc"
+                  ? asc(sources.title)
+                  : desc(sources.title);
+              case "author":
+                return direction === "asc"
+                  ? asc(sources.author)
+                  : desc(sources.author);
+              case "year":
+                return direction === "asc"
+                  ? asc(sources.sourceYear)
+                  : desc(sources.sourceYear);
+              case "publisher":
+                return direction === "asc"
+                  ? asc(sources.publisher)
+                  : desc(sources.publisher);
+              case "created_at":
+              case "createdAt":
+                return direction === "asc"
+                  ? asc(sources.createdAt)
+                  : desc(sources.createdAt);
+              case "updated_at":
+              case "updatedAt":
+                return direction === "asc"
+                  ? asc(sources.updatedAt)
+                  : desc(sources.updatedAt);
               default:
                 return undefined;
             }
           })
-          .filter((clause): clause is Exclude<typeof clause, undefined> => clause !== undefined);
+          .filter(
+            (clause): clause is Exclude<typeof clause, undefined> =>
+              clause !== undefined,
+          );
 
         if (orderClauses.length > 0) {
           query = query.orderBy(...orderClauses) as typeof query;
         }
       }
 
-      if (typeof queryParams.limit === 'number') {
+      if (typeof queryParams.limit === "number") {
         query = query.limit(queryParams.limit) as typeof query;
       }
-      if (typeof queryParams.offset === 'number') {
+      if (typeof queryParams.offset === "number") {
         query = query.offset(queryParams.offset) as typeof query;
       }
     }
@@ -157,18 +165,22 @@ export class SourceRepository implements ISourceRepository {
       .insert(sources)
       .values(dataToInsert)
       .returning();
-    
+
     return convertToSource(inserted);
   }
 
-  async update(id: number, sourceData: Partial<Source>): Promise<Source | null> {
+  async update(
+    id: number,
+    sourceData: Partial<Source>,
+  ): Promise<Source | null> {
     if (!(await this.getById(id))) return null;
-    
+
     const dataToUpdate = {
       ...sourceData,
-      sourceYear: sourceData.sourceYear !== undefined 
-        ? ensureNumberOrNull(sourceData.sourceYear) 
-        : undefined,
+      sourceYear:
+        sourceData.sourceYear !== undefined
+          ? ensureNumberOrNull(sourceData.sourceYear)
+          : undefined,
     };
 
     const [updated] = await this.db
@@ -176,7 +188,7 @@ export class SourceRepository implements ISourceRepository {
       .set(dataToUpdate)
       .where(eq(sources.id, id))
       .returning();
-    
+
     return convertToSource(updated);
   }
 

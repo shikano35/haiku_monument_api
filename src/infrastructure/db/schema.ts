@@ -1,4 +1,10 @@
-import { sqliteTable, integer, text, real, integer as bool } from "drizzle-orm/sqlite-core";
+import {
+  sqliteTable,
+  integer,
+  text,
+  real,
+  integer as bool,
+} from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
 // Poets テーブル
@@ -60,13 +66,16 @@ export const haikuMonuments = sqliteTable("haiku_monuments", {
   model3dUrl: text("model_3d_url"),
   remarks: text("remarks"),
 
-  poetId: integer("poet_id")
-    .references(() => poets.id, { onDelete: "restrict" }),
-  sourceId: integer("source_id")
-    .references(() => sources.id, { onDelete: "restrict" }),
-  locationId: integer("location_id")
-    .references(() => locations.id, { onDelete: "restrict" }),
-  
+  poetId: integer("poet_id").references(() => poets.id, {
+    onDelete: "restrict",
+  }),
+  sourceId: integer("source_id").references(() => sources.id, {
+    onDelete: "restrict",
+  }),
+  locationId: integer("location_id").references(() => locations.id, {
+    onDelete: "restrict",
+  }),
+
   createdAt: text("created_at").default(sql`(DATETIME('now','localtime'))`),
   updatedAt: text("updated_at").default(sql`(DATETIME('now','localtime'))`),
 });

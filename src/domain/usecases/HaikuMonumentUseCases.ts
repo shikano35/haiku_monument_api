@@ -1,11 +1,17 @@
-import type { QueryParams } from '../common/QueryParams';
-import type { CreateHaikuMonumentInput, HaikuMonument, UpdateHaikuMonumentInput } from '../entities/HaikuMonument';
-import type { IHaikuMonumentRepository } from '../repositories/IHaikuMonumentRepository';
+import type { QueryParams } from "../common/QueryParams";
+import type {
+  CreateHaikuMonumentInput,
+  HaikuMonument,
+  UpdateHaikuMonumentInput,
+} from "../entities/HaikuMonument";
+import type { IHaikuMonumentRepository } from "../repositories/IHaikuMonumentRepository";
 
 export class HaikuMonumentUseCases {
   constructor(private readonly monumentRepo: IHaikuMonumentRepository) {}
 
-  async getAllHaikuMonuments(queryParams: QueryParams): Promise<HaikuMonument[]> {
+  async getAllHaikuMonuments(
+    queryParams: QueryParams,
+  ): Promise<HaikuMonument[]> {
     return this.monumentRepo.getAll(queryParams);
   }
 
@@ -13,11 +19,16 @@ export class HaikuMonumentUseCases {
     return this.monumentRepo.getById(id);
   }
 
-  async createHaikuMonument(monumentData: CreateHaikuMonumentInput): Promise<HaikuMonument> {
+  async createHaikuMonument(
+    monumentData: CreateHaikuMonumentInput,
+  ): Promise<HaikuMonument> {
     return this.monumentRepo.create(monumentData);
   }
 
-  async updateHaikuMonument(id: number, monumentData: UpdateHaikuMonumentInput): Promise<HaikuMonument | null> {
+  async updateHaikuMonument(
+    id: number,
+    monumentData: UpdateHaikuMonumentInput,
+  ): Promise<HaikuMonument | null> {
     return this.monumentRepo.update(id, monumentData);
   }
 
@@ -29,7 +40,9 @@ export class HaikuMonumentUseCases {
     return this.monumentRepo.getByPoetId(poetId);
   }
 
-  async getHaikuMonumentsByLocation(locationId: number): Promise<HaikuMonument[]> {
+  async getHaikuMonumentsByLocation(
+    locationId: number,
+  ): Promise<HaikuMonument[]> {
     return this.monumentRepo.getByLocationId(locationId);
   }
 

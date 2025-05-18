@@ -1,22 +1,17 @@
-import type { IHaikuMonumentRepository } from '../../domain/repositories/IHaikuMonumentRepository';
-import type { CreateHaikuMonumentInput, HaikuMonument, UpdateHaikuMonumentInput } from '../../domain/entities/HaikuMonument';
-import type { Poet } from '../../domain/entities/Poet';
-import type { Source } from '../../domain/entities/Source';
-import type { Location } from '../../domain/entities/Location';
-import { getDB } from '../db/db';
-import { haikuMonuments, poets, sources, locations } from '../db/schema';
-import {
-  eq,
-  and,
-  or,
-  like,
-  asc,
-  desc,
-  gt,
-  lt,
-} from 'drizzle-orm/expressions';
-import type { D1Database } from '@cloudflare/workers-types';
-import type { QueryParams } from '../../domain/common/QueryParams';
+import type { IHaikuMonumentRepository } from "../../domain/repositories/IHaikuMonumentRepository";
+import type {
+  CreateHaikuMonumentInput,
+  HaikuMonument,
+  UpdateHaikuMonumentInput,
+} from "../../domain/entities/HaikuMonument";
+import type { Poet } from "../../domain/entities/Poet";
+import type { Source } from "../../domain/entities/Source";
+import type { Location } from "../../domain/entities/Location";
+import { getDB } from "../db/db";
+import { haikuMonuments, poets, sources, locations } from "../db/schema";
+import { eq, and, or, like, asc, desc, gt, lt } from "drizzle-orm/expressions";
+import type { D1Database } from "@cloudflare/workers-types";
+import type { QueryParams } from "../../domain/common/QueryParams";
 
 type DbPoet = typeof poets.$inferSelect;
 type DbSource = typeof sources.$inferSelect;
@@ -29,16 +24,18 @@ interface HaikuMonumentQueryResult extends DbHaikuMonument {
   location: DbLocation | null;
 }
 
-function isHaikuMonumentQueryResult(obj: unknown): obj is HaikuMonumentQueryResult {
-  if (typeof obj !== 'object' || obj === null) return false;
-  
+function isHaikuMonumentQueryResult(
+  obj: unknown,
+): obj is HaikuMonumentQueryResult {
+  if (typeof obj !== "object" || obj === null) return false;
+
   const item = obj as Record<string, unknown>;
   return (
-    typeof item.id === 'number' &&
-    typeof item.inscription === 'string' &&
-    'poet' in item &&
-    'source' in item &&
-    'location' in item
+    typeof item.id === "number" &&
+    typeof item.inscription === "string" &&
+    "poet" in item &&
+    "source" in item &&
+    "location" in item
   );
 }
 
@@ -103,7 +100,9 @@ const convertToLocation = (dbLocation: DbLocation | null): Location | null => {
   };
 };
 
-const convertToHaikuMonument = (dbMonument: HaikuMonumentQueryResult): HaikuMonument => {
+const convertToHaikuMonument = (
+  dbMonument: HaikuMonumentQueryResult,
+): HaikuMonument => {
   return {
     id: dbMonument.id,
     inscription: dbMonument.inscription,
@@ -199,21 +198,28 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
         conditions.push(
           or(
             like(haikuMonuments.inscription, `%${queryParams.search}%`),
-            like(haikuMonuments.commentary, `%${queryParams.search}%`)
-          )
+            like(haikuMonuments.commentary, `%${queryParams.search}%`),
+          ),
         );
       }
       if (queryParams.title_contains) {
         conditions.push(like(sources.title, `%${queryParams.title_contains}%`));
       }
       if (queryParams.description_contains) {
-        conditions.push(like(haikuMonuments.commentary, `%${queryParams.description_contains}%`));
+        conditions.push(
+          like(
+            haikuMonuments.commentary,
+            `%${queryParams.description_contains}%`,
+          ),
+        );
       }
       if (queryParams.name_contains) {
         conditions.push(like(poets.name, `%${queryParams.name_contains}%`));
       }
       if (queryParams.biography_contains) {
-        conditions.push(like(poets.biography, `%${queryParams.biography_contains}%`));
+        conditions.push(
+          like(poets.biography, `%${queryParams.biography_contains}%`),
+        );
       }
       if (queryParams.prefecture) {
         conditions.push(eq(locations.prefecture, queryParams.prefecture));
@@ -222,16 +228,24 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
         conditions.push(like(locations.region, `%${queryParams.region}%`));
       }
       if (queryParams.created_at_gt) {
-        conditions.push(gt(haikuMonuments.createdAt, queryParams.created_at_gt));
+        conditions.push(
+          gt(haikuMonuments.createdAt, queryParams.created_at_gt),
+        );
       }
       if (queryParams.created_at_lt) {
-        conditions.push(lt(haikuMonuments.createdAt, queryParams.created_at_lt));
+        conditions.push(
+          lt(haikuMonuments.createdAt, queryParams.created_at_lt),
+        );
       }
       if (queryParams.updated_at_gt) {
-        conditions.push(gt(haikuMonuments.updatedAt, queryParams.updated_at_gt));
+        conditions.push(
+          gt(haikuMonuments.updatedAt, queryParams.updated_at_gt),
+        );
       }
       if (queryParams.updated_at_lt) {
-        conditions.push(lt(haikuMonuments.updatedAt, queryParams.updated_at_lt));
+        conditions.push(
+          lt(haikuMonuments.updatedAt, queryParams.updated_at_lt),
+        );
       }
       if (conditions.length > 0) {
         query = query.where(and(...conditions)) as typeof query;
@@ -240,41 +254,41 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
       if (queryParams.ordering?.length) {
         const orderClauses = queryParams.ordering
           .map((order) => {
-            const direction = order.startsWith('-') ? 'desc' : 'asc';
-            const columnName = order.startsWith('-') ? order.substring(1) : order;
+            const direction = order.startsWith("-") ? "desc" : "asc";
+            const columnName = order.startsWith("-")
+              ? order.substring(1)
+              : order;
             switch (columnName) {
-              case 'created_at':
-                return direction === 'asc'
+              case "created_at":
+                return direction === "asc"
                   ? asc(haikuMonuments.createdAt)
                   : desc(haikuMonuments.createdAt);
-              case 'updated_at':
-                return direction === 'asc'
+              case "updated_at":
+                return direction === "asc"
                   ? asc(haikuMonuments.updatedAt)
                   : desc(haikuMonuments.updatedAt);
-              case 'established_date':
-                return direction === 'asc'
+              case "established_date":
+                return direction === "asc"
                   ? asc(haikuMonuments.establishedDate)
                   : desc(haikuMonuments.establishedDate);
-              case 'inscription':
-                return direction === 'asc'
+              case "inscription":
+                return direction === "asc"
                   ? asc(haikuMonuments.inscription)
                   : desc(haikuMonuments.inscription);
-              case 'poet':
-              case 'poet_name':
-                return direction === 'asc'
-                  ? asc(poets.name)
-                  : desc(poets.name);
-              case 'source':
-              case 'source_title':
-                return direction === 'asc'
+              case "poet":
+              case "poet_name":
+                return direction === "asc" ? asc(poets.name) : desc(poets.name);
+              case "source":
+              case "source_title":
+                return direction === "asc"
                   ? asc(sources.title)
                   : desc(sources.title);
-              case 'prefecture':
-                return direction === 'asc'
+              case "prefecture":
+                return direction === "asc"
                   ? asc(locations.prefecture)
                   : desc(locations.prefecture);
-              case 'region':
-                return direction === 'asc'
+              case "region":
+                return direction === "asc"
                   ? asc(locations.region)
                   : desc(locations.region);
               default:
@@ -282,22 +296,23 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
             }
           })
           .filter(
-            (clause): clause is Exclude<typeof clause, undefined> => clause !== undefined
+            (clause): clause is Exclude<typeof clause, undefined> =>
+              clause !== undefined,
           );
         if (orderClauses.length > 0) {
           query = query.orderBy(...orderClauses) as typeof query;
         }
       }
-      if (typeof queryParams.limit === 'number') {
+      if (typeof queryParams.limit === "number") {
         query = query.limit(queryParams.limit) as typeof query;
       }
-      if (typeof queryParams.offset === 'number') {
+      if (typeof queryParams.offset === "number") {
         query = query.offset(queryParams.offset) as typeof query;
       }
     }
 
     const result = await query.all();
-    
+
     return this.convertResults(result);
   }
 
@@ -308,19 +323,19 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
       .all();
 
     if (result.length === 0) return null;
-    
+
     const monument = result[0];
     if (!isHaikuMonumentQueryResult(monument)) {
       return null;
     }
-    
+
     return convertToHaikuMonument(monument);
   }
 
   async create(monumentData: CreateHaikuMonumentInput): Promise<HaikuMonument> {
     let poetId: number | null = null;
     if (monumentData.poet) {
-      if ('id' in monumentData.poet) {
+      if ("id" in monumentData.poet) {
         poetId = monumentData.poet.id;
       } else {
         const [insertedPoet] = await this.db
@@ -338,7 +353,7 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
 
     let sourceId: number | null = null;
     if (monumentData.source) {
-      if ('id' in monumentData.source) {
+      if ("id" in monumentData.source) {
         sourceId = monumentData.source.id;
       } else {
         const [insertedSource] = await this.db
@@ -357,7 +372,7 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
 
     let locationId: number | null = null;
     if (monumentData.location) {
-      if ('id' in monumentData.location) {
+      if ("id" in monumentData.location) {
         locationId = monumentData.location.id;
       } else {
         const [insertedLocation] = await this.db
@@ -383,7 +398,9 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
       kigo: monumentData.kigo,
       season: monumentData.season,
       isReliable: convertToNumber(monumentData.isReliable ?? null),
-      hasReverseInscription: convertToNumber(monumentData.hasReverseInscription ?? null),
+      hasReverseInscription: convertToNumber(
+        monumentData.hasReverseInscription ?? null,
+      ),
       material: monumentData.material,
       totalHeight: monumentData.totalHeight,
       width: monumentData.width,
@@ -409,20 +426,25 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
 
     const monument = await this.getById(insertedMonument.id);
     if (!monument) {
-      throw new Error(`Failed to retrieve created monument with ID ${insertedMonument.id}`);
+      throw new Error(
+        `Failed to retrieve created monument with ID ${insertedMonument.id}`,
+      );
     }
 
     return monument;
   }
 
-  async update(id: number, monumentData: UpdateHaikuMonumentInput): Promise<HaikuMonument | null> {
+  async update(
+    id: number,
+    monumentData: UpdateHaikuMonumentInput,
+  ): Promise<HaikuMonument | null> {
     const exists = await this.getById(id);
     if (!exists) return null;
 
     let poetId: number | null = exists.poetId;
     if (monumentData.poet !== undefined) {
       if (monumentData.poet) {
-        if ('id' in monumentData.poet) {
+        if ("id" in monumentData.poet) {
           poetId = monumentData.poet.id;
         } else {
           const [insertedPoet] = await this.db
@@ -444,7 +466,7 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
     let sourceId: number | null = exists.sourceId;
     if (monumentData.source !== undefined) {
       if (monumentData.source) {
-        if ('id' in monumentData.source) {
+        if ("id" in monumentData.source) {
           sourceId = monumentData.source.id;
         } else {
           const [insertedSource] = await this.db
@@ -467,7 +489,7 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
     let locationId: number | null = exists.locationId;
     if (monumentData.location !== undefined) {
       if (monumentData.location) {
-        if ('id' in monumentData.location) {
+        if ("id" in monumentData.location) {
           locationId = monumentData.location.id;
         } else {
           const [insertedLocation] = await this.db
@@ -492,43 +514,72 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
     const monumentToUpdate = {
       inscription: monumentData.inscription ?? exists.inscription,
       establishedDate:
-        monumentData.establishedDate !== undefined ? monumentData.establishedDate : exists.establishedDate,
+        monumentData.establishedDate !== undefined
+          ? monumentData.establishedDate
+          : exists.establishedDate,
       commentary:
-        monumentData.commentary !== undefined ? monumentData.commentary : exists.commentary,
-      kigo: 
-        monumentData.kigo !== undefined ? monumentData.kigo : exists.kigo,
+        monumentData.commentary !== undefined
+          ? monumentData.commentary
+          : exists.commentary,
+      kigo: monumentData.kigo !== undefined ? monumentData.kigo : exists.kigo,
       season:
         monumentData.season !== undefined ? monumentData.season : exists.season,
       isReliable:
-        monumentData.isReliable !== undefined ? convertToNumber(monumentData.isReliable) : convertToNumber(exists.isReliable),
+        monumentData.isReliable !== undefined
+          ? convertToNumber(monumentData.isReliable)
+          : convertToNumber(exists.isReliable),
       hasReverseInscription:
-        monumentData.hasReverseInscription !== undefined ? convertToNumber(monumentData.hasReverseInscription) : convertToNumber(exists.hasReverseInscription),
+        monumentData.hasReverseInscription !== undefined
+          ? convertToNumber(monumentData.hasReverseInscription)
+          : convertToNumber(exists.hasReverseInscription),
       material:
-        monumentData.material !== undefined ? monumentData.material : exists.material,
+        monumentData.material !== undefined
+          ? monumentData.material
+          : exists.material,
       totalHeight:
-        monumentData.totalHeight !== undefined ? monumentData.totalHeight : exists.totalHeight,
+        monumentData.totalHeight !== undefined
+          ? monumentData.totalHeight
+          : exists.totalHeight,
       width:
         monumentData.width !== undefined ? monumentData.width : exists.width,
       depth:
         monumentData.depth !== undefined ? monumentData.depth : exists.depth,
       establishedYear:
-        monumentData.establishedYear !== undefined ? monumentData.establishedYear : exists.establishedYear,
+        monumentData.establishedYear !== undefined
+          ? monumentData.establishedYear
+          : exists.establishedYear,
       founder:
-        monumentData.founder !== undefined ? monumentData.founder : exists.founder,
+        monumentData.founder !== undefined
+          ? monumentData.founder
+          : exists.founder,
       monumentType:
-        monumentData.monumentType !== undefined ? monumentData.monumentType : exists.monumentType,
+        monumentData.monumentType !== undefined
+          ? monumentData.monumentType
+          : exists.monumentType,
       designationStatus:
-        monumentData.designationStatus !== undefined ? monumentData.designationStatus : exists.designationStatus,
-      photoUrl: 
-        monumentData.photoUrl !== undefined ? monumentData.photoUrl : exists.photoUrl,
+        monumentData.designationStatus !== undefined
+          ? monumentData.designationStatus
+          : exists.designationStatus,
+      photoUrl:
+        monumentData.photoUrl !== undefined
+          ? monumentData.photoUrl
+          : exists.photoUrl,
       photoDate:
-        monumentData.photoDate !== undefined ? monumentData.photoDate : exists.photoDate,
+        monumentData.photoDate !== undefined
+          ? monumentData.photoDate
+          : exists.photoDate,
       photographer:
-        monumentData.photographer !== undefined ? monumentData.photographer : exists.photographer,
+        monumentData.photographer !== undefined
+          ? monumentData.photographer
+          : exists.photographer,
       model3dUrl:
-        monumentData.model3dUrl !== undefined ? monumentData.model3dUrl : exists.model3dUrl,
+        monumentData.model3dUrl !== undefined
+          ? monumentData.model3dUrl
+          : exists.model3dUrl,
       remarks:
-        monumentData.remarks !== undefined ? monumentData.remarks : exists.remarks,
+        monumentData.remarks !== undefined
+          ? monumentData.remarks
+          : exists.remarks,
       poetId,
       sourceId,
       locationId,
@@ -539,7 +590,7 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
       .update(haikuMonuments)
       .set(monumentToUpdate)
       .where(eq(haikuMonuments.id, id));
-      
+
     return this.getById(id);
   }
 
@@ -555,7 +606,7 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
     const result = await this.createBaseQuery()
       .where(eq(haikuMonuments.poetId, poetId))
       .all();
-  
+
     return this.convertResults(result);
   }
 
@@ -563,7 +614,7 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
     const result = await this.createBaseQuery()
       .where(eq(haikuMonuments.locationId, locationId))
       .all();
-  
+
     return this.convertResults(result);
   }
 
@@ -571,7 +622,7 @@ export class HaikuMonumentRepository implements IHaikuMonumentRepository {
     const result = await this.createBaseQuery()
       .where(eq(haikuMonuments.sourceId, sourceId))
       .all();
-  
+
     return this.convertResults(result);
   }
 }

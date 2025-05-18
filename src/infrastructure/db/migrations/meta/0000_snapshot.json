@@ -200,12 +200,8 @@
           "name": "haiku_monuments_poet_id_poets_id_fk",
           "tableFrom": "haiku_monuments",
           "tableTo": "poets",
-          "columnsFrom": [
-            "poet_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["poet_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -213,12 +209,8 @@
           "name": "haiku_monuments_source_id_sources_id_fk",
           "tableFrom": "haiku_monuments",
           "tableTo": "sources",
-          "columnsFrom": [
-            "source_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["source_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -226,12 +218,8 @@
           "name": "haiku_monuments_location_id_locations_id_fk",
           "tableFrom": "haiku_monuments",
           "tableTo": "locations",
-          "columnsFrom": [
-            "location_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["location_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }

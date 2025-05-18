@@ -29,7 +29,7 @@ describe("Poets API GET Endpoints", () => {
         links: "https://example.com/basho",
         image_url: "https://example.com/basho.jpg",
         created_at: "2025-05-11 10:41:34",
-        updated_at: "2025-05-11 10:41:34"
+        updated_at: "2025-05-11 10:41:34",
       },
       {
         id: 2,
