@@ -1,0 +1,187 @@
+-- 既存データ削除
+DELETE FROM haiku_monuments;
+DELETE FROM locations;
+DELETE FROM poets;
+DELETE FROM sources;
+
+-- IDリセット（SQLiteの場合）
+DELETE FROM sqlite_sequence WHERE name IN ('haiku_monuments', 'locations', 'poets', 'sources');
+
+-- Poets テーブルのデータ
+INSERT INTO poets (name, biography, link_url, image_url)
+VALUES
+  ('松尾芭蕉', '江戸時代の俳人。奥の細道の著者。', 'https://example.com/basho', 'https://example.com/basho.jpg'),
+  ('小林一茶', '江戸時代後期の俳人。自然や日常を詠んだ。', 'https://example.com/issa', 'https://example.com/issa.jpg'),
+  ('与謝蕪村', '江戸時代中期の俳人、画家。', 'https://example.com/buson', 'https://example.com/buson.jpg'),
+  ('正岡子規', '明治時代の俳人。俳句改革を行った。', 'https://example.com/shiki', 'https://example.com/shiki.jpg'),
+  ('高浜虚子', '正岡子規の弟子で俳壇の指導者。', 'https://example.com/kyooshi', 'https://example.com/kyooshi.jpg');
+
+-- Sources テーブルのデータ
+INSERT INTO sources (title, author, source_year, url, publisher)
+VALUES
+  ('奥の細道', '松尾芭蕉', 1702, 'https://example.com/okuno-hosomichi', '江戸出版'),
+  ('おらが春', '小林一茶', 1819, 'https://example.com/oraga-haru', '江戸出版'),
+  ('蕪村句集', '与謝蕪村', 1775, 'https://example.com/buson-kushu', '江戸出版'),
+  ('俳句革新', '正岡子規', 1893, 'https://example.com/haiku-kakushin', '明治出版社'),
+  ('ホトトギス', '高浜虚子', 1897, 'https://example.com/hototogisu', '明治出版社');
+
+-- Locations テーブルのデータ
+INSERT INTO locations (region, prefecture, address, place_name, latitude, longitude)
+VALUES
+  ('関東', '東京都', '東京都台東区上野公園', '上野恩賜公園', 35.715298, 139.773037),
+  ('中部', '長野県', '長野県長野市', '一茶記念館', 36.648583, 138.194953),
+  ('近畿', '京都府', '京都府京都市中京区', '与謝蕪村の句碑', 35.011564, 135.768149),
+  ('四国', '愛媛県', '愛媛県松山市', '子規記念館', 33.839157, 132.765575),
+  ('近畿', '兵庫県', '兵庫県神戸市', '高浜虚子の句碑', 34.690084, 135.195510);
+
+-- Haiku Monuments テーブルのデータ
+INSERT INTO haiku_monuments (
+  inscription,
+  commentary,
+  kigo,
+  season,
+  is_reliable,
+  has_reverse_inscription,
+  material,
+  total_height,
+  width,
+  depth,
+  established_date,
+  established_year,
+  founder,
+  monument_type,
+  designation_status,
+  photo_url,
+  photo_date,
+  photographer,
+  model_3d_url,
+  remarks,
+  poet_id,
+  source_id,
+  location_id
+) VALUES
+  (
+    '夏草や 兵どもが 夢の跡',
+    '奥の細道に記された有名な句。',
+    '夏草',
+    '夏',
+    1,
+    0,
+    '石',
+    150.0,
+    50.0,
+    30.0,
+    '享保17年5月15日',
+    1712,
+    '松尾芭蕉',
+    '句碑',
+    '県指定史跡',
+    'https://example.com/basho-haiku.jpg',
+    '2023-04-01',
+    null,
+    'https://example.com/basho-3d-model.glb',
+    '芭蕉の句碑、上野公園内',
+    1,
+    1,
+    1
+  ),
+  (
+    '雀の子 そこのけそこのけ お馬が通る',
+    '一茶の優しい俳句の代表作。',
+    '雀',
+    '春',
+    1,
+    0,
+    '石',
+    140.0,
+    45.0,
+    25.0,
+    '文政2年6月10日',
+    1819,
+    '小林一茶',
+    '句碑',
+    '市登録記念碑',
+    'https://example.com/issa-haiku.jpg',
+    '2023-05-10',
+    '鈴木花子',
+    'https://example.com/issa-3d-model.glb',
+    null,
+    2,
+    2,
+    2
+  ),
+  (
+    '春の海 ひねもすのたり のたりかな',
+    '穏やかな海を詠んだ句。',
+    '海',
+    '春',
+    0,
+    0,
+    '銅',
+    160.0,
+    55.0,
+    35.0,
+    '天明10年4月8日',
+    1780,
+    '与謝蕪村',
+    '句碑',
+    null,
+    'https://example.com/buson-haiku.jpg',
+    '2023-06-15',
+    '佐藤次郎',
+    'https://example.com/buson-3d-model.glb',
+    '銅製の句碑',
+    3,
+    3,
+    3
+  ),
+  (
+    '柿くへば 鐘が鳴るなり 法隆寺',
+    '秋の味覚と歴史的建造物を結びつけた句。',
+    '柿',
+    '秋',
+    1,
+    1,
+    '石',
+    155.0,
+    50.0,
+    30.0,
+    '明治28年10月12日',
+    1895,
+    '正岡子規',
+    '句碑',
+    '国指定史跡',
+    'https://example.com/shiki-haiku.jpg',
+    '2023-07-20',
+    '高橋一郎',
+    'https://example.com/shiki-3d-model.glb',
+    null,
+    4,
+    4,
+    4
+  ),
+  (
+    '遠山に 日の当たりたる 枯野かな',
+    '枯野に光が当たる美しい情景を描く句。',
+    '野',
+    '冬',
+    0,
+    0,
+    '石',
+    150.0,
+    50.0,
+    30.0,
+    '明治34年11月20日',
+    1901,
+    '高浜虚子',
+    '句碑',
+    null,
+    'https://example.com/kyooshi-haiku.jpg',
+    '2023-08-05',
+    '山本花子',
+    'https://example.com/kyooshi-3d-model.glb',
+    '冬季限定ライトアップ',
+    5,
+    5,
+    5
+  ); 
