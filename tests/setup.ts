@@ -4,12 +4,16 @@ import { execSync } from 'node:child_process';
 
 let worker: Unstable_DevWorker;
 const isGithubActions = process.env.GITHUB_ACTIONS === 'true';
+const useLocalDatabase = process.env.D1_LOCAL_DATABASE === 'true';
 
 export async function startWorker() {
   const options: Unstable_DevOptions = {
     experimental: { disableExperimentalWarning: true },
     ip: "127.0.0.1",
-    vars: { D1_MAX_DURATION_MS: "3600000" }
+    vars: { 
+      D1_MAX_DURATION_MS: "3600000",
+      ...(useLocalDatabase ? { D1_LOCAL_DATABASE: "true" } : {})
+    }
   };
   
   worker = await unstable_dev('./src/index.ts', options);
@@ -33,11 +37,14 @@ export async function resetDb() {
   
   for (let i = 0; i < maxRetries; i++) {
     try {
-      if (isGithubActions) {
-        execSync('bunx wrangler d1 execute DB --file ./src/infrastructure/db/seeds/reset_and_seed.sql --test', { timeout: 10000 });
-      } else {
-        execSync('bunx wrangler d1 execute DB --file ./src/infrastructure/db/seeds/reset_and_seed.sql', { timeout: 5000 });
-      }
+      execSync('bunx wrangler d1 execute DB --file ./src/infrastructure/db/seeds/reset_and_seed.sql', { 
+        timeout: isGithubActions ? 10000 : 5000,
+        env: {
+          ...process.env,
+          ...(useLocalDatabase ? { D1_LOCAL_DATABASE: "true" } : {})
+        }
+      });
+      
       await new Promise(resolve => setTimeout(resolve, 500));
       return;
     } catch (e) {

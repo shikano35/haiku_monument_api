@@ -27,19 +27,19 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Create D1 Database for testing
+      - name: Create local database for testing
         run: |
-          bunx wrangler d1 create haiku_monument_db_test --test
-          echo "CLOUDFLARE_DATABASE_ID=haiku_monument_db_test" >> $GITHUB_ENV
+          echo "CLOUDFLARE_DATABASE_ID=DB" >> $GITHUB_ENV
+          echo "D1_LOCAL_DATABASE=true" >> $GITHUB_ENV
 
       - name: Apply D1 migrations
         run: |
-          bunx wrangler d1 migrations apply DB --test
+          bunx wrangler d1 migrations apply DB
           sleep 5
 
       - name: Setup D1 DB
         run: |
-          bunx wrangler d1 execute DB --test --file ./src/infrastructure/db/seeds/seeds.sql
+          bunx wrangler d1 execute DB --file ./src/infrastructure/db/seeds/seeds.sql
           sleep 5
 
       - name: Run tests
