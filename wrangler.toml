@@ -1,0 +1,26 @@
+name = "haiku_monument_api"
+main = "src/index.ts"
+compatibility_date = "2025-01-24"
+
+compatibility_flags = [ "nodejs_compat" ]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "kuhi-database"
+database_id = "d7dbf1b5-274e-49f4-8a75-c689e7d86097"
+
+# [[kv_namespaces]]
+# binding = "MY_KV_NAMESPACE"
+# id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# [[r2_buckets]]
+# binding = "MY_BUCKET"
+# bucket_name = "my-bucket"
+
+# [ai]
+# binding = "AI"
+
+# [observability]
+# enabled = true
+# head_sampling_rate = 1
+
