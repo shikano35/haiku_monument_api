@@ -9,5 +9,11 @@ export default defineConfig({
     sequence: {
       concurrent: false,
     },
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: ['**/*.spec.ts', '**/*.test.ts'],
+    },
   },
 }); 
