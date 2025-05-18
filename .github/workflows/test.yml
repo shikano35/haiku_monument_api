@@ -24,6 +24,9 @@ jobs:
       - name: Install dependencies
         run: bun install
 
+      - name: Apply D1 migrations
+        run: bunx wrangler d1 migrations apply DB
+
       - name: Setup D1 DB (migrate & seed)
         run: bunx wrangler d1 execute DB --file ./src/infrastructure/db/seeds/seeds.sql
 
