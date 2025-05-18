@@ -27,7 +27,7 @@ jobs:
       - name: Apply D1 migrations
         run: bunx wrangler d1 migrations apply DB
 
-      - name: Setup D1 DB (migrate & seed)
+      - name: Setup D1 DB
         run: bunx wrangler d1 execute DB --file ./src/infrastructure/db/seeds/seeds.sql
 
       - name: Run tests
