@@ -1,0 +1,1348 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "7002ff92-97f0-46a2-9c43-272d76a6fbb6",
+  "prevId": "7881a1b0-982c-49f1-99ab-49dcbd00f61e",
+  "tables": {
+    "events": {
+      "name": "events",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "monument_id": {
+          "name": "monument_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "event_type": {
+          "name": "event_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "hu_time_normalized": {
+          "name": "hu_time_normalized",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "interval_start": {
+          "name": "interval_start",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "interval_end": {
+          "name": "interval_end",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "uncertainty_note": {
+          "name": "uncertainty_note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "actor": {
+          "name": "actor",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_id": {
+          "name": "source_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(DATETIME('now','localtime'))"
+        }
+      },
+      "indexes": {
+        "events_monument_idx": {
+          "name": "events_monument_idx",
+          "columns": [
+            "monument_id"
+          ],
+          "isUnique": false
+        },
+        "events_type_idx": {
+          "name": "events_type_idx",
+          "columns": [
+            "event_type"
+          ],
+          "isUnique": false
+        },
+        "events_time_idx": {
+          "name": "events_time_idx",
+          "columns": [
+            "interval_start"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "events_monument_id_monuments_id_fk": {
+          "name": "events_monument_id_monuments_id_fk",
+          "tableFrom": "events",
+          "tableTo": "monuments",
+          "columnsFrom": [
+            "monument_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "events_source_id_sources_id_fk": {
+          "name": "events_source_id_sources_id_fk",
+          "tableFrom": "events",
+          "tableTo": "sources",
+          "columnsFrom": [
+            "source_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "monuments": {
+      "name": "monuments",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "canonical_name": {
+          "name": "canonical_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "monument_type": {
+          "name": "monument_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "monument_type_uri": {
+          "name": "monument_type_uri",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "material": {
+          "name": "material",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "material_uri": {
+          "name": "material_uri",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(DATETIME('now','localtime'))"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(DATETIME('now','localtime'))"
+        }
+      },
+      "indexes": {
+        "monuments_canonical_name_idx": {
+          "name": "monuments_canonical_name_idx",
+          "columns": [
+            "canonical_name"
+          ],
+          "isUnique": false
+        },
+        "monuments_type_idx": {
+          "name": "monuments_type_idx",
+          "columns": [
+            "monument_type"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "inscription_poems": {
+      "name": "inscription_poems",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "inscription_id": {
+          "name": "inscription_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "poem_id": {
+          "name": "poem_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "position": {
+          "name": "position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(DATETIME('now','localtime'))"
+        }
+      },
+      "indexes": {
+        "inscription_poems_inscription_idx": {
+          "name": "inscription_poems_inscription_idx",
+          "columns": [
+            "inscription_id"
+          ],
+          "isUnique": false
+        },
+        "inscription_poems_poem_idx": {
+          "name": "inscription_poems_poem_idx",
+          "columns": [
+            "poem_id"
+          ],
+          "isUnique": false
+        },
+        "inscription_poems_unique_idx": {
+          "name": "inscription_poems_unique_idx",
+          "columns": [
+            "inscription_id",
+            "poem_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "inscription_poems_inscription_id_inscriptions_id_fk": {
+          "name": "inscription_poems_inscription_id_inscriptions_id_fk",
+          "tableFrom": "inscription_poems",
+          "tableTo": "inscriptions",
+          "columnsFrom": [
+            "inscription_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "inscription_poems_poem_id_poems_id_fk": {
+          "name": "inscription_poems_poem_id_poems_id_fk",
+          "tableFrom": "inscription_poems",
+          "tableTo": "poems",
+          "columnsFrom": [
+            "poem_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "inscriptions": {
+      "name": "inscriptions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "monument_id": {
+          "name": "monument_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "side": {
+          "name": "side",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'front'"
+        },
+        "original_text": {
+          "name": "original_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "transliteration": {
+          "name": "transliteration",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "reading": {
+          "name": "reading",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "language": {
+          "name": "language",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'ja'"
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_id": {
+          "name": "source_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(DATETIME('now','localtime'))"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(DATETIME('now','localtime'))"
+        }
+      },
+      "indexes": {
+        "inscriptions_monument_idx": {
+          "name": "inscriptions_monument_idx",
+          "columns": [
+            "monument_id"
+          ],
+          "isUnique": false
+        },
+        "inscriptions_text_idx": {
+          "name": "inscriptions_text_idx",
+          "columns": [
+            "original_text"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "inscriptions_monument_id_monuments_id_fk": {
+          "name": "inscriptions_monument_id_monuments_id_fk",
+          "tableFrom": "inscriptions",
+          "tableTo": "monuments",
+          "columnsFrom": [
+            "monument_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "inscriptions_source_id_sources_id_fk": {
+          "name": "inscriptions_source_id_sources_id_fk",
+          "tableFrom": "inscriptions",
+          "tableTo": "sources",
+          "columnsFrom": [
+            "source_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "locations": {
+      "name": "locations",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "imi_pref_code": {
+          "name": "imi_pref_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "region": {
+          "name": "region",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "prefecture": {
+          "name": "prefecture",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "municipality": {
+          "name": "municipality",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "place_name": {
+          "name": "place_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "latitude": {
+          "name": "latitude",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "longitude": {
+          "name": "longitude",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "geohash": {
+          "name": "geohash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "geom_geojson": {
+          "name": "geom_geojson",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "accuracy_m": {
+          "name": "accuracy_m",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(DATETIME('now','localtime'))"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(DATETIME('now','localtime'))"
+        }
+      },
+      "indexes": {
+        "locations_pref_idx": {
+          "name": "locations_pref_idx",
+          "columns": [
+            "prefecture"
+          ],
+          "isUnique": false
+        },
+        "locations_coord_idx": {
+          "name": "locations_coord_idx",
+          "columns": [
+            "latitude",
+            "longitude"
+          ],
+          "isUnique": false
+        },
+        "locations_geohash_idx": {
+          "name": "locations_geohash_idx",
+          "columns": [
+            "geohash"
+          ],
+          "isUnique": false
+        },
+        "locations_imi_idx": {
+          "name": "locations_imi_idx",
+          "columns": [
+            "imi_pref_code"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "measurements": {
+      "name": "measurements",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "monument_id": {
+          "name": "monument_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "measurement_type": {
+          "name": "measurement_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "unit": {
+          "name": "unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "measured_at": {
+          "name": "measured_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "measured_by": {
+          "name": "measured_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_id": {
+          "name": "source_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(DATETIME('now','localtime'))"
+        }
+      },
+      "indexes": {
+        "measurements_monument_idx": {
+          "name": "measurements_monument_idx",
+          "columns": [
+            "monument_id"
+          ],
+          "isUnique": false
+        },
+        "measurements_type_idx": {
+          "name": "measurements_type_idx",
+          "columns": [
+            "measurement_type"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "measurements_monument_id_monuments_id_fk": {
+          "name": "measurements_monument_id_monuments_id_fk",
+          "tableFrom": "measurements",
+          "tableTo": "monuments",
+          "columnsFrom": [
+            "monument_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "measurements_source_id_sources_id_fk": {
+          "name": "measurements_source_id_sources_id_fk",
+          "tableFrom": "measurements",
+          "tableTo": "sources",
+          "columnsFrom": [
+            "source_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "media": {
+      "name": "media",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "monument_id": {
+          "name": "monument_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "media_type": {
+          "name": "media_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "iiif_manifest_url": {
+          "name": "iiif_manifest_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "captured_at": {
+          "name": "captured_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "photographer": {
+          "name": "photographer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "license": {
+          "name": "license",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "exif_json": {
+          "name": "exif_json",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(DATETIME('now','localtime'))"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(DATETIME('now','localtime'))"
+        }
+      },
+      "indexes": {
+        "media_monument_idx": {
+          "name": "media_monument_idx",
+          "columns": [
+            "monument_id"
+          ],
+          "isUnique": false
+        },
+        "media_type_idx": {
+          "name": "media_type_idx",
+          "columns": [
+            "media_type"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "media_monument_id_monuments_id_fk": {
+          "name": "media_monument_id_monuments_id_fk",
+          "tableFrom": "media",
+          "tableTo": "monuments",
+          "columnsFrom": [
+            "monument_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "monument_locations": {
+      "name": "monument_locations",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "monument_id": {
+          "name": "monument_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "location_id": {
+          "name": "location_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "assigned_at": {
+          "name": "assigned_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(DATETIME('now','localtime'))"
+        },
+        "is_primary": {
+          "name": "is_primary",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 0
+        }
+      },
+      "indexes": {
+        "monument_locations_monument_idx": {
+          "name": "monument_locations_monument_idx",
+          "columns": [
+            "monument_id"
+          ],
+          "isUnique": false
+        },
+        "monument_locations_location_idx": {
+          "name": "monument_locations_location_idx",
+          "columns": [
+            "location_id"
+          ],
+          "isUnique": false
+        },
+        "monument_locations_unique_idx": {
+          "name": "monument_locations_unique_idx",
+          "columns": [
+            "monument_id",
+            "location_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "monument_locations_monument_id_monuments_id_fk": {
+          "name": "monument_locations_monument_id_monuments_id_fk",
+          "tableFrom": "monument_locations",
+          "tableTo": "monuments",
+          "columnsFrom": [
+            "monument_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "monument_locations_location_id_locations_id_fk": {
+          "name": "monument_locations_location_id_locations_id_fk",
+          "tableFrom": "monument_locations",
+          "tableTo": "locations",
+          "columnsFrom": [
+            "location_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "poem_attributions": {
+      "name": "poem_attributions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "poem_id": {
+          "name": "poem_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "poet_id": {
+          "name": "poet_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "confidence": {
+          "name": "confidence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'certain'"
+        },
+        "confidence_score": {
+          "name": "confidence_score",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 1
+        },
+        "source_id": {
+          "name": "source_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(DATETIME('now','localtime'))"
+        }
+      },
+      "indexes": {
+        "poem_attributions_poem_idx": {
+          "name": "poem_attributions_poem_idx",
+          "columns": [
+            "poem_id"
+          ],
+          "isUnique": false
+        },
+        "poem_attributions_poet_idx": {
+          "name": "poem_attributions_poet_idx",
+          "columns": [
+            "poet_id"
+          ],
+          "isUnique": false
+        },
+        "poem_attributions_unique_idx": {
+          "name": "poem_attributions_unique_idx",
+          "columns": [
+            "poem_id",
+            "poet_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "poem_attributions_poem_id_poems_id_fk": {
+          "name": "poem_attributions_poem_id_poems_id_fk",
+          "tableFrom": "poem_attributions",
+          "tableTo": "poems",
+          "columnsFrom": [
+            "poem_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "poem_attributions_poet_id_poets_id_fk": {
+          "name": "poem_attributions_poet_id_poets_id_fk",
+          "tableFrom": "poem_attributions",
+          "tableTo": "poets",
+          "columnsFrom": [
+            "poet_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "poem_attributions_source_id_sources_id_fk": {
+          "name": "poem_attributions_source_id_sources_id_fk",
+          "tableFrom": "poem_attributions",
+          "tableTo": "sources",
+          "columnsFrom": [
+            "source_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "poems": {
+      "name": "poems",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "normalized_text": {
+          "name": "normalized_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "text_hash": {
+          "name": "text_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "kigo": {
+          "name": "kigo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "season": {
+          "name": "season",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(DATETIME('now','localtime'))"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(DATETIME('now','localtime'))"
+        }
+      },
+      "indexes": {
+        "poems_normalized_text_unique": {
+          "name": "poems_normalized_text_unique",
+          "columns": [
+            "normalized_text"
+          ],
+          "isUnique": true
+        },
+        "poems_text_idx": {
+          "name": "poems_text_idx",
+          "columns": [
+            "text"
+          ],
+          "isUnique": false
+        },
+        "poems_normalized_idx": {
+          "name": "poems_normalized_idx",
+          "columns": [
+            "normalized_text"
+          ],
+          "isUnique": false
+        },
+        "poems_season_idx": {
+          "name": "poems_season_idx",
+          "columns": [
+            "season"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "poets": {
+      "name": "poets",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name_kana": {
+          "name": "name_kana",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "biography": {
+          "name": "biography",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "birth_year": {
+          "name": "birth_year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "death_year": {
+          "name": "death_year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "link_url": {
+          "name": "link_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "image_url": {
+          "name": "image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(DATETIME('now','localtime'))"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(DATETIME('now','localtime'))"
+        }
+      },
+      "indexes": {
+        "poets_name_idx": {
+          "name": "poets_name_idx",
+          "columns": [
+            "name"
+          ],
+          "isUnique": false
+        },
+        "poets_birth_idx": {
+          "name": "poets_birth_idx",
+          "columns": [
+            "birth_year"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "sources": {
+      "name": "sources",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "citation": {
+          "name": "citation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "author": {
+          "name": "author",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "publisher": {
+          "name": "publisher",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_year": {
+          "name": "source_year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(DATETIME('now','localtime'))"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(DATETIME('now','localtime'))"
+        }
+      },
+      "indexes": {
+        "sources_title_idx": {
+          "name": "sources_title_idx",
+          "columns": [
+            "title"
+          ],
+          "isUnique": false
+        },
+        "sources_author_idx": {
+          "name": "sources_author_idx",
+          "columns": [
+            "author"
+          ],
+          "isUnique": false
+        },
+        "sources_year_idx": {
+          "name": "sources_year_idx",
+          "columns": [
+            "source_year"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}
