@@ -137,7 +137,7 @@ CREATE UNIQUE INDEX `poems_normalized_text_unique` ON `poems` (`normalized_text`
 CREATE INDEX `poems_text_idx` ON `poems` (`text`);--> statement-breakpoint
 CREATE INDEX `poems_normalized_idx` ON `poems` (`normalized_text`);--> statement-breakpoint
 CREATE INDEX `poems_season_idx` ON `poems` (`season`);--> statement-breakpoint
-DROP TABLE `haiku_monuments`;--> statement-breakpoint
+-- DROP TABLE `haiku_monuments`;--> statement-breakpoint
 PRAGMA foreign_keys=OFF;--> statement-breakpoint
 CREATE TABLE `__new_locations` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -157,7 +157,7 @@ CREATE TABLE `__new_locations` (
 );
 --> statement-breakpoint
 INSERT INTO `__new_locations`("id", "imi_pref_code", "region", "prefecture", "municipality", "address", "place_name", "latitude", "longitude", "geohash", "geom_geojson", "accuracy_m", "created_at", "updated_at") SELECT "id", "imi_pref_code", "region", "prefecture", "municipality", "address", "place_name", "latitude", "longitude", "geohash", "geom_geojson", "accuracy_m", "created_at", "updated_at" FROM `locations`;--> statement-breakpoint
-DROP TABLE `locations`;--> statement-breakpoint
+-- DROP TABLE `locations`;--> statement-breakpoint
 ALTER TABLE `__new_locations` RENAME TO `locations`;--> statement-breakpoint
 PRAGMA foreign_keys=ON;--> statement-breakpoint
 CREATE INDEX `locations_pref_idx` ON `locations` (`prefecture`);--> statement-breakpoint
@@ -178,7 +178,7 @@ CREATE TABLE `__new_poets` (
 );
 --> statement-breakpoint
 INSERT INTO `__new_poets`("id", "name", "name_kana", "biography", "birth_year", "death_year", "link_url", "image_url", "created_at", "updated_at") SELECT "id", "name", "name_kana", "biography", "birth_year", "death_year", "link_url", "image_url", "created_at", "updated_at" FROM `poets`;--> statement-breakpoint
-DROP TABLE `poets`;--> statement-breakpoint
+-- DROP TABLE `poets`;--> statement-breakpoint
 ALTER TABLE `__new_poets` RENAME TO `poets`;--> statement-breakpoint
 CREATE INDEX `poets_name_idx` ON `poets` (`name`);--> statement-breakpoint
 CREATE INDEX `poets_birth_idx` ON `poets` (`birth_year`);--> statement-breakpoint
@@ -195,7 +195,7 @@ CREATE TABLE `__new_sources` (
 );
 --> statement-breakpoint
 INSERT INTO `__new_sources`("id", "citation", "author", "title", "publisher", "source_year", "url", "created_at", "updated_at") SELECT "id", "citation", "author", "title", "publisher", "source_year", "url", "created_at", "updated_at" FROM `sources`;--> statement-breakpoint
-DROP TABLE `sources`;--> statement-breakpoint
+-- DROP TABLE `sources`;--> statement-breakpoint
 ALTER TABLE `__new_sources` RENAME TO `sources`;--> statement-breakpoint
 CREATE INDEX `sources_title_idx` ON `sources` (`title`);--> statement-breakpoint
 CREATE INDEX `sources_author_idx` ON `sources` (`author`);--> statement-breakpoint
