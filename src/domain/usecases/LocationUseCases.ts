@@ -1,11 +1,17 @@
 import type { LocationQueryParams } from "../common/QueryParams";
-import type { CreateLocationInput, UpdateLocationInput, Location } from "../entities/Location";
+import type {
+  CreateLocationInput,
+  UpdateLocationInput,
+  Location,
+} from "../entities/Location";
 import type { ILocationRepository } from "../repositories/ILocationRepository";
 
 export class LocationUseCases {
   constructor(private readonly locationRepo: ILocationRepository) {}
 
-  async getAllLocations(queryParams?: LocationQueryParams): Promise<Location[]> {
+  async getAllLocations(
+    queryParams?: LocationQueryParams,
+  ): Promise<Location[]> {
     return this.locationRepo.getAll(queryParams);
   }
 
@@ -19,7 +25,7 @@ export class LocationUseCases {
 
   async updateLocation(
     id: number,
-    locationData: Partial<Location>,
+    locationData: UpdateLocationInput,
   ): Promise<Location | null> {
     return this.locationRepo.update(id, locationData);
   }

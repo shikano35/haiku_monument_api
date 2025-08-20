@@ -1,5 +1,9 @@
 import type { SourceQueryParams } from "../common/QueryParams";
-import type { CreateSourceInput, UpdateSourceInput, Source } from "../entities/Source";
+import type {
+  CreateSourceInput,
+  UpdateSourceInput,
+  Source,
+} from "../entities/Source";
 import type { ISourceRepository } from "../repositories/ISourceRepository";
 
 export class SourceUseCases {
@@ -19,7 +23,7 @@ export class SourceUseCases {
 
   async updateSource(
     id: number,
-    sourceData: Partial<Source>,
+    sourceData: UpdateSourceInput,
   ): Promise<Source | null> {
     return this.sourceRepo.update(id, sourceData);
   }

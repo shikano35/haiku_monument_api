@@ -29,7 +29,10 @@ export class PoemUseCases {
     return this.poemRepository.create(poemData);
   }
 
-  async updatePoem(id: number, poemData: UpdatePoemInput): Promise<Poem | null> {
+  async updatePoem(
+    id: number,
+    poemData: UpdatePoemInput,
+  ): Promise<Poem | null> {
     return this.poemRepository.update(id, poemData);
   }
 

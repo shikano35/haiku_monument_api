@@ -17,7 +17,10 @@ export class PoetUseCases {
     return this.poetRepo.create(poetData);
   }
 
-  async updatePoet(id: number, poetData: Partial<Poet>): Promise<Poet | null> {
+  async updatePoet(
+    id: number,
+    poetData: UpdatePoetInput,
+  ): Promise<Poet | null> {
     return this.poetRepo.update(id, poetData);
   }
 

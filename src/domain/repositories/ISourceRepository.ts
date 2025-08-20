@@ -1,4 +1,8 @@
-import type { CreateSourceInput, UpdateSourceInput, Source } from "../entities/Source";
+import type {
+  CreateSourceInput,
+  UpdateSourceInput,
+  Source,
+} from "../entities/Source";
 import type { SourceQueryParams } from "../common/QueryParams";
 
 export interface ISourceRepository {

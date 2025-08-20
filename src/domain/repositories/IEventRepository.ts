@@ -1,4 +1,8 @@
-import type { Event, CreateEventInput, UpdateEventInput } from "../entities/Event";
+import type {
+  Event,
+  CreateEventInput,
+  UpdateEventInput,
+} from "../entities/Event";
 import type { EventQueryParams } from "../common/QueryParams";
 
 export interface IEventRepository {

@@ -1,6 +1,10 @@
 import type { IEventRepository } from "../repositories/IEventRepository";
 import type { EventQueryParams } from "../common/QueryParams";
-import type { Event, CreateEventInput, UpdateEventInput } from "../entities/Event";
+import type {
+  Event,
+  CreateEventInput,
+  UpdateEventInput,
+} from "../entities/Event";
 
 export class EventUseCases {
   constructor(private eventRepository: IEventRepository) {}
@@ -25,7 +29,10 @@ export class EventUseCases {
     return this.eventRepository.create(eventData);
   }
 
-  async updateEvent(id: number, eventData: UpdateEventInput): Promise<Event | null> {
+  async updateEvent(
+    id: number,
+    eventData: UpdateEventInput,
+  ): Promise<Event | null> {
     return this.eventRepository.update(id, eventData);
   }
 

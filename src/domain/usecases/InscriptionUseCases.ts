@@ -1,11 +1,17 @@
 import type { IInscriptionRepository } from "../repositories/IInscriptionRepository";
 import type { InscriptionQueryParams } from "../common/QueryParams";
-import type { Inscription, CreateInscriptionInput, UpdateInscriptionInput } from "../entities/Inscription";
+import type {
+  Inscription,
+  CreateInscriptionInput,
+  UpdateInscriptionInput,
+} from "../entities/Inscription";
 
 export class InscriptionUseCases {
   constructor(private inscriptionRepository: IInscriptionRepository) {}
 
-  async getAllInscriptions(queryParams: InscriptionQueryParams = {}): Promise<Inscription[]> {
+  async getAllInscriptions(
+    queryParams: InscriptionQueryParams = {},
+  ): Promise<Inscription[]> {
     return this.inscriptionRepository.getAll(queryParams);
   }
 
@@ -17,11 +23,16 @@ export class InscriptionUseCases {
     return this.inscriptionRepository.getByMonumentId(monumentId);
   }
 
-  async createInscription(inscriptionData: CreateInscriptionInput): Promise<Inscription> {
+  async createInscription(
+    inscriptionData: CreateInscriptionInput,
+  ): Promise<Inscription> {
     return this.inscriptionRepository.create(inscriptionData);
   }
 
-  async updateInscription(id: number, inscriptionData: UpdateInscriptionInput): Promise<Inscription | null> {
+  async updateInscription(
+    id: number,
+    inscriptionData: UpdateInscriptionInput,
+  ): Promise<Inscription | null> {
     return this.inscriptionRepository.update(id, inscriptionData);
   }
 

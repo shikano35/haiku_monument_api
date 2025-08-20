@@ -82,23 +82,17 @@
       "indexes": {
         "events_monument_idx": {
           "name": "events_monument_idx",
-          "columns": [
-            "monument_id"
-          ],
+          "columns": ["monument_id"],
           "isUnique": false
         },
         "events_type_idx": {
           "name": "events_type_idx",
-          "columns": [
-            "event_type"
-          ],
+          "columns": ["event_type"],
           "isUnique": false
         },
         "events_time_idx": {
           "name": "events_time_idx",
-          "columns": [
-            "interval_start"
-          ],
+          "columns": ["interval_start"],
           "isUnique": false
         }
       },
@@ -107,12 +101,8 @@
           "name": "events_monument_id_monuments_id_fk",
           "tableFrom": "events",
           "tableTo": "monuments",
-          "columnsFrom": [
-            "monument_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["monument_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -120,12 +110,8 @@
           "name": "events_source_id_sources_id_fk",
           "tableFrom": "events",
           "tableTo": "sources",
-          "columnsFrom": [
-            "source_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["source_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -199,16 +185,12 @@
       "indexes": {
         "monuments_canonical_name_idx": {
           "name": "monuments_canonical_name_idx",
-          "columns": [
-            "canonical_name"
-          ],
+          "columns": ["canonical_name"],
           "isUnique": false
         },
         "monuments_type_idx": {
           "name": "monuments_type_idx",
-          "columns": [
-            "monument_type"
-          ],
+          "columns": ["monument_type"],
           "isUnique": false
         }
       },
@@ -261,24 +243,17 @@
       "indexes": {
         "inscription_poems_inscription_idx": {
           "name": "inscription_poems_inscription_idx",
-          "columns": [
-            "inscription_id"
-          ],
+          "columns": ["inscription_id"],
           "isUnique": false
         },
         "inscription_poems_poem_idx": {
           "name": "inscription_poems_poem_idx",
-          "columns": [
-            "poem_id"
-          ],
+          "columns": ["poem_id"],
           "isUnique": false
         },
         "inscription_poems_unique_idx": {
           "name": "inscription_poems_unique_idx",
-          "columns": [
-            "inscription_id",
-            "poem_id"
-          ],
+          "columns": ["inscription_id", "poem_id"],
           "isUnique": false
         }
       },
@@ -287,12 +262,8 @@
           "name": "inscription_poems_inscription_id_inscriptions_id_fk",
           "tableFrom": "inscription_poems",
           "tableTo": "inscriptions",
-          "columnsFrom": [
-            "inscription_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["inscription_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -300,12 +271,8 @@
           "name": "inscription_poems_poem_id_poems_id_fk",
           "tableFrom": "inscription_poems",
           "tableTo": "poems",
-          "columnsFrom": [
-            "poem_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["poem_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -402,16 +369,12 @@
       "indexes": {
         "inscriptions_monument_idx": {
           "name": "inscriptions_monument_idx",
-          "columns": [
-            "monument_id"
-          ],
+          "columns": ["monument_id"],
           "isUnique": false
         },
         "inscriptions_text_idx": {
           "name": "inscriptions_text_idx",
-          "columns": [
-            "original_text"
-          ],
+          "columns": ["original_text"],
           "isUnique": false
         }
       },
@@ -420,12 +383,8 @@
           "name": "inscriptions_monument_id_monuments_id_fk",
           "tableFrom": "inscriptions",
           "tableTo": "monuments",
-          "columnsFrom": [
-            "monument_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["monument_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -433,12 +392,8 @@
           "name": "inscriptions_source_id_sources_id_fk",
           "tableFrom": "inscriptions",
           "tableTo": "sources",
-          "columnsFrom": [
-            "source_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["source_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -554,31 +509,22 @@
       "indexes": {
         "locations_pref_idx": {
           "name": "locations_pref_idx",
-          "columns": [
-            "prefecture"
-          ],
+          "columns": ["prefecture"],
           "isUnique": false
         },
         "locations_coord_idx": {
           "name": "locations_coord_idx",
-          "columns": [
-            "latitude",
-            "longitude"
-          ],
+          "columns": ["latitude", "longitude"],
           "isUnique": false
         },
         "locations_geohash_idx": {
           "name": "locations_geohash_idx",
-          "columns": [
-            "geohash"
-          ],
+          "columns": ["geohash"],
           "isUnique": false
         },
         "locations_imi_idx": {
           "name": "locations_imi_idx",
-          "columns": [
-            "imi_pref_code"
-          ],
+          "columns": ["imi_pref_code"],
           "isUnique": false
         }
       },
@@ -658,16 +604,12 @@
       "indexes": {
         "measurements_monument_idx": {
           "name": "measurements_monument_idx",
-          "columns": [
-            "monument_id"
-          ],
+          "columns": ["monument_id"],
           "isUnique": false
         },
         "measurements_type_idx": {
           "name": "measurements_type_idx",
-          "columns": [
-            "measurement_type"
-          ],
+          "columns": ["measurement_type"],
           "isUnique": false
         }
       },
@@ -676,12 +618,8 @@
           "name": "measurements_monument_id_monuments_id_fk",
           "tableFrom": "measurements",
           "tableTo": "monuments",
-          "columnsFrom": [
-            "monument_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["monument_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -689,12 +627,8 @@
           "name": "measurements_source_id_sources_id_fk",
           "tableFrom": "measurements",
           "tableTo": "sources",
-          "columnsFrom": [
-            "source_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["source_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -789,16 +723,12 @@
       "indexes": {
         "media_monument_idx": {
           "name": "media_monument_idx",
-          "columns": [
-            "monument_id"
-          ],
+          "columns": ["monument_id"],
           "isUnique": false
         },
         "media_type_idx": {
           "name": "media_type_idx",
-          "columns": [
-            "media_type"
-          ],
+          "columns": ["media_type"],
           "isUnique": false
         }
       },
@@ -807,12 +737,8 @@
           "name": "media_monument_id_monuments_id_fk",
           "tableFrom": "media",
           "tableTo": "monuments",
-          "columnsFrom": [
-            "monument_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["monument_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -865,24 +791,17 @@
       "indexes": {
         "monument_locations_monument_idx": {
           "name": "monument_locations_monument_idx",
-          "columns": [
-            "monument_id"
-          ],
+          "columns": ["monument_id"],
           "isUnique": false
         },
         "monument_locations_location_idx": {
           "name": "monument_locations_location_idx",
-          "columns": [
-            "location_id"
-          ],
+          "columns": ["location_id"],
           "isUnique": false
         },
         "monument_locations_unique_idx": {
           "name": "monument_locations_unique_idx",
-          "columns": [
-            "monument_id",
-            "location_id"
-          ],
+          "columns": ["monument_id", "location_id"],
           "isUnique": false
         }
       },
@@ -891,12 +810,8 @@
           "name": "monument_locations_monument_id_monuments_id_fk",
           "tableFrom": "monument_locations",
           "tableTo": "monuments",
-          "columnsFrom": [
-            "monument_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["monument_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -904,12 +819,8 @@
           "name": "monument_locations_location_id_locations_id_fk",
           "tableFrom": "monument_locations",
           "tableTo": "locations",
-          "columnsFrom": [
-            "location_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["location_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -977,24 +888,17 @@
       "indexes": {
         "poem_attributions_poem_idx": {
           "name": "poem_attributions_poem_idx",
-          "columns": [
-            "poem_id"
-          ],
+          "columns": ["poem_id"],
           "isUnique": false
         },
         "poem_attributions_poet_idx": {
           "name": "poem_attributions_poet_idx",
-          "columns": [
-            "poet_id"
-          ],
+          "columns": ["poet_id"],
           "isUnique": false
         },
         "poem_attributions_unique_idx": {
           "name": "poem_attributions_unique_idx",
-          "columns": [
-            "poem_id",
-            "poet_id"
-          ],
+          "columns": ["poem_id", "poet_id"],
           "isUnique": false
         }
       },
@@ -1003,12 +907,8 @@
           "name": "poem_attributions_poem_id_poems_id_fk",
           "tableFrom": "poem_attributions",
           "tableTo": "poems",
-          "columnsFrom": [
-            "poem_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["poem_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1016,12 +916,8 @@
           "name": "poem_attributions_poet_id_poets_id_fk",
           "tableFrom": "poem_attributions",
           "tableTo": "poets",
-          "columnsFrom": [
-            "poet_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["poet_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -1029,12 +925,8 @@
           "name": "poem_attributions_source_id_sources_id_fk",
           "tableFrom": "poem_attributions",
           "tableTo": "sources",
-          "columnsFrom": [
-            "source_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["source_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -1108,30 +1000,22 @@
       "indexes": {
         "poems_normalized_text_unique": {
           "name": "poems_normalized_text_unique",
-          "columns": [
-            "normalized_text"
-          ],
+          "columns": ["normalized_text"],
           "isUnique": true
         },
         "poems_text_idx": {
           "name": "poems_text_idx",
-          "columns": [
-            "text"
-          ],
+          "columns": ["text"],
           "isUnique": false
         },
         "poems_normalized_idx": {
           "name": "poems_normalized_idx",
-          "columns": [
-            "normalized_text"
-          ],
+          "columns": ["normalized_text"],
           "isUnique": false
         },
         "poems_season_idx": {
           "name": "poems_season_idx",
-          "columns": [
-            "season"
-          ],
+          "columns": ["season"],
           "isUnique": false
         }
       },
@@ -1219,16 +1103,12 @@
       "indexes": {
         "poets_name_idx": {
           "name": "poets_name_idx",
-          "columns": [
-            "name"
-          ],
+          "columns": ["name"],
           "isUnique": false
         },
         "poets_birth_idx": {
           "name": "poets_birth_idx",
-          "columns": [
-            "birth_year"
-          ],
+          "columns": ["birth_year"],
           "isUnique": false
         }
       },
@@ -1309,23 +1189,17 @@
       "indexes": {
         "sources_title_idx": {
           "name": "sources_title_idx",
-          "columns": [
-            "title"
-          ],
+          "columns": ["title"],
           "isUnique": false
         },
         "sources_author_idx": {
           "name": "sources_author_idx",
-          "columns": [
-            "author"
-          ],
+          "columns": ["author"],
           "isUnique": false
         },
         "sources_year_idx": {
           "name": "sources_year_idx",
-          "columns": [
-            "source_year"
-          ],
+          "columns": ["source_year"],
           "isUnique": false
         }
       },

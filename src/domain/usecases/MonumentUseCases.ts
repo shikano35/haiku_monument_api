@@ -1,11 +1,17 @@
 import type { IMonumentRepository } from "../repositories/IMonumentRepository";
 import type { MonumentQueryParams } from "../common/QueryParams";
-import type { Monument, CreateMonumentInput, UpdateMonumentInput } from "../entities/Monument";
+import type {
+  Monument,
+  CreateMonumentInput,
+  UpdateMonumentInput,
+} from "../entities/Monument";
 
 export class MonumentUseCases {
   constructor(private monumentRepository: IMonumentRepository) {}
 
-  async getAllMonuments(queryParams: MonumentQueryParams = {}): Promise<Monument[]> {
+  async getAllMonuments(
+    queryParams: MonumentQueryParams = {},
+  ): Promise<Monument[]> {
     return this.monumentRepository.getAll(queryParams);
   }
 
@@ -28,7 +34,7 @@ export class MonumentUseCases {
   async getMonumentsByCoordinates(
     lat: number,
     lon: number,
-    radius: number
+    radius: number,
   ): Promise<Monument[]> {
     return this.monumentRepository.getByCoordinates(lat, lon, radius);
   }
@@ -37,7 +43,10 @@ export class MonumentUseCases {
     return this.monumentRepository.create(monumentData);
   }
 
-  async updateMonument(id: number, monumentData: UpdateMonumentInput): Promise<Monument | null> {
+  async updateMonument(
+    id: number,
+    monumentData: UpdateMonumentInput,
+  ): Promise<Monument | null> {
     return this.monumentRepository.update(id, monumentData);
   }
 

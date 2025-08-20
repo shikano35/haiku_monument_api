@@ -1,6 +1,10 @@
 import type { IMediaRepository } from "../repositories/IMediaRepository";
 import type { MediaQueryParams } from "../common/QueryParams";
-import type { Media, CreateMediaInput, UpdateMediaInput } from "../entities/Media";
+import type {
+  Media,
+  CreateMediaInput,
+  UpdateMediaInput,
+} from "../entities/Media";
 
 export class MediaUseCases {
   constructor(private mediaRepository: IMediaRepository) {}
@@ -25,7 +29,10 @@ export class MediaUseCases {
     return this.mediaRepository.create(mediaData);
   }
 
-  async updateMedia(id: number, mediaData: UpdateMediaInput): Promise<Media | null> {
+  async updateMedia(
+    id: number,
+    mediaData: UpdateMediaInput,
+  ): Promise<Media | null> {
     return this.mediaRepository.update(id, mediaData);
   }
 

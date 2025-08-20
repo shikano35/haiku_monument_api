@@ -1,4 +1,8 @@
-import type { Media, CreateMediaInput, UpdateMediaInput } from "../entities/Media";
+import type {
+  Media,
+  CreateMediaInput,
+  UpdateMediaInput,
+} from "../entities/Media";
 import type { MediaQueryParams } from "../common/QueryParams";
 
 export interface IMediaRepository {
