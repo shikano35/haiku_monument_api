@@ -6,11 +6,11 @@ export interface Poem {
   text: string;
   normalizedText: string;
   textHash: string;
-  kigo?: string;
-  season?: string;
+  kigo: string | null;
+  season: string | null;
   createdAt: string;
   updatedAt: string;
-  attributions?: PoemAttribution[];
+  attributions: PoemAttribution[] | null;
 }
 
 export interface PoemAttribution {
@@ -19,24 +19,24 @@ export interface PoemAttribution {
   poetId: number;
   confidence: string;
   confidenceScore: number;
-  sourceId?: number;
+  sourceId: number | null;
   createdAt: string;
-  poet?: Poet;
-  source?: Source;
+  poet: Poet | null;
+  source: Source | null;
 }
 
 export interface CreatePoemInput {
   text: string;
   normalizedText: string;
   textHash: string;
-  kigo?: string;
-  season?: string;
+  kigo: string | null;
+  season: string | null;
 }
 
 export interface UpdatePoemInput {
-  text?: string;
-  normalizedText?: string;
-  textHash?: string;
-  kigo?: string;
-  season?: string;
+  text: string | null;
+  normalizedText: string | null;
+  textHash: string | null;
+  kigo: string | null;
+  season: string | null;
 }

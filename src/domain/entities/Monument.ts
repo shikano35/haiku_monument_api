@@ -8,52 +8,52 @@ import type { Media } from "./Media";
 export interface Monument {
   id: number;
   canonicalName: string;
-  canonicalUri?: string;
-  monumentType?: string;
-  monumentTypeUri?: string;
-  material?: string;
-  materialUri?: string;
+  canonicalUri: string | null;
+  monumentType: string | null;
+  monumentTypeUri: string | null;
+  material: string | null;
+  materialUri: string | null;
   createdAt: string;
   updatedAt: string;
-  
-  inscriptions?: Inscription[];
-  events?: Event[];
-  media?: Media[];
-  locations?: Location[];
-  poets?: Poet[];
-  sources?: Source[];
-  
-  originalEstablishedDate?: string;
-  huTimeNormalized?: string;
-  intervalStart?: string;
-  intervalEnd?: string;
-  uncertaintyNote?: string;
+
+  inscriptions: Inscription[] | null;
+  events: Event[] | null;
+  media: Media[] | null;
+  locations: Location[] | null;
+  poets: Poet[] | null;
+  sources: Source[] | null;
+
+  originalEstablishedDate: string | null;
+  huTimeNormalized: string | null;
+  intervalStart: string | null;
+  intervalEnd: string | null;
+  uncertaintyNote: string | null;
 }
 
 export interface CreateMonumentInput {
   canonicalName: string;
-  monumentType?: string;
-  monumentTypeUri?: string;
-  material?: string;
-  materialUri?: string;
-  originalEstablishedDate?: string;
-  huTimeNormalized?: string;
-  intervalStart?: string;
-  intervalEnd?: string;
-  uncertaintyNote?: string;
+  monumentType: string | null;
+  monumentTypeUri: string | null;
+  material: string | null;
+  materialUri: string | null;
+  originalEstablishedDate: string | null;
+  huTimeNormalized: string | null;
+  intervalStart: string | null;
+  intervalEnd: string | null;
+  uncertaintyNote: string | null;
 }
 
 export interface UpdateMonumentInput {
-  canonicalName?: string;
-  monumentType?: string;
-  monumentTypeUri?: string;
-  material?: string;
-  materialUri?: string;
-  originalEstablishedDate?: string;
-  huTimeNormalized?: string;
-  intervalStart?: string;
-  intervalEnd?: string;
-  uncertaintyNote?: string;
+  canonicalName: string | null;
+  monumentType: string | null;
+  monumentTypeUri: string | null;
+  material: string | null;
+  materialUri: string | null;
+  originalEstablishedDate: string | null;
+  huTimeNormalized: string | null;
+  intervalStart: string | null;
+  intervalEnd: string | null;
+  uncertaintyNote: string | null;
 }
 
 export type HaikuMonument = Monument;

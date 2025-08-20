@@ -1,29 +1,29 @@
 export interface Source {
   id: number;
   citation: string;
-  author?: string;
-  title?: string;
-  publisher?: string;
-  sourceYear?: number;
-  url?: string;
+  author: string | null;
+  title: string | null;
+  publisher: string | null;
+  sourceYear: number | null;
+  url: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface CreateSourceInput {
   citation: string;
-  author?: string;
-  title?: string;
-  publisher?: string;
-  sourceYear?: number;
-  url?: string;
+  author: string | null;
+  title: string | null;
+  publisher: string | null;
+  sourceYear: number | null;
+  url: string | null;
 }
 
 export interface UpdateSourceInput {
-  citation?: string;
-  author?: string;
-  title?: string;
-  publisher?: string;
-  sourceYear?: number;
-  url?: string;
+  citation: string | null;
+  author: string | null;
+  title: string | null;
+  publisher: string | null;
+  sourceYear: number | null;
+  url: string | null;
 }

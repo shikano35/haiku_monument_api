@@ -1,44 +1,44 @@
 export interface Location {
   id: number;
-  imiPrefCode?: string;
-  region?: string;
-  prefecture?: string;
-  municipality?: string;
-  address?: string;
-  placeName?: string;
-  latitude?: number;
-  longitude?: number;
-  geohash?: string;
-  geomGeojson?: string;
-  accuracyM?: number;
+  imiPrefCode: string | null;
+  region: string | null;
+  prefecture: string | null;
+  municipality: string | null;
+  address: string | null;
+  placeName: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  geohash: string | null;
+  geomGeojson: string | null;
+  accuracyM: number | null;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface CreateLocationInput {
-  imiPrefCode?: string;
-  region?: string;
-  prefecture?: string;
-  municipality?: string;
-  address?: string;
-  placeName?: string;
-  latitude?: number;
-  longitude?: number;
-  geohash?: string;
-  geomGeojson?: string;
-  accuracyM?: number;
+  imiPrefCode: string | null;
+  region: string | null;
+  prefecture: string | null;
+  municipality: string | null;
+  address: string | null;
+  placeName: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  geohash: string | null;
+  geomGeojson: string | null;
+  accuracyM: number | null;
 }
 
 export interface UpdateLocationInput {
-  imiPrefCode?: string;
-  region?: string;
-  prefecture?: string;
-  municipality?: string;
-  address?: string;
-  placeName?: string;
-  latitude?: number;
-  longitude?: number;
-  geohash?: string;
-  geomGeojson?: string;
-  accuracyM?: number;
+  imiPrefCode: string | null;
+  region: string | null;
+  prefecture: string | null;
+  municipality: string | null;
+  address: string | null;
+  placeName: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  geohash: string | null;
+  geomGeojson: string | null;
+  accuracyM: number | null;
 }

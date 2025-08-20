@@ -5,14 +5,14 @@ export interface Inscription {
   id: number;
   monumentId: number;
   side: string;
-  originalText?: string;
-  transliteration?: string;
-  reading?: string;
+  originalText: string | null;
+  transliteration: string | null;
+  reading: string | null;
   language: string;
-  notes?: string;
-  sourceId?: number;
-  poems?: Poem[];
-  source?: Source;
+  notes: string | null;
+  sourceId: number | null;
+  poems: Poem[] | null;
+  source: Source | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -20,20 +20,20 @@ export interface Inscription {
 export interface CreateInscriptionInput {
   monumentId: number;
   side: string;
-  originalText?: string;
-  transliteration?: string;
-  reading?: string;
-  language?: string;
-  notes?: string;
-  sourceId?: number;
+  originalText: string | null;
+  transliteration: string | null;
+  reading: string | null;
+  language: string | null;
+  notes: string | null;
+  sourceId: number | null;
 }
 
 export interface UpdateInscriptionInput {
-  side?: string;
-  originalText?: string;
-  transliteration?: string;
-  reading?: string;
-  language?: string;
-  notes?: string;
-  sourceId?: number;
+  side: string | null;
+  originalText: string | null;
+  transliteration: string | null;
+  reading: string | null;
+  language: string | null;
+  notes: string | null;
+  sourceId: number | null;
 }
