@@ -1,32 +1,38 @@
 import type { IPoetRepository } from "../../domain/repositories/IPoetRepository";
-import type { CreatePoetInput, Poet } from "../../domain/entities/Poet";
+import type {
+  CreatePoetInput,
+  UpdatePoetInput,
+  Poet,
+} from "../../domain/entities/Poet";
+import type { PoetQueryParams } from "../../domain/common/QueryParams";
 import { getDB } from "../db/db";
 import { poets } from "../db/schema";
-import { asc, desc, eq, gt, like, lt, or } from "drizzle-orm/expressions";
+import { eq, like, gte, lte, and, count, desc, asc } from "drizzle-orm";
 import type { D1Database } from "@cloudflare/workers-types";
-import type { QueryParams } from "../../domain/common/QueryParams";
-
-const ensureString = (value: string | null): string => {
-  return value || "";
-};
 
 const convertToPoet = (dbPoet: {
   id: number;
   name: string;
+  nameKana: string | null;
   biography: string | null;
+  birthYear: number | null;
+  deathYear: number | null;
   linkUrl: string | null;
   imageUrl: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
 }): Poet => {
   return {
     id: dbPoet.id,
     name: dbPoet.name,
-    biography: dbPoet.biography,
-    linkUrl: dbPoet.linkUrl,
-    imageUrl: dbPoet.imageUrl,
-    createdAt: ensureString(dbPoet.createdAt),
-    updatedAt: ensureString(dbPoet.updatedAt),
+    nameKana: dbPoet.nameKana ?? null,
+    biography: dbPoet.biography ?? null,
+    birthYear: dbPoet.birthYear ?? null,
+    deathYear: dbPoet.deathYear ?? null,
+    linkUrl: dbPoet.linkUrl ?? null,
+    imageUrl: dbPoet.imageUrl ?? null,
+    createdAt: dbPoet.createdAt ?? "",
+    updatedAt: dbPoet.updatedAt ?? "",
   };
 };
 
@@ -37,83 +43,104 @@ export class PoetRepository implements IPoetRepository {
     return getDB(this.dbBinding);
   }
 
-  async getAll(queryParams: QueryParams): Promise<Poet[]> {
+  async getAll(queryParams?: PoetQueryParams): Promise<Poet[]> {
+    const {
+      limit = 50,
+      offset = 0,
+      ordering = [],
+      search,
+      createdAtGt,
+      createdAtLt,
+      updatedAtGt,
+      updatedAtLt,
+      nameContains,
+      biographyContains,
+      birthYear,
+      deathYear,
+    } = queryParams || {};
+
     let query = this.db.select().from(poets);
 
-    if (queryParams) {
-      if (queryParams.name_contains) {
-        query = query.where(
-          like(poets.name, `%${queryParams.name_contains}%`),
-        ) as typeof query;
-      }
-      if (queryParams.biography_contains) {
-        query = query.where(
-          like(poets.biography, `%${queryParams.biography_contains}%`),
-        ) as typeof query;
-      }
-      if (queryParams.created_at_gt) {
-        query = query.where(
-          gt(poets.createdAt, queryParams.created_at_gt),
-        ) as typeof query;
-      }
-      if (queryParams.created_at_lt) {
-        query = query.where(
-          lt(poets.createdAt, queryParams.created_at_lt),
-        ) as typeof query;
-      }
-      if (queryParams.updated_at_gt) {
-        query = query.where(
-          gt(poets.updatedAt, queryParams.updated_at_gt),
-        ) as typeof query;
-      }
-      if (queryParams.updated_at_lt) {
-        query = query.where(
-          lt(poets.updatedAt, queryParams.updated_at_lt),
-        ) as typeof query;
-      }
-      if (queryParams.search) {
-        query = query.where(
-          or(
-            like(poets.name, `%${queryParams.search}%`),
-            like(poets.biography, `%${queryParams.search}%`),
-          ),
-        ) as typeof query;
-      }
+    const conditions = [];
 
-      if (queryParams.ordering && queryParams.ordering.length > 0) {
-        for (const order of queryParams.ordering) {
-          const direction = order.startsWith("-") ? "desc" : "asc";
-          const columnName = order.startsWith("-") ? order.substring(1) : order;
-          if (columnName === "name") {
-            query = query.orderBy(
-              direction === "asc" ? asc(poets.name) : desc(poets.name),
-            ) as typeof query;
-          } else if (columnName === "created_at") {
-            query = query.orderBy(
-              direction === "asc"
-                ? asc(poets.createdAt)
-                : desc(poets.createdAt),
-            ) as typeof query;
-          } else if (columnName === "updated_at") {
-            query = query.orderBy(
-              direction === "asc"
-                ? asc(poets.updatedAt)
-                : desc(poets.updatedAt),
-            ) as typeof query;
-          }
-        }
-      }
-
-      if (typeof queryParams.limit === "number") {
-        query = query.limit(queryParams.limit) as typeof query;
-      }
-      if (typeof queryParams.offset === "number") {
-        query = query.offset(queryParams.offset) as typeof query;
-      }
+    // 全文検索
+    if (search) {
+      conditions.push(like(poets.name, `%${search}%`));
     }
 
-    const results = await query.all();
-    return results.map(convertToPoet);
+    if (nameContains) {
+      conditions.push(like(poets.name, `%${nameContains}%`));
+    }
+
+    if (biographyContains) {
+      conditions.push(like(poets.biography, `%${biographyContains}%`));
+    }
+
+    if (birthYear) {
+      conditions.push(eq(poets.birthYear, birthYear));
+    }
+
+    if (deathYear) {
+      conditions.push(eq(poets.deathYear, deathYear));
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as typeof query;
+    }
+
+    if (ordering.length > 0) {
+      const orderClauses = ordering.map((order) => {
+        const isDesc = order.startsWith("-");
+        const field = isDesc ? order.slice(1) : order;
+
+        switch (field) {
+          case "name":
+            return isDesc ? desc(poets.name) : asc(poets.name);
+          case "birth_year":
+            return isDesc ? desc(poets.birthYear) : asc(poets.birthYear);
+          case "created_at":
+            return isDesc ? desc(poets.createdAt) : asc(poets.createdAt);
+          case "updated_at":
+            return isDesc ? desc(poets.updatedAt) : asc(poets.updatedAt);
+          default:
+            return asc(poets.id);
+        }
+      });
+      query = query.orderBy(...orderClauses) as typeof query;
+    }
+
+    // 基本クエリ実行
+    let results = await query.limit(limit).offset(offset);
+
+    // メモリ内での追加フィルタリング
+    let filteredResults = results;
+
+    // 日付フィルタリング
+    if (createdAtGt) {
+      filteredResults = filteredResults.filter(
+        (poet) => new Date(poet.createdAt) > new Date(createdAtGt),
+      );
+    }
+
+    if (createdAtLt) {
+      filteredResults = filteredResults.filter(
+        (poet) => new Date(poet.createdAt) < new Date(createdAtLt),
+      );
+    }
+
+    if (updatedAtGt) {
+      filteredResults = filteredResults.filter(
+        (poet) => new Date(poet.updatedAt) > new Date(updatedAtGt),
+      );
+    }
+
+    if (updatedAtLt) {
+      filteredResults = filteredResults.filter(
+        (poet) => new Date(poet.updatedAt) < new Date(updatedAtLt),
+      );
+    }
+
+    return filteredResults.map(convertToPoet);
   }
 
   async getById(id: number): Promise<Poet | null> {
@@ -121,24 +148,69 @@ export class PoetRepository implements IPoetRepository {
       .select()
       .from(poets)
       .where(eq(poets.id, id))
-      .limit(1)
-      .all();
+      .limit(1);
 
     return result.length > 0 ? convertToPoet(result[0]) : null;
   }
 
+  async getByName(name: string): Promise<Poet[]> {
+    const results = await this.db
+      .select()
+      .from(poets)
+      .where(eq(poets.name, name));
+    return results.map(convertToPoet);
+  }
+
+  async getByNameContains(nameFragment: string): Promise<Poet[]> {
+    const results = await this.db
+      .select()
+      .from(poets)
+      .where(like(poets.name, `%${nameFragment}%`));
+    return results.map(convertToPoet);
+  }
+
+  async getByBirthYear(birthYear: number): Promise<Poet[]> {
+    const results = await this.db
+      .select()
+      .from(poets)
+      .where(eq(poets.birthYear, birthYear));
+    return results.map(convertToPoet);
+  }
+
+  async getByBirthYearRange(
+    startYear: number,
+    endYear: number,
+  ): Promise<Poet[]> {
+    const results = await this.db
+      .select()
+      .from(poets)
+      .where(
+        and(gte(poets.birthYear, startYear), lte(poets.birthYear, endYear)),
+      );
+    return results.map(convertToPoet);
+  }
+
   async create(poetData: CreatePoetInput): Promise<Poet> {
     const [inserted] = await this.db.insert(poets).values(poetData).returning();
-
     return convertToPoet(inserted);
   }
 
-  async update(id: number, poetData: Partial<Poet>): Promise<Poet | null> {
+  async update(id: number, poetData: UpdatePoetInput): Promise<Poet | null> {
     if (!(await this.getById(id))) return null;
+
+    const updateData: Record<string, unknown> = {};
+
+    if (poetData.name !== null) updateData.name = poetData.name;
+    if (poetData.nameKana !== null) updateData.nameKana = poetData.nameKana;
+    if (poetData.biography !== null) updateData.biography = poetData.biography;
+    if (poetData.birthYear !== null) updateData.birthYear = poetData.birthYear;
+    if (poetData.deathYear !== null) updateData.deathYear = poetData.deathYear;
+    if (poetData.linkUrl !== null) updateData.linkUrl = poetData.linkUrl;
+    if (poetData.imageUrl !== null) updateData.imageUrl = poetData.imageUrl;
 
     const [updated] = await this.db
       .update(poets)
-      .set(poetData)
+      .set(updateData)
       .where(eq(poets.id, id))
       .returning();
 
@@ -151,5 +223,10 @@ export class PoetRepository implements IPoetRepository {
       .where(eq(poets.id, id))
       .returning({ id: poets.id });
     return results.length > 0;
+  }
+
+  async count(): Promise<number> {
+    const results = await this.db.select({ count: count() }).from(poets);
+    return results[0]?.count ?? 0;
   }
 }

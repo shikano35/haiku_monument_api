@@ -1,42 +1,38 @@
 import type { ISourceRepository } from "../../domain/repositories/ISourceRepository";
-import type { CreateSourceInput, Source } from "../../domain/entities/Source";
+import type {
+  CreateSourceInput,
+  UpdateSourceInput,
+  Source,
+} from "../../domain/entities/Source";
+import type { SourceQueryParams } from "../../domain/common/QueryParams";
 import { getDB } from "../db/db";
 import { sources } from "../db/schema";
-import { eq, and, or, like, asc, desc, gt, lt } from "drizzle-orm/expressions";
+import { eq, like, gte, lte, and, count, desc, asc } from "drizzle-orm";
 import type { D1Database } from "@cloudflare/workers-types";
-import type { QueryParams } from "../../domain/common/QueryParams";
 
-const ensureNumberOrNull = (value: unknown): number | null => {
-  if (value === null || value === undefined) return null;
-  const num = Number(value);
-  return isNaN(num) ? null : num;
-};
-
-const ensureString = (value: string | null): string => {
-  return value || "";
-};
-
-const convertToSource = (dbSource: {
+function convertToSource(dbSource: {
   id: number;
-  title: string;
+  citation: string;
   author: string | null;
+  title: string | null;
   publisher: string | null;
   sourceYear: number | null;
   url: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}): Source => {
+  createdAt: string;
+  updatedAt: string;
+}): Source {
   return {
     id: dbSource.id,
-    title: dbSource.title,
-    author: dbSource.author,
-    publisher: dbSource.publisher,
-    sourceYear: dbSource.sourceYear,
-    url: dbSource.url,
-    createdAt: ensureString(dbSource.createdAt),
-    updatedAt: ensureString(dbSource.updatedAt),
+    citation: dbSource.citation,
+    title: dbSource.title ?? null,
+    author: dbSource.author ?? null,
+    publisher: dbSource.publisher ?? null,
+    sourceYear: dbSource.sourceYear ?? null,
+    url: dbSource.url ?? null,
+    createdAt: dbSource.createdAt,
+    updatedAt: dbSource.updatedAt,
   };
-};
+}
 
 export class SourceRepository implements ISourceRepository {
   constructor(private readonly dbBinding: D1Database) {}
@@ -45,104 +41,119 @@ export class SourceRepository implements ISourceRepository {
     return getDB(this.dbBinding);
   }
 
-  async getAll(queryParams: QueryParams): Promise<Source[]> {
+  async getAll(queryParams?: SourceQueryParams): Promise<Source[]> {
+    const {
+      limit = 50,
+      offset = 0,
+      ordering = [],
+      search,
+      createdAtGt,
+      createdAtLt,
+      updatedAtGt,
+      updatedAtLt,
+      titleContains,
+      authorContains,
+      publisherContains,
+      sourceYear,
+      sourceYearGt,
+      sourceYearLt,
+    } = queryParams || {};
+
     let query = this.db.select().from(sources);
 
-    if (queryParams) {
-      const conditions = [];
+    const conditions = [];
 
-      if (queryParams.title_contains) {
-        conditions.push(like(sources.title, `%${queryParams.title_contains}%`));
-      }
-
-      if (queryParams.search) {
-        conditions.push(
-          or(
-            like(sources.title, `%${queryParams.search}%`),
-            like(sources.publisher, `%${queryParams.search}%`),
-            like(sources.author, `%${queryParams.search}%`),
-          ),
-        );
-      }
-      if (queryParams.name_contains) {
-        conditions.push(like(sources.author, `%${queryParams.name_contains}%`));
-      }
-      if (queryParams.created_at_gt) {
-        conditions.push(gt(sources.createdAt, queryParams.created_at_gt));
-      }
-      if (queryParams.created_at_lt) {
-        conditions.push(lt(sources.createdAt, queryParams.created_at_lt));
-      }
-      if (queryParams.updated_at_gt) {
-        conditions.push(gt(sources.updatedAt, queryParams.updated_at_gt));
-      }
-      if (queryParams.updated_at_lt) {
-        conditions.push(lt(sources.updatedAt, queryParams.updated_at_lt));
-      }
-
-      if (conditions.length > 0) {
-        query = query.where(and(...conditions)) as typeof query;
-      }
-
-      if (queryParams.ordering?.length) {
-        const orderClauses = queryParams.ordering
-          .map((order) => {
-            const direction = order.startsWith("-") ? "desc" : "asc";
-            const columnName = order.startsWith("-")
-              ? order.substring(1)
-              : order;
-
-            switch (columnName) {
-              case "title":
-                return direction === "asc"
-                  ? asc(sources.title)
-                  : desc(sources.title);
-              case "author":
-                return direction === "asc"
-                  ? asc(sources.author)
-                  : desc(sources.author);
-              case "year":
-                return direction === "asc"
-                  ? asc(sources.sourceYear)
-                  : desc(sources.sourceYear);
-              case "publisher":
-                return direction === "asc"
-                  ? asc(sources.publisher)
-                  : desc(sources.publisher);
-              case "created_at":
-              case "createdAt":
-                return direction === "asc"
-                  ? asc(sources.createdAt)
-                  : desc(sources.createdAt);
-              case "updated_at":
-              case "updatedAt":
-                return direction === "asc"
-                  ? asc(sources.updatedAt)
-                  : desc(sources.updatedAt);
-              default:
-                return undefined;
-            }
-          })
-          .filter(
-            (clause): clause is Exclude<typeof clause, undefined> =>
-              clause !== undefined,
-          );
-
-        if (orderClauses.length > 0) {
-          query = query.orderBy(...orderClauses) as typeof query;
-        }
-      }
-
-      if (typeof queryParams.limit === "number") {
-        query = query.limit(queryParams.limit) as typeof query;
-      }
-      if (typeof queryParams.offset === "number") {
-        query = query.offset(queryParams.offset) as typeof query;
-      }
+    // 全文検索
+    if (search) {
+      conditions.push(like(sources.title, `%${search}%`));
     }
 
-    const results = await query.all();
-    return results.map(convertToSource);
+    if (titleContains) {
+      conditions.push(like(sources.title, `%${titleContains}%`));
+    }
+
+    if (authorContains) {
+      conditions.push(like(sources.author, `%${authorContains}%`));
+    }
+
+    if (publisherContains) {
+      conditions.push(like(sources.publisher, `%${publisherContains}%`));
+    }
+
+    if (sourceYear) {
+      conditions.push(eq(sources.sourceYear, sourceYear));
+    }
+
+    if (sourceYearGt) {
+      conditions.push(gte(sources.sourceYear, sourceYearGt));
+    }
+
+    if (sourceYearLt) {
+      conditions.push(lte(sources.sourceYear, sourceYearLt));
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as typeof query;
+    }
+
+    if (ordering.length > 0) {
+      const orderClauses = ordering.map((order) => {
+        const isDesc = order.startsWith("-");
+        const field = isDesc ? order.slice(1) : order;
+
+        switch (field) {
+          case "title":
+            return isDesc ? desc(sources.title) : asc(sources.title);
+          case "author":
+            return isDesc ? desc(sources.author) : asc(sources.author);
+          case "year":
+          case "source_year":
+            return isDesc ? desc(sources.sourceYear) : asc(sources.sourceYear);
+          case "publisher":
+            return isDesc ? desc(sources.publisher) : asc(sources.publisher);
+          case "created_at":
+            return isDesc ? desc(sources.createdAt) : asc(sources.createdAt);
+          case "updated_at":
+            return isDesc ? desc(sources.updatedAt) : asc(sources.updatedAt);
+          default:
+            return asc(sources.id);
+        }
+      });
+      query = query.orderBy(...orderClauses) as typeof query;
+    }
+
+    // 基本クエリ実行
+    let results = await query.limit(limit).offset(offset);
+
+    // メモリ内での追加フィルタリング
+    let filteredResults = results;
+
+    // 日付フィルタリング
+    if (createdAtGt) {
+      filteredResults = filteredResults.filter(
+        (source) => new Date(source.createdAt) > new Date(createdAtGt),
+      );
+    }
+
+    if (createdAtLt) {
+      filteredResults = filteredResults.filter(
+        (source) => new Date(source.createdAt) < new Date(createdAtLt),
+      );
+    }
+
+    if (updatedAtGt) {
+      filteredResults = filteredResults.filter(
+        (source) => new Date(source.updatedAt) > new Date(updatedAtGt),
+      );
+    }
+
+    if (updatedAtLt) {
+      filteredResults = filteredResults.filter(
+        (source) => new Date(source.updatedAt) < new Date(updatedAtLt),
+      );
+    }
+
+    return filteredResults.map(convertToSource);
   }
 
   async getById(id: number): Promise<Source | null> {
@@ -150,20 +161,59 @@ export class SourceRepository implements ISourceRepository {
       .select()
       .from(sources)
       .where(eq(sources.id, id))
-      .limit(1)
-      .all();
+      .limit(1);
     return result.length > 0 ? convertToSource(result[0]) : null;
   }
 
-  async create(sourceData: CreateSourceInput): Promise<Source> {
-    const dataToInsert = {
-      ...sourceData,
-      sourceYear: ensureNumberOrNull(sourceData.sourceYear),
-    };
+  async getByTitle(title: string): Promise<Source[]> {
+    const results = await this.db
+      .select()
+      .from(sources)
+      .where(like(sources.title, `%${title}%`));
+    return results.map(convertToSource);
+  }
 
+  async getByAuthor(author: string): Promise<Source[]> {
+    const results = await this.db
+      .select()
+      .from(sources)
+      .where(like(sources.author, `%${author}%`));
+    return results.map(convertToSource);
+  }
+
+  async getByPublisher(publisher: string): Promise<Source[]> {
+    const results = await this.db
+      .select()
+      .from(sources)
+      .where(like(sources.publisher, `%${publisher}%`));
+    return results.map(convertToSource);
+  }
+
+  async getByYear(year: number): Promise<Source[]> {
+    const results = await this.db
+      .select()
+      .from(sources)
+      .where(eq(sources.sourceYear, year));
+    return results.map(convertToSource);
+  }
+
+  async getByYearRange(startYear: number, endYear: number): Promise<Source[]> {
+    const results = await this.db
+      .select()
+      .from(sources)
+      .where(
+        and(
+          gte(sources.sourceYear, startYear),
+          lte(sources.sourceYear, endYear),
+        ),
+      );
+    return results.map(convertToSource);
+  }
+
+  async create(sourceData: CreateSourceInput): Promise<Source> {
     const [inserted] = await this.db
       .insert(sources)
-      .values(dataToInsert)
+      .values(sourceData)
       .returning();
 
     return convertToSource(inserted);
@@ -171,21 +221,24 @@ export class SourceRepository implements ISourceRepository {
 
   async update(
     id: number,
-    sourceData: Partial<Source>,
+    sourceData: UpdateSourceInput,
   ): Promise<Source | null> {
     if (!(await this.getById(id))) return null;
 
-    const dataToUpdate = {
-      ...sourceData,
-      sourceYear:
-        sourceData.sourceYear !== undefined
-          ? ensureNumberOrNull(sourceData.sourceYear)
-          : undefined,
-    };
+    const updateData: Record<string, unknown> = {};
+
+    if (sourceData.citation !== null) updateData.citation = sourceData.citation;
+    if (sourceData.author !== null) updateData.author = sourceData.author;
+    if (sourceData.title !== null) updateData.title = sourceData.title;
+    if (sourceData.publisher !== null)
+      updateData.publisher = sourceData.publisher;
+    if (sourceData.sourceYear !== null)
+      updateData.sourceYear = sourceData.sourceYear;
+    if (sourceData.url !== null) updateData.url = sourceData.url;
 
     const [updated] = await this.db
       .update(sources)
-      .set(dataToUpdate)
+      .set(updateData)
       .where(eq(sources.id, id))
       .returning();
 
@@ -198,5 +251,10 @@ export class SourceRepository implements ISourceRepository {
       .where(eq(sources.id, id))
       .returning({ id: sources.id });
     return results.length > 0;
+  }
+
+  async count(): Promise<number> {
+    const results = await this.db.select({ count: count() }).from(sources);
+    return results[0]?.count ?? 0;
   }
 }
