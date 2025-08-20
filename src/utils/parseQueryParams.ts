@@ -1,10 +1,13 @@
 import type { QueryParams } from "../domain/common/QueryParams";
 
-export function parseQueryParams(query: URLSearchParams): QueryParams {
+export function parseQueryParams(url: string): QueryParams {
+  const query = new URL(url).searchParams;
   return {
     limit: query.get("limit") ? Number(query.get("limit")) : null,
     offset: query.get("offset") ? Number(query.get("offset")) : null,
-    ordering: query.getAll("ordering").length ? query.getAll("ordering") : null,
+    ordering: query.getAll("ordering").length
+      ? query.getAll("ordering")
+      : null,
     updated_at_gt: query.get("updated_at_gt") || null,
     updated_at_lt: query.get("updated_at_lt") || null,
     search: query.get("search") || null,

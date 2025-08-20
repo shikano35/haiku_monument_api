@@ -1,27 +1,27 @@
 export interface PaginationParams {
-  limit?: number;
-  offset?: number;
+  limit?: number | null;
+  offset?: number | null;
 }
 
 export interface OrderingParams {
-  ordering?: string[];
+  ordering?: string[] | null;
 }
 
 export interface DateFilterParams {
-  createdAtGt?: string;
-  createdAtLt?: string;
-  updatedAtGt?: string;
-  updatedAtLt?: string;
+  createdAtGt?: string | null;
+  createdAtLt?: string | null;
+  updatedAtGt?: string | null;
+  updatedAtLt?: string | null;
 }
 
 export interface SearchParams {
-  search?: string;
+  search?: string | null;
 }
 
 export interface LocationFilterParams {
-  prefecture?: string;
-  region?: string;
-  bbox?: [number, number, number, number]; // [minLon, minLat, maxLon, maxLat]
+  prefecture?: string | null;
+  region?: string | null;
+  bbox?: [number, number, number, number] | null; // [minLon, minLat, maxLon, maxLat]
 }
 
 // 基本QueryParams（共通部分）
@@ -37,114 +37,114 @@ export interface GeoQueryParams extends BaseQueryParams, LocationFilterParams {}
 // Monument専用QueryParams
 export interface MonumentQueryParams extends GeoQueryParams {
   // 全文検索
-  q?: string;
+  q?: string | null;
 
   // フィールド指定検索
-  canonicalNameContains?: string;
-  titleContains?: string;
-  inscriptionContains?: string;
-  commentaryContains?: string;
+  canonicalNameContains?: string | null;
+  titleContains?: string | null;
+  inscriptionContains?: string | null;
+  commentaryContains?: string | null;
 
   // 俳人関連
-  poetNameContains?: string;
-  poetId?: number;
+  poetNameContains?: string | null;
+  poetId?: number | null;
 
   // 俳句関連
-  kigo?: string;
-  season?: string;
+  kigo?: string | null;
+  season?: string | null;
 
   // 素材・種類
-  material?: string;
-  monumentType?: string;
+  material?: string | null;
+  monumentType?: string | null;
 
   // 地理関連
-  locationId?: number;
+  locationId?: number | null;
 
   // 時間関連
-  establishedStart?: string;
-  establishedEnd?: string;
-  intervalStart?: string;
-  intervalEnd?: string;
+  establishedStart?: string | null;
+  establishedEnd?: string | null;
+  intervalStart?: string | null;
+  intervalEnd?: string | null;
 
   // メディア・品質
-  hasMedia?: boolean;
-  uncertain?: boolean;
+  hasMedia?: boolean | null;
+  uncertain?: boolean | null;
 
   // 関連データ展開
-  expand?: string[];
+  expand?: string[] | null;
 
   // レガシー互換
-  nameContains?: string;
-  biographyContains?: string;
+  nameContains?: string | null;
+  biographyContains?: string | null;
 }
 
 // Location専用QueryParams
 export interface LocationQueryParams
   extends BaseQueryParams,
     LocationFilterParams {
-  imiPrefCode?: string;
+  imiPrefCode?: string | null;
 }
 
 // Poet専用QueryParams
 export interface PoetQueryParams extends BaseQueryParams {
-  nameContains?: string;
-  biographyContains?: string;
-  birthYear?: number;
-  deathYear?: number;
+  nameContains?: string | null;
+  biographyContains?: string | null;
+  birthYear?: number | null;
+  deathYear?: number | null;
 }
 
 // Source専用QueryParams
 export interface SourceQueryParams extends BaseQueryParams {
-  titleContains?: string;
-  authorContains?: string;
-  publisherContains?: string;
-  sourceYear?: number;
-  sourceYearGt?: number;
-  sourceYearLt?: number;
+  titleContains?: string | null;
+  authorContains?: string | null;
+  publisherContains?: string | null;
+  sourceYear?: number | null;
+  sourceYearGt?: number | null;
+  sourceYearLt?: number | null;
 }
 
 // Inscription専用QueryParams
 export interface InscriptionQueryParams extends BaseQueryParams {
-  monumentId?: number;
-  side?: string;
-  language?: string;
-  sourceId?: number;
+  monumentId?: number | null;
+  side?: string | null;
+  language?: string | null;
+  sourceId?: number | null;
 }
 
 // Poem専用QueryParams
 export interface PoemQueryParams extends BaseQueryParams {
-  kigo?: string;
-  season?: string;
-  poetId?: number;
+  kigo?: string | null;
+  season?: string | null;
+  poetId?: number | null;
 }
 
 // Event専用QueryParams
 export interface EventQueryParams extends BaseQueryParams {
-  monumentId?: number;
-  eventType?: string;
-  actor?: string;
-  sourceId?: number;
-  intervalStart?: string;
-  intervalEnd?: string;
+  monumentId?: number | null;
+  eventType?: string | null;
+  actor?: string | null;
+  sourceId?: number | null;
+  intervalStart?: string | null;
+  intervalEnd?: string | null;
 }
 
 // Media専用QueryParams
 export interface MediaQueryParams extends BaseQueryParams {
-  monumentId?: number;
-  mediaType?: string;
-  photographer?: string;
-  license?: string;
+  monumentId?: number | null;
+  mediaType?: string | null;
+  photographer?: string | null;
+  license?: string | null;
 }
 
 export interface QueryParams extends BaseQueryParams {
-  title_contains?: string;
-  description_contains?: string;
-  name_contains?: string;
-  biography_contains?: string;
-  prefecture?: string;
-  region?: string;
-  created_at_gt?: string;
-  created_at_lt?: string;
-  updated_at_gt?: string;
-  updated_at_lt?: string;
+  title_contains?: string | null;
+  description_contains?: string | null;
+  name_contains?: string | null;
+  biography_contains?: string | null;
+  prefecture?: string | null;
+  region?: string | null;
+  created_at_gt?: string | null;
+  created_at_lt?: string | null;
+  updated_at_gt?: string | null;
+  updated_at_lt?: string | null;
 }
