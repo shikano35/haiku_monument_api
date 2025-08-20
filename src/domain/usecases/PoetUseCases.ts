@@ -1,11 +1,11 @@
-import type { Poet, CreatePoetInput } from "../entities/Poet";
+import type { Poet, CreatePoetInput, UpdatePoetInput } from "../entities/Poet";
 import type { IPoetRepository } from "../repositories/IPoetRepository";
-import type { QueryParams } from "../common/QueryParams";
+import type { PoetQueryParams } from "../common/QueryParams";
 
 export class PoetUseCases {
   constructor(private readonly poetRepo: IPoetRepository) {}
 
-  async getAllPoets(queryParams: QueryParams): Promise<Poet[]> {
+  async getAllPoets(queryParams?: PoetQueryParams): Promise<Poet[]> {
     return this.poetRepo.getAll(queryParams);
   }
 
