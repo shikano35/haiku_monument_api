@@ -1,12 +1,44 @@
-export type Location = {
+export interface Location {
   id: number;
-  region: string;
-  prefecture: string;
-  municipality: string | null;
-  address: string | null;
-  placeName: string | null;
-  latitude: number | null;
-  longitude: number | null;
-};
+  imiPrefCode?: string;
+  region?: string;
+  prefecture?: string;
+  municipality?: string;
+  address?: string;
+  placeName?: string;
+  latitude?: number;
+  longitude?: number;
+  geohash?: string;
+  geomGeojson?: string;
+  accuracyM?: number;
+  createdAt: string;
+  updatedAt: string;
+}
 
-export type CreateLocationInput = Omit<Location, "id">;
+export interface CreateLocationInput {
+  imiPrefCode?: string;
+  region?: string;
+  prefecture?: string;
+  municipality?: string;
+  address?: string;
+  placeName?: string;
+  latitude?: number;
+  longitude?: number;
+  geohash?: string;
+  geomGeojson?: string;
+  accuracyM?: number;
+}
+
+export interface UpdateLocationInput {
+  imiPrefCode?: string;
+  region?: string;
+  prefecture?: string;
+  municipality?: string;
+  address?: string;
+  placeName?: string;
+  latitude?: number;
+  longitude?: number;
+  geohash?: string;
+  geomGeojson?: string;
+  accuracyM?: number;
+}

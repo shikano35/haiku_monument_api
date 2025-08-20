@@ -1,12 +1,29 @@
-export type Source = {
+export interface Source {
   id: number;
-  title: string;
-  author?: string | null;
-  publisher?: string | null;
-  sourceYear?: number | null;
-  url?: string | null;
+  citation: string;
+  author?: string;
+  title?: string;
+  publisher?: string;
+  sourceYear?: number;
+  url?: string;
   createdAt: string;
   updatedAt: string;
-};
+}
 
-export type CreateSourceInput = Omit<Source, "id" | "createdAt" | "updatedAt">;
+export interface CreateSourceInput {
+  citation: string;
+  author?: string;
+  title?: string;
+  publisher?: string;
+  sourceYear?: number;
+  url?: string;
+}
+
+export interface UpdateSourceInput {
+  citation?: string;
+  author?: string;
+  title?: string;
+  publisher?: string;
+  sourceYear?: number;
+  url?: string;
+}
