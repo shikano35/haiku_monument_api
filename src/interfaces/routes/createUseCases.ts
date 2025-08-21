@@ -87,12 +87,12 @@ export function createUseCases(
       return { monumentUseCases: new MonumentUseCases(monumentRepo) };
     }
     case "inscriptions": {
-      const db = drizzle(env.DB);
+      const db = drizzle(env.DB as unknown as import("@miniflare/d1").D1Database);
       const inscriptionRepo = new InscriptionRepository(db);
       return { inscriptionUseCases: new InscriptionUseCases(inscriptionRepo) };
     }
     case "poems": {
-      const db = drizzle(env.DB);
+      const db = drizzle(env.DB as unknown as import("@miniflare/d1").D1Database);
       const poemRepo = new PoemRepository(db);
       return { poemUseCases: new PoemUseCases(poemRepo) };
     }
