@@ -112,7 +112,7 @@ export class InscriptionRepository implements IInscriptionRepository {
         .offset(offset);
     }
 
-    return results.map(this.convertToInscription);
+    return results.map((row) => this.convertToInscription(row));
   }
 
   async getById(id: number): Promise<Inscription | null> {
@@ -130,7 +130,7 @@ export class InscriptionRepository implements IInscriptionRepository {
       .from(inscriptions)
       .where(eq(inscriptions.monumentId, monumentId));
 
-    return results.map(this.convertToInscription);
+    return results.map((row) => this.convertToInscription(row));
   }
 
   async create(inscription: CreateInscriptionInput): Promise<Inscription> {

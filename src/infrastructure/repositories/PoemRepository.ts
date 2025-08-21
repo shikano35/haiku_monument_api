@@ -72,7 +72,7 @@ export class PoemRepository implements IPoemRepository {
     }
 
     const results = await query.limit(limit).offset(offset);
-    return results.map(this.convertToPoem);
+    return results.map((row) => this.convertToPoem(row));
   }
 
   async getById(id: number): Promise<Poem | null> {
@@ -105,7 +105,7 @@ export class PoemRepository implements IPoemRepository {
       .from(poems)
       .where(eq(poems.season, season));
 
-    return results.map(this.convertToPoem);
+    return results.map((row) => this.convertToPoem(row));
   }
 
   async getByKigo(kigo: string): Promise<Poem[]> {
@@ -114,7 +114,7 @@ export class PoemRepository implements IPoemRepository {
       .from(poems)
       .where(like(poems.kigo, `%${kigo}%`));
 
-    return results.map(this.convertToPoem);
+    return results.map((row) => this.convertToPoem(row));
   }
 
   async create(poem: CreatePoemInput): Promise<Poem> {

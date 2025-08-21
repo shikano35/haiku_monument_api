@@ -97,7 +97,7 @@ export class EventRepository implements IEventRepository {
       results = await this.db.select().from(events).limit(limit).offset(offset);
     }
 
-    return results.map(this.convertToEvent);
+    return results.map((row) => this.convertToEvent(row));
   }
 
   async getById(id: number): Promise<Event | null> {
@@ -115,7 +115,7 @@ export class EventRepository implements IEventRepository {
       .from(events)
       .where(eq(events.monumentId, monumentId));
 
-    return results.map(this.convertToEvent);
+    return results.map((row) => this.convertToEvent(row));
   }
 
   async getByEventType(eventType: string): Promise<Event[]> {
@@ -124,7 +124,7 @@ export class EventRepository implements IEventRepository {
       .from(events)
       .where(eq(events.eventType, eventType));
 
-    return results.map(this.convertToEvent);
+    return results.map((row) => this.convertToEvent(row));
   }
 
   async create(event: CreateEventInput): Promise<Event> {

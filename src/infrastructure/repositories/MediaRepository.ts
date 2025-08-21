@@ -76,7 +76,7 @@ export class MediaRepository implements IMediaRepository {
     }
 
     const results = await query.limit(limit).offset(offset);
-    return results.map(this.convertToMedia);
+    return results.map((row) => this.convertToMedia(row));
   }
 
   async getById(id: number): Promise<Media | null> {
@@ -94,7 +94,7 @@ export class MediaRepository implements IMediaRepository {
       .from(media)
       .where(eq(media.monumentId, monumentId));
 
-    return results.map(this.convertToMedia);
+    return results.map((row) => this.convertToMedia(row));
   }
 
   async getByMediaType(mediaType: string): Promise<Media[]> {
@@ -103,7 +103,7 @@ export class MediaRepository implements IMediaRepository {
       .from(media)
       .where(eq(media.mediaType, mediaType));
 
-    return results.map(this.convertToMedia);
+    return results.map((row) => this.convertToMedia(row));
   }
 
   async create(mediaData: CreateMediaInput): Promise<Media> {
