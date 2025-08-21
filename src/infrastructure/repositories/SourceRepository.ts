@@ -43,9 +43,9 @@ export class SourceRepository implements ISourceRepository {
 
   async getAll(queryParams?: SourceQueryParams): Promise<Source[]> {
     const {
-      limit = 50,
-      offset = 0,
-      ordering = [],
+      limit: paramLimit = 50,
+      offset: paramOffset = 0,
+      ordering: paramOrdering = [],
       search,
       createdAtGt,
       createdAtLt,
@@ -58,6 +58,10 @@ export class SourceRepository implements ISourceRepository {
       sourceYearGt,
       sourceYearLt,
     } = queryParams || {};
+
+    const limit = paramLimit ?? 50;
+    const offset = paramOffset ?? 0;
+    const ordering = paramOrdering ?? [];
 
     let query = this.db.select().from(sources);
 
@@ -96,7 +100,7 @@ export class SourceRepository implements ISourceRepository {
       query = query.where(and(...conditions)) as typeof query;
     }
 
-    if (ordering.length > 0) {
+    if (ordering && ordering.length > 0) {
       const orderClauses = ordering.map((order) => {
         const isDesc = order.startsWith("-");
         const field = isDesc ? order.slice(1) : order;

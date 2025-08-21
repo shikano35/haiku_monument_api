@@ -10,14 +10,18 @@ export class MediaRepository implements IMediaRepository {
 
   async getAll(queryParams?: MediaQueryParams): Promise<Media[]> {
     const {
-      limit = 50,
-      offset = 0,
-      ordering = [],
+      limit: paramLimit = 50,
+      offset: paramOffset = 0,
+      ordering: paramOrdering = [],
       search,
       monumentId,
       mediaType,
       photographer
     } = queryParams || {};
+
+    const limit = paramLimit ?? 50;
+    const offset = paramOffset ?? 0;
+    const ordering = paramOrdering ?? [];
 
     let query = this.db.select().from(media);
 

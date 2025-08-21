@@ -14,14 +14,18 @@ export class EventRepository implements IEventRepository {
 
   async getAll(queryParams?: EventQueryParams): Promise<Event[]> {
     const {
-      limit = 50,
-      offset = 0,
-      ordering = [],
+      limit: paramLimit = 50,
+      offset: paramOffset = 0,
+      ordering: paramOrdering = [],
       search,
       monumentId,
       eventType,
       sourceId,
     } = queryParams || {};
+
+    const limit = paramLimit ?? 50;
+    const offset = paramOffset ?? 0;
+    const ordering = paramOrdering ?? [];
 
     const conditions = [];
 

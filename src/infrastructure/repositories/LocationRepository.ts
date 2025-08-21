@@ -61,9 +61,9 @@ export class LocationRepository implements ILocationRepository {
 
   async getAll(queryParams?: LocationQueryParams): Promise<Location[]> {
     const {
-      limit = 50,
-      offset = 0,
-      ordering = [],
+      limit: paramLimit = 50,
+      offset: paramOffset = 0,
+      ordering: paramOrdering = [],
       search,
       createdAtGt,
       createdAtLt,
@@ -74,6 +74,10 @@ export class LocationRepository implements ILocationRepository {
       bbox,
       imiPrefCode,
     } = queryParams || {};
+
+    const limit = paramLimit ?? 50;
+    const offset = paramOffset ?? 0;
+    const ordering = paramOrdering ?? [];
 
     let query = this.db.select().from(locations);
 
@@ -100,7 +104,7 @@ export class LocationRepository implements ILocationRepository {
       query = query.where(and(...conditions)) as typeof query;
     }
 
-    if (ordering.length > 0) {
+    if (ordering && ordering.length > 0) {
       const orderClauses = ordering.map((order) => {
         const isDesc = order.startsWith("-");
         const field = isDesc ? order.slice(1) : order;

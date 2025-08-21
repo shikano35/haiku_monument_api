@@ -27,16 +27,20 @@ export class MonumentRepository implements IMonumentRepository {
 
   async getAll(params: MonumentQueryParams = {}): Promise<Monument[]> {
     const {
-      limit = 50,
-      offset = 0,
+      limit: paramLimit = 50,
+      offset: paramOffset = 0,
       search,
       prefecture,
       region,
       monumentType,
       q,
       canonicalNameContains,
-      ordering = [],
+      ordering: paramOrdering = [],
     } = params;
+
+    const limit = paramLimit ?? 50;
+    const offset = paramOffset ?? 0;
+    const ordering = paramOrdering ?? [];
 
     let query = this.db
       .select({
@@ -94,7 +98,7 @@ export class MonumentRepository implements IMonumentRepository {
     }
 
     // 順序付け
-    if (ordering.length > 0) {
+    if (ordering && Array.isArray(ordering) && ordering.length > 0) {
       const orderColumns = ordering.map((orderItem) => {
         const isDesc = orderItem.startsWith("-");
         const fieldName = isDesc ? orderItem.slice(1) : orderItem;

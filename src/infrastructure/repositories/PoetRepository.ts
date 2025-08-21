@@ -45,9 +45,9 @@ export class PoetRepository implements IPoetRepository {
 
   async getAll(queryParams?: PoetQueryParams): Promise<Poet[]> {
     const {
-      limit = 50,
-      offset = 0,
-      ordering = [],
+      limit: paramLimit = 50,
+      offset: paramOffset = 0,
+      ordering: paramOrdering = [],
       search,
       createdAtGt,
       createdAtLt,
@@ -58,6 +58,10 @@ export class PoetRepository implements IPoetRepository {
       birthYear,
       deathYear,
     } = queryParams || {};
+
+    const limit = paramLimit ?? 50;
+    const offset = paramOffset ?? 0;
+    const ordering = paramOrdering ?? [];
 
     let query = this.db.select().from(poets);
 
@@ -88,7 +92,7 @@ export class PoetRepository implements IPoetRepository {
       query = query.where(and(...conditions)) as typeof query;
     }
 
-    if (ordering.length > 0) {
+    if (ordering && ordering.length > 0) {
       const orderClauses = ordering.map((order) => {
         const isDesc = order.startsWith("-");
         const field = isDesc ? order.slice(1) : order;

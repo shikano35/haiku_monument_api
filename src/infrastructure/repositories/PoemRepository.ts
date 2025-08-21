@@ -14,13 +14,17 @@ export class PoemRepository implements IPoemRepository {
 
   async getAll(queryParams?: PoemQueryParams): Promise<Poem[]> {
     const {
-      limit = 50,
-      offset = 0,
-      ordering = [],
+      limit: paramLimit = 50,
+      offset: paramOffset = 0,
+      ordering: paramOrdering = [],
       search,
       kigo,
       season,
     } = queryParams || {};
+
+    const limit = paramLimit ?? 50;
+    const offset = paramOffset ?? 0;
+    const ordering = paramOrdering ?? [];
 
     let baseQuery = this.db.select().from(poems);
 

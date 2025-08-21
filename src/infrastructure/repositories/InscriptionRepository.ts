@@ -14,15 +14,19 @@ export class InscriptionRepository implements IInscriptionRepository {
 
   async getAll(queryParams?: InscriptionQueryParams): Promise<Inscription[]> {
     const {
-      limit = 50,
-      offset = 0,
-      ordering = [],
+      limit: paramLimit = 50,
+      offset: paramOffset = 0,
+      ordering: paramOrdering = [],
       search,
       monumentId,
       side,
       language,
       sourceId,
     } = queryParams || {};
+
+    const limit = paramLimit ?? 50;
+    const offset = paramOffset ?? 0;
+    const ordering = paramOrdering ?? [];
 
     const conditions = [];
 
