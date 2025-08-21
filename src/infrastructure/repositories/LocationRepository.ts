@@ -176,7 +176,7 @@ export class LocationRepository implements ILocationRepository {
       );
     }
 
-    return filteredResults.map(this.convertToLocation);
+    return filteredResults.map((data) => this.convertToLocation(data));
   }
 
   async getById(id: number): Promise<Location | null> {
@@ -193,7 +193,7 @@ export class LocationRepository implements ILocationRepository {
       .select()
       .from(locations)
       .where(eq(locations.prefecture, prefecture));
-    return results.map(this.convertToLocation);
+    return results.map((data) => this.convertToLocation(data));
   }
 
   async getByRegion(region: string): Promise<Location[]> {
@@ -201,7 +201,7 @@ export class LocationRepository implements ILocationRepository {
       .select()
       .from(locations)
       .where(eq(locations.region, region));
-    return results.map(this.convertToLocation);
+    return results.map((data) => this.convertToLocation(data));
   }
 
   async getByCoordinates(
@@ -222,7 +222,7 @@ export class LocationRepository implements ILocationRepository {
         );
         return distance <= radius;
       })
-      .map(this.convertToLocation);
+      .map((data) => this.convertToLocation(data));
   }
 
   async getByImiPrefCode(imiPrefCode: string): Promise<Location[]> {
@@ -230,7 +230,7 @@ export class LocationRepository implements ILocationRepository {
       .select()
       .from(locations)
       .where(eq(locations.imiPrefCode, imiPrefCode));
-    return results.map(this.convertToLocation);
+    return results.map((data) => this.convertToLocation(data));
   }
 
   async create(locationData: CreateLocationInput): Promise<Location> {
