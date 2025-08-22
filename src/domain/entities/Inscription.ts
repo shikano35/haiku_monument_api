@@ -1,5 +1,6 @@
 import type { Poem } from "./Poem";
 import type { Source } from "./Source";
+import type { Monument } from "./Monument";
 
 export interface Inscription {
   id: number;
@@ -12,6 +13,7 @@ export interface Inscription {
   notes: string | null;
   sourceId: number | null;
   poems: Poem[] | null;
+  monument: Monument | null;
   source: Source | null;
   createdAt: string;
   updatedAt: string;

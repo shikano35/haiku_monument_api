@@ -1,3 +1,5 @@
+import type { Monument } from "./Monument";
+
 export interface Source {
   id: number;
   citation: string;
@@ -6,6 +8,7 @@ export interface Source {
   publisher: string | null;
   sourceYear: number | null;
   url: string | null;
+  monuments: Monument[] | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -20,10 +23,10 @@ export interface CreateSourceInput {
 }
 
 export interface UpdateSourceInput {
-  citation: string | null;
-  author: string | null;
-  title: string | null;
-  publisher: string | null;
-  sourceYear: number | null;
-  url: string | null;
+  citation?: string | null;
+  author?: string | null;
+  title?: string | null;
+  publisher?: string | null;
+  sourceYear?: number | null;
+  url?: string | null;
 }
