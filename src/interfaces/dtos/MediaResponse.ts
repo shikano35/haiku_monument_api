@@ -15,10 +15,12 @@ export const MediaBaseSchema = z.object({
 });
 
 export const MediaDetailSchema = MediaBaseSchema.extend({
-  monument: z.object({
-    id: z.number(),
-    canonical_name: z.string(),
-  }).nullable(),
+  monument: z
+    .object({
+      id: z.number(),
+      canonical_name: z.string(),
+    })
+    .nullable(),
   exif: z.record(z.string()).nullable(),
 });
 
@@ -34,7 +36,10 @@ export const MediaQuerySchema = z.object({
   offset: z.string().optional().default("0").transform(Number),
   ordering: z.string().optional(),
   search: z.string().optional(),
-  monument_id: z.string().optional().transform((val) => (val ? Number(val) : null)),
+  monument_id: z
+    .string()
+    .optional()
+    .transform((val) => (val ? Number(val) : null)),
   media_type: z.string().optional(),
   photographer: z.string().optional(),
 });

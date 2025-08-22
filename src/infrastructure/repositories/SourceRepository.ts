@@ -167,7 +167,9 @@ export class SourceRepository implements ISourceRepository {
       .from(sources)
       .where(eq(sources.id, id))
       .limit(1);
-    return result.length > 0 ? await this.convertToSourceWithRelations(result[0]) : null;
+    return result.length > 0
+      ? await this.convertToSourceWithRelations(result[0])
+      : null;
   }
 
   async getByTitle(title: string): Promise<Source[]> {
@@ -297,7 +299,7 @@ export class SourceRepository implements ISourceRepository {
       publisher: dbSource.publisher ?? null,
       sourceYear: dbSource.sourceYear ?? null,
       url: dbSource.url ?? null,
-      monuments: relatedMonuments.map(monument => ({
+      monuments: relatedMonuments.map((monument) => ({
         id: monument.id,
         canonicalName: monument.canonicalName,
         canonicalUri: `https://api.kuhiapi.com/monuments/${monument.id}`,

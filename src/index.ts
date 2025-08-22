@@ -1,9 +1,9 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Hono } from "hono";
 import { corsMiddleware } from "./interfaces/middlewares/corsMiddleware";
-import {errorHandler }  from "./interfaces/middlewares/errorHandler";
+import { errorHandler } from "./interfaces/middlewares/errorHandler";
 import { requestLogger } from "./interfaces/middlewares/requestLogger";
-import {securityHeaders }  from "./interfaces/middlewares/securityHeaders";
+import { securityHeaders } from "./interfaces/middlewares/securityHeaders";
 import locationsRoutes from "./interfaces/routes/locationsRoutes";
 import monumentsRoutes from "./interfaces/routes/monumentsRoutes";
 import inscriptionsRoutes from "./interfaces/routes/inscriptionsRoutes";

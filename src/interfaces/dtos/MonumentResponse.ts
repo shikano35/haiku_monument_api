@@ -22,30 +22,37 @@ export const InscriptionSchema = z.object({
   reading: z.string().nullable(),
   language: z.string(),
   notes: z.string().nullable(),
-  poems: z.array(z.object({
-    id: z.number(),
-    text: z.string(),
-    normalized_text: z.string(),
-    text_hash: z.string(),
-    kigo: z.string().nullable(),
-    season: z.string().nullable(),
-    created_at: z.string(),
-    updated_at: z.string(),
-  })).optional(),
-  source: z.object({
-    id: z.number(),
-    citation: z.string(),
-    author: z.string().nullable(),
-    title: z.string().nullable(),
-    publisher: z.string().nullable(),
-    source_year: z.number().nullable(),
-    url: z.string().nullable(),
-    created_at: z.string(),
-    updated_at: z.string(),
-  }).nullable().optional(),
+  poems: z
+    .array(
+      z.object({
+        id: z.number(),
+        text: z.string(),
+        normalized_text: z.string(),
+        text_hash: z.string(),
+        kigo: z.string().nullable(),
+        season: z.string().nullable(),
+        created_at: z.string(),
+        updated_at: z.string(),
+      }),
+    )
+    .optional(),
+  source: z
+    .object({
+      id: z.number(),
+      citation: z.string(),
+      author: z.string().nullable(),
+      title: z.string().nullable(),
+      publisher: z.string().nullable(),
+      source_year: z.number().nullable(),
+      url: z.string().nullable(),
+      created_at: z.string(),
+      updated_at: z.string(),
+    })
+    .nullable()
+    .optional(),
 });
 
-// Event（出来事）スキーマ  
+// Event（出来事）スキーマ
 export const EventSchema = z.object({
   id: z.number(),
   event_type: z.string(),
@@ -54,17 +61,20 @@ export const EventSchema = z.object({
   interval_end: z.string().nullable(),
   uncertainty_note: z.string().nullable(),
   actor: z.string().nullable(),
-  source: z.object({
-    id: z.number(),
-    citation: z.string(),
-    author: z.string().nullable(),
-    title: z.string().nullable(),
-    publisher: z.string().nullable(),
-    source_year: z.number().nullable(),
-    url: z.string().nullable(),
-    created_at: z.string(),
-    updated_at: z.string(),
-  }).nullable().optional(),
+  source: z
+    .object({
+      id: z.number(),
+      citation: z.string(),
+      author: z.string().nullable(),
+      title: z.string().nullable(),
+      publisher: z.string().nullable(),
+      source_year: z.number().nullable(),
+      url: z.string().nullable(),
+      created_at: z.string(),
+      updated_at: z.string(),
+    })
+    .nullable()
+    .optional(),
 });
 
 // Media（メディア）スキーマ
@@ -152,19 +162,31 @@ export const MonumentQuerySchema = z.object({
   inscription_contains: z.string().optional(),
   commentary_contains: z.string().optional(),
   poet_name_contains: z.string().optional(),
-  poet_id: z.string().optional().transform((val) => (val ? Number(val) : null)),
+  poet_id: z
+    .string()
+    .optional()
+    .transform((val) => (val ? Number(val) : null)),
   kigo: z.string().optional(),
   season: z.string().optional(),
   material: z.string().optional(),
   monument_type: z.string().optional(),
   prefecture: z.string().optional(),
   region: z.string().optional(),
-  location_id: z.string().optional().transform((val) => (val ? Number(val) : null)),
+  location_id: z
+    .string()
+    .optional()
+    .transform((val) => (val ? Number(val) : null)),
   bbox: z.string().optional(),
   established_start: z.string().optional(),
   established_end: z.string().optional(),
-  has_media: z.string().optional().transform((val) => val === "true"),
-  uncertain: z.string().optional().transform((val) => val === "true"),
+  has_media: z
+    .string()
+    .optional()
+    .transform((val) => val === "true"),
+  uncertain: z
+    .string()
+    .optional()
+    .transform((val) => val === "true"),
   expand: z.string().optional(),
 });
 

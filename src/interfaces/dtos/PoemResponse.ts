@@ -12,29 +12,39 @@ export const PoemBaseSchema = z.object({
 });
 
 export const PoemDetailSchema = PoemBaseSchema.extend({
-  attributions: z.array(z.object({
-    id: z.number(),
-    poet: z.object({
-      id: z.number(),
-      name: z.string(),
-      link_url: z.string().nullable(),
-    }),
-    confidence: z.string(),
-    confidence_score: z.number(),
-    source: z.object({
-      id: z.number(),
-      title: z.string(),
-      url: z.string().nullable(),
-    }).nullable(),
-  })).nullable(),
-  inscriptions: z.array(z.object({
-    id: z.number(),
-    monument: z.object({
-      id: z.number(),
-      canonical_name: z.string(),
-    }),
-    side: z.string(),
-  })).nullable(),
+  attributions: z
+    .array(
+      z.object({
+        id: z.number(),
+        poet: z.object({
+          id: z.number(),
+          name: z.string(),
+          link_url: z.string().nullable(),
+        }),
+        confidence: z.string(),
+        confidence_score: z.number(),
+        source: z
+          .object({
+            id: z.number(),
+            title: z.string(),
+            url: z.string().nullable(),
+          })
+          .nullable(),
+      }),
+    )
+    .nullable(),
+  inscriptions: z
+    .array(
+      z.object({
+        id: z.number(),
+        monument: z.object({
+          id: z.number(),
+          canonical_name: z.string(),
+        }),
+        side: z.string(),
+      }),
+    )
+    .nullable(),
 });
 
 export const PoemListSchema = z.object({
@@ -50,7 +60,10 @@ export const PoemQuerySchema = z.object({
   ordering: z.string().optional(),
   search: z.string().optional(),
   text_contains: z.string().optional(),
-  poet_id: z.string().optional().transform((val) => (val ? Number(val) : null)),
+  poet_id: z
+    .string()
+    .optional()
+    .transform((val) => (val ? Number(val) : null)),
   season: z.string().optional(),
   kigo: z.string().optional(),
 });

@@ -3,10 +3,10 @@ import { createRouter } from "./commonRouter";
 import { createUseCases } from "./createUseCases";
 import { parseQueryParams } from "../../utils/parseQueryParams";
 import type { Poem } from "../../domain/entities/Poem";
-import { 
-  PoemDetailSchema, 
-  PoemListSchema, 
-  PoemQuerySchema 
+import {
+  PoemDetailSchema,
+  PoemListSchema,
+  PoemQuerySchema,
 } from "../dtos/PoemResponse";
 
 const router = createRouter();
@@ -37,51 +37,57 @@ const convertPoemToResponse = (poem: Poem) => ({
   season: poem.season,
   created_at: poem.createdAt,
   updated_at: poem.updatedAt,
-  attributions: poem.attributions?.map(attr => ({
-    id: attr.id,
-    poem_id: attr.poemId,
-    poet_id: attr.poetId,
-    confidence: attr.confidence,
-    confidence_score: attr.confidenceScore,
-    source_id: attr.sourceId,
-    created_at: attr.createdAt,
-    poet: attr.poet ? {
-      id: attr.poet.id,
-      name: attr.poet.name,
-      name_kana: attr.poet.nameKana,
-      biography: attr.poet.biography,
-      birth_year: attr.poet.birthYear,
-      death_year: attr.poet.deathYear,
-      link_url: attr.poet.linkUrl,
-      image_url: attr.poet.imageUrl,
-      created_at: attr.poet.createdAt,
-      updated_at: attr.poet.updatedAt,
-    } : null,
-    source: attr.source ? {
-      id: attr.source.id,
-      citation: attr.source.citation,
-      author: attr.source.author,
-      title: attr.source.title,
-      publisher: attr.source.publisher,
-      source_year: attr.source.sourceYear,
-      url: attr.source.url,
-      created_at: attr.source.createdAt,
-      updated_at: attr.source.updatedAt,
-    } : null,
-  })) || [],
-  inscriptions: poem.inscriptions?.map(ins => ({
-    id: ins.id,
-    monument_id: ins.monumentId,
-    side: ins.side,
-    original_text: ins.originalText,
-    transliteration: ins.transliteration,
-    reading: ins.reading,
-    language: ins.language,
-    notes: ins.notes,
-    source_id: ins.sourceId,
-    created_at: ins.createdAt,
-    updated_at: ins.updatedAt,
-  })) || [],
+  attributions:
+    poem.attributions?.map((attr) => ({
+      id: attr.id,
+      poem_id: attr.poemId,
+      poet_id: attr.poetId,
+      confidence: attr.confidence,
+      confidence_score: attr.confidenceScore,
+      source_id: attr.sourceId,
+      created_at: attr.createdAt,
+      poet: attr.poet
+        ? {
+            id: attr.poet.id,
+            name: attr.poet.name,
+            name_kana: attr.poet.nameKana,
+            biography: attr.poet.biography,
+            birth_year: attr.poet.birthYear,
+            death_year: attr.poet.deathYear,
+            link_url: attr.poet.linkUrl,
+            image_url: attr.poet.imageUrl,
+            created_at: attr.poet.createdAt,
+            updated_at: attr.poet.updatedAt,
+          }
+        : null,
+      source: attr.source
+        ? {
+            id: attr.source.id,
+            citation: attr.source.citation,
+            author: attr.source.author,
+            title: attr.source.title,
+            publisher: attr.source.publisher,
+            source_year: attr.source.sourceYear,
+            url: attr.source.url,
+            created_at: attr.source.createdAt,
+            updated_at: attr.source.updatedAt,
+          }
+        : null,
+    })) || [],
+  inscriptions:
+    poem.inscriptions?.map((ins) => ({
+      id: ins.id,
+      monument_id: ins.monumentId,
+      side: ins.side,
+      original_text: ins.originalText,
+      transliteration: ins.transliteration,
+      reading: ins.reading,
+      language: ins.language,
+      notes: ins.notes,
+      source_id: ins.sourceId,
+      created_at: ins.createdAt,
+      updated_at: ins.updatedAt,
+    })) || [],
 });
 
 // GET /poems
@@ -89,10 +95,10 @@ const getAllPoemsRoute = createRoute({
   method: "get",
   tags: ["poems"],
   path: "/",
-  request: { 
+  request: {
     query: PoemQuerySchema.openapi({
-      description: "俳句一覧取得のクエリパラメータ"
-    })
+      description: "俳句一覧取得のクエリパラメータ",
+    }),
   },
   responses: {
     200: {
@@ -110,14 +116,14 @@ router.openapi(getAllPoemsRoute, async (c) => {
   const queryParams = parseQueryParams(c.req.url);
   const { poemUseCases } = createUseCases(c.env, "poems");
   const poems = await poemUseCases.getAllPoems(queryParams);
-  
+
   const response = {
     poems: poems.map(convertPoemToResponse),
     total: poems.length,
     limit: queryParams.limit || 50,
     offset: queryParams.offset || 0,
   };
-  
+
   return c.json(response);
 });
 

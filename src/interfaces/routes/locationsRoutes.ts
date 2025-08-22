@@ -38,9 +38,7 @@ const locationsQuerySchema = z.object({
   ordering: z
     .preprocess(
       (arg) => (typeof arg === "string" ? [arg] : arg),
-      z.array(
-        z.enum(["-prefecture", "-region", "prefecture", "region"]),
-      ),
+      z.array(z.enum(["-prefecture", "-region", "prefecture", "region"])),
     )
     .optional()
     .openapi({
@@ -116,22 +114,24 @@ router.openapi(getAllLocationsRoute, async (c) => {
   const { locationUseCases } = createUseCases(c.env, "locations");
   const locations = await locationUseCases.getAllLocations(queryParams);
 
-  const convertedLocations = locations.map((location): LocationDetail => ({
-    id: location.id,
-    imi_pref_code: location.imiPrefCode,
-    region: location.region,
-    prefecture: location.prefecture,
-    municipality: location.municipality,
-    address: location.address,
-    place_name: location.placeName,
-    latitude: location.latitude,
-    longitude: location.longitude,
-    geohash: location.geohash,
-    geom_geojson: location.geomGeojson,
-    accuracy_m: location.accuracyM,
-    created_at: location.createdAt,
-    updated_at: location.updatedAt,
-  }));
+  const convertedLocations = locations.map(
+    (location): LocationDetail => ({
+      id: location.id,
+      imi_pref_code: location.imiPrefCode,
+      region: location.region,
+      prefecture: location.prefecture,
+      municipality: location.municipality,
+      address: location.address,
+      place_name: location.placeName,
+      latitude: location.latitude,
+      longitude: location.longitude,
+      geohash: location.geohash,
+      geom_geojson: location.geomGeojson,
+      accuracy_m: location.accuracyM,
+      created_at: location.createdAt,
+      updated_at: location.updatedAt,
+    }),
+  );
 
   return c.json(convertedLocations);
 });
@@ -235,7 +235,9 @@ router.openapi(getLocationMonumentsRoute, async (c) => {
   const convertedMonuments = monuments.map((monument) => ({
     id: monument.id,
     canonical_name: monument.canonicalName,
-    canonical_uri: monument.canonicalUri || `https://api.kuhiapi.com/monuments/${monument.id}`,
+    canonical_uri:
+      monument.canonicalUri ||
+      `https://api.kuhiapi.com/monuments/${monument.id}`,
     monument_type: monument.monumentType,
     material: monument.material,
     created_at: monument.createdAt,

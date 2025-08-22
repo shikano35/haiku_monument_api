@@ -1,7 +1,11 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import { parseQueryParams } from "../../utils/parseQueryParams";
 import type { SourceDetail } from "../dtos/SourceResponse";
-import { SourceBaseSchema, SourceDetailSchema, SourceQuerySchema } from "../dtos/SourceResponse";
+import {
+  SourceBaseSchema,
+  SourceDetailSchema,
+  SourceQuerySchema,
+} from "../dtos/SourceResponse";
 import { createRouter } from "./commonRouter";
 import { createUseCases } from "./createUseCases";
 
@@ -123,7 +127,7 @@ router.openapi(getAllSourcesRoute, async (c) => {
   const queryParams = parseQueryParams(c.req.url);
   const { sourceUseCases } = createUseCases(c.env, "sources");
   const sources = await sourceUseCases.getAllSources(queryParams);
-  
+
   const convertedSources = sources.map((source) => ({
     id: source.id,
     citation: source.citation,
@@ -135,7 +139,7 @@ router.openapi(getAllSourcesRoute, async (c) => {
     created_at: source.createdAt,
     updated_at: source.updatedAt,
   }));
-  
+
   return c.json(convertedSources);
 });
 
@@ -171,22 +175,25 @@ router.openapi(getSourceByIdRoute, async (c) => {
     url: source.url,
     created_at: source.createdAt,
     updated_at: source.updatedAt,
-    monuments: source.monuments?.map(monument => ({
-      id: monument.id,
-      canonical_name: monument.canonicalName,
-      canonical_uri: monument.canonicalUri || `https://api.kuhiapi.com/monuments/${monument.id}`,
-      monument_type: monument.monumentType,
-      monument_type_uri: monument.monumentTypeUri,
-      material: monument.material,
-      material_uri: monument.materialUri,
-      created_at: monument.createdAt,
-      updated_at: monument.updatedAt,
-      original_established_date: monument.originalEstablishedDate,
-      hu_time_normalized: monument.huTimeNormalized,
-      interval_start: monument.intervalStart,
-      interval_end: monument.intervalEnd,
-      uncertainty_note: monument.uncertaintyNote,
-    })) || [],
+    monuments:
+      source.monuments?.map((monument) => ({
+        id: monument.id,
+        canonical_name: monument.canonicalName,
+        canonical_uri:
+          monument.canonicalUri ||
+          `https://api.kuhiapi.com/monuments/${monument.id}`,
+        monument_type: monument.monumentType,
+        monument_type_uri: monument.monumentTypeUri,
+        material: monument.material,
+        material_uri: monument.materialUri,
+        created_at: monument.createdAt,
+        updated_at: monument.updatedAt,
+        original_established_date: monument.originalEstablishedDate,
+        hu_time_normalized: monument.huTimeNormalized,
+        interval_start: monument.intervalStart,
+        interval_end: monument.intervalEnd,
+        uncertainty_note: monument.uncertaintyNote,
+      })) || [],
   };
   return c.json(snakeSource);
 });
@@ -232,7 +239,9 @@ router.openapi(getSourceMonumentsRoute, async (c) => {
   const convertedMonuments = monuments.map((monument) => ({
     id: monument.id,
     canonical_name: monument.canonicalName,
-    canonical_uri: monument.canonicalUri || `https://api.kuhiapi.com/monuments/${monument.id}`,
+    canonical_uri:
+      monument.canonicalUri ||
+      `https://api.kuhiapi.com/monuments/${monument.id}`,
     monument_type: monument.monumentType,
     material: monument.material,
     created_at: monument.createdAt,

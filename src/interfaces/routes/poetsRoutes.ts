@@ -39,12 +39,7 @@ const poetsQuerySchema = z.object({
     .preprocess(
       (arg) => (typeof arg === "string" ? [arg] : arg),
       z.array(
-        z.enum([
-          "-created_at",
-          "-updated_at",
-          "created_at",
-          "updated_at",
-        ]),
+        z.enum(["-created_at", "-updated_at", "created_at", "updated_at"]),
       ),
     )
     .optional()
@@ -128,18 +123,20 @@ router.openapi(getAllPoetsRoute, async (c) => {
   const { poetUseCases } = createUseCases(c.env, "poets");
   const poets = await poetUseCases.getAllPoets(queryParams);
 
-  const convertedPoets = poets.map((poet): PoetDetail => ({
-    id: poet.id,
-    name: poet.name,
-    name_kana: poet.nameKana,
-    biography: poet.biography,
-    birth_year: poet.birthYear,
-    death_year: poet.deathYear,
-    link_url: poet.linkUrl,
-    image_url: poet.imageUrl,
-    created_at: poet.createdAt,
-    updated_at: poet.updatedAt,
-  }));
+  const convertedPoets = poets.map(
+    (poet): PoetDetail => ({
+      id: poet.id,
+      name: poet.name,
+      name_kana: poet.nameKana,
+      biography: poet.biography,
+      birth_year: poet.birthYear,
+      death_year: poet.deathYear,
+      link_url: poet.linkUrl,
+      image_url: poet.imageUrl,
+      created_at: poet.createdAt,
+      updated_at: poet.updatedAt,
+    }),
+  );
 
   return c.json(convertedPoets);
 });
@@ -235,7 +232,9 @@ router.openapi(getPoetMonumentsRoute, async (c) => {
   const convertedMonuments = monuments.map((monument) => ({
     id: monument.id,
     canonical_name: monument.canonicalName,
-    canonical_uri: monument.canonicalUri || `https://api.kuhiapi.com/monuments/${monument.id}`,
+    canonical_uri:
+      monument.canonicalUri ||
+      `https://api.kuhiapi.com/monuments/${monument.id}`,
     monument_type: monument.monumentType,
     material: monument.material,
     created_at: monument.createdAt,

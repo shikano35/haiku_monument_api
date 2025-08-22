@@ -14,15 +14,19 @@ export const EventBaseSchema = z.object({
 });
 
 export const EventDetailSchema = EventBaseSchema.extend({
-  monument: z.object({
-    id: z.number(),
-    canonical_name: z.string(),
-  }).nullable(),
-  source: z.object({
-    id: z.number(),
-    title: z.string(),
-    url: z.string().nullable(),
-  }).nullable(),
+  monument: z
+    .object({
+      id: z.number(),
+      canonical_name: z.string(),
+    })
+    .nullable(),
+  source: z
+    .object({
+      id: z.number(),
+      title: z.string(),
+      url: z.string().nullable(),
+    })
+    .nullable(),
 });
 
 export const EventListSchema = z.object({
@@ -37,7 +41,10 @@ export const EventQuerySchema = z.object({
   offset: z.string().optional().default("0").transform(Number),
   ordering: z.string().optional(),
   search: z.string().optional(),
-  monument_id: z.string().optional().transform((val) => (val ? Number(val) : null)),
+  monument_id: z
+    .string()
+    .optional()
+    .transform((val) => (val ? Number(val) : null)),
   event_type: z.string().optional(),
   actor: z.string().optional(),
   from_date: z.string().optional(),

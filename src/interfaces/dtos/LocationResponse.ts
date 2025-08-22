@@ -20,11 +20,15 @@ export const LocationBaseSchema = z.object({
 
 // Location詳細スキーマ
 export const LocationDetailSchema = LocationBaseSchema.extend({
-  monuments: z.array(z.object({
-    id: z.number(),
-    canonical_name: z.string(),
-    monument_type: z.string().nullable(),
-  })).optional(),
+  monuments: z
+    .array(
+      z.object({
+        id: z.number(),
+        canonical_name: z.string(),
+        monument_type: z.string().nullable(),
+      }),
+    )
+    .optional(),
 });
 
 // Location一覧レスポンス

@@ -1,4 +1,7 @@
-export const securityHeaders = async (ctx: { res: { headers: { set: (key: string, value: string) => void } } }, next: () => Promise<void>) => {
+export const securityHeaders = async (
+  ctx: { res: { headers: { set: (key: string, value: string) => void } } },
+  next: () => Promise<void>,
+) => {
   await next();
   ctx.res.headers.set("X-Frame-Options", "DENY");
   ctx.res.headers.set("X-Content-Type-Options", "nosniff");

@@ -92,7 +92,7 @@ export class MonumentRepository implements IMonumentRepository {
           eq(monuments.id, monumentLocations.monumentId),
         )
         .innerJoin(locations, eq(monumentLocations.locationId, locations.id));
-      
+
       query = joinedQuery as unknown as typeof query;
 
       if (prefecture) {
@@ -132,7 +132,9 @@ export class MonumentRepository implements IMonumentRepository {
     }
 
     const results = await query.limit(limit).offset(offset);
-    return Promise.all(results.map(async (row) => this.convertToMonumentWithRelations(row)));
+    return Promise.all(
+      results.map(async (row) => this.convertToMonumentWithRelations(row)),
+    );
   }
 
   async getById(id: number): Promise<Monument | null> {
@@ -173,7 +175,9 @@ export class MonumentRepository implements IMonumentRepository {
       )
       .where(eq(poemAttributions.poetId, poetId));
 
-    return Promise.all(results.map(async (row) => this.convertToMonumentWithRelations(row)));
+    return Promise.all(
+      results.map(async (row) => this.convertToMonumentWithRelations(row)),
+    );
   }
 
   async getByLocationId(locationId: number): Promise<Monument[]> {
@@ -195,7 +199,9 @@ export class MonumentRepository implements IMonumentRepository {
       )
       .where(eq(monumentLocations.locationId, locationId));
 
-    return Promise.all(results.map(async (row) => this.convertToMonumentWithRelations(row)));
+    return Promise.all(
+      results.map(async (row) => this.convertToMonumentWithRelations(row)),
+    );
   }
 
   async getBySourceId(sourceId: number): Promise<Monument[]> {
@@ -214,7 +220,9 @@ export class MonumentRepository implements IMonumentRepository {
       .innerJoin(inscriptions, eq(monuments.id, inscriptions.monumentId))
       .where(eq(inscriptions.sourceId, sourceId));
 
-    return Promise.all(results.map(async (row) => this.convertToMonumentWithRelations(row)));
+    return Promise.all(
+      results.map(async (row) => this.convertToMonumentWithRelations(row)),
+    );
   }
 
   async getByCoordinates(
@@ -251,7 +259,9 @@ export class MonumentRepository implements IMonumentRepository {
         ) <= ${radius}`,
       );
 
-    return Promise.all(results.map(async (row) => this.convertToMonumentWithRelations(row)));
+    return Promise.all(
+      results.map(async (row) => this.convertToMonumentWithRelations(row)),
+    );
   }
 
   async create(input: CreateMonumentInput): Promise<Monument> {
@@ -389,7 +399,7 @@ export class MonumentRepository implements IMonumentRepository {
           language: inscription.language ?? "ja",
           notes: inscription.notes,
           sourceId: inscription.sourceId,
-          poems: relatedPoems.map(poem => ({
+          poems: relatedPoems.map((poem) => ({
             id: poem.id,
             text: poem.text,
             normalizedText: poem.normalizedText,
@@ -402,24 +412,29 @@ export class MonumentRepository implements IMonumentRepository {
             updatedAt: this.convertToISOString(poem.updatedAt),
           })),
           monument: null,
-          source: inscriptionSource.length > 0
-            ? {
-                id: inscriptionSource[0].id,
-                citation: inscriptionSource[0].citation,
-                author: inscriptionSource[0].author,
-                title: inscriptionSource[0].title,
-                publisher: inscriptionSource[0].publisher,
-                sourceYear: inscriptionSource[0].sourceYear,
-                url: inscriptionSource[0].url,
-                monuments: null,
-                createdAt: this.convertToISOString(inscriptionSource[0].createdAt),
-                updatedAt: this.convertToISOString(inscriptionSource[0].updatedAt),
-              }
-            : null,
+          source:
+            inscriptionSource.length > 0
+              ? {
+                  id: inscriptionSource[0].id,
+                  citation: inscriptionSource[0].citation,
+                  author: inscriptionSource[0].author,
+                  title: inscriptionSource[0].title,
+                  publisher: inscriptionSource[0].publisher,
+                  sourceYear: inscriptionSource[0].sourceYear,
+                  url: inscriptionSource[0].url,
+                  monuments: null,
+                  createdAt: this.convertToISOString(
+                    inscriptionSource[0].createdAt,
+                  ),
+                  updatedAt: this.convertToISOString(
+                    inscriptionSource[0].updatedAt,
+                  ),
+                }
+              : null,
           createdAt: this.convertToISOString(inscription.createdAt),
           updatedAt: this.convertToISOString(inscription.updatedAt),
         };
-      })
+      }),
     );
 
     const relatedEvents = await this.db
@@ -447,23 +462,24 @@ export class MonumentRepository implements IMonumentRepository {
           uncertaintyNote: event.uncertaintyNote,
           actor: event.actor,
           sourceId: event.sourceId,
-          source: eventSource.length > 0
-            ? {
-                id: eventSource[0].id,
-                citation: eventSource[0].citation,
-                author: eventSource[0].author,
-                title: eventSource[0].title,
-                publisher: eventSource[0].publisher,
-                sourceYear: eventSource[0].sourceYear,
-                url: eventSource[0].url,
-                monuments: null,
-                createdAt: this.convertToISOString(eventSource[0].createdAt),
-                updatedAt: this.convertToISOString(eventSource[0].updatedAt),
-              }
-            : null,
+          source:
+            eventSource.length > 0
+              ? {
+                  id: eventSource[0].id,
+                  citation: eventSource[0].citation,
+                  author: eventSource[0].author,
+                  title: eventSource[0].title,
+                  publisher: eventSource[0].publisher,
+                  sourceYear: eventSource[0].sourceYear,
+                  url: eventSource[0].url,
+                  monuments: null,
+                  createdAt: this.convertToISOString(eventSource[0].createdAt),
+                  updatedAt: this.convertToISOString(eventSource[0].updatedAt),
+                }
+              : null,
           createdAt: this.convertToISOString(event.createdAt),
         };
-      })
+      }),
     );
 
     const relatedMedia = await this.db
@@ -489,7 +505,10 @@ export class MonumentRepository implements IMonumentRepository {
         updatedAt: locations.updatedAt,
       })
       .from(locations)
-      .innerJoin(monumentLocations, eq(locations.id, monumentLocations.locationId))
+      .innerJoin(
+        monumentLocations,
+        eq(locations.id, monumentLocations.locationId),
+      )
       .where(eq(monumentLocations.monumentId, row.id));
 
     const relatedPoets = await this.db
@@ -509,7 +528,10 @@ export class MonumentRepository implements IMonumentRepository {
       .innerJoin(poemAttributions, eq(poets.id, poemAttributions.poetId))
       .innerJoin(poems, eq(poemAttributions.poemId, poems.id))
       .innerJoin(inscriptionPoems, eq(poems.id, inscriptionPoems.poemId))
-      .innerJoin(inscriptions, eq(inscriptionPoems.inscriptionId, inscriptions.id))
+      .innerJoin(
+        inscriptions,
+        eq(inscriptionPoems.inscriptionId, inscriptions.id),
+      )
       .where(eq(inscriptions.monumentId, row.id));
 
     const relatedSources = await this.db
@@ -530,7 +552,7 @@ export class MonumentRepository implements IMonumentRepository {
       updatedAt: this.convertToISOString(row.updatedAt),
       inscriptions: inscriptionsWithPoems,
       events: eventsWithSources,
-      media: relatedMedia.map(mediaItem => ({
+      media: relatedMedia.map((mediaItem) => ({
         id: mediaItem.id,
         monumentId: mediaItem.monumentId,
         mediaType: mediaItem.mediaType,
@@ -543,7 +565,7 @@ export class MonumentRepository implements IMonumentRepository {
         createdAt: this.convertToISOString(mediaItem.createdAt),
         updatedAt: this.convertToISOString(mediaItem.updatedAt),
       })),
-      locations: relatedLocations.map(location => ({
+      locations: relatedLocations.map((location) => ({
         id: location.id,
         imiPrefCode: location.imiPrefCode,
         region: location.region,
@@ -559,7 +581,7 @@ export class MonumentRepository implements IMonumentRepository {
         createdAt: this.convertToISOString(location.createdAt),
         updatedAt: this.convertToISOString(location.updatedAt),
       })),
-      poets: relatedPoets.map(poet => ({
+      poets: relatedPoets.map((poet) => ({
         id: poet.id,
         name: poet.name,
         nameKana: poet.nameKana,
@@ -571,7 +593,7 @@ export class MonumentRepository implements IMonumentRepository {
         createdAt: this.convertToISOString(poet.createdAt),
         updatedAt: this.convertToISOString(poet.updatedAt),
       })),
-      sources: relatedSources.map(sourceResult => ({
+      sources: relatedSources.map((sourceResult) => ({
         id: sourceResult.sources.id,
         citation: sourceResult.sources.citation,
         author: sourceResult.sources.author,

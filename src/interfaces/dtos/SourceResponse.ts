@@ -15,11 +15,15 @@ export const SourceBaseSchema = z.object({
 
 // Source詳細スキーマ
 export const SourceDetailSchema = SourceBaseSchema.extend({
-  monuments: z.array(z.object({
-    id: z.number(),
-    canonical_name: z.string(),
-    monument_type: z.string().nullable(),
-  })).optional(),
+  monuments: z
+    .array(
+      z.object({
+        id: z.number(),
+        canonical_name: z.string(),
+        monument_type: z.string().nullable(),
+      }),
+    )
+    .optional(),
 });
 
 // Source一覧レスポンス

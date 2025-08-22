@@ -55,7 +55,13 @@ export function createUseCases(
 
 export function createUseCases(
   env: Env,
-  domain: "locations" | "poets" | "sources" | "monuments" | "inscriptions" | "poems",
+  domain:
+    | "locations"
+    | "poets"
+    | "sources"
+    | "monuments"
+    | "inscriptions"
+    | "poems",
 ) {
   switch (domain) {
     case "locations": {

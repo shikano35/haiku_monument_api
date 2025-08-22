@@ -7,7 +7,13 @@ import type {
   UpdatePoemInput,
 } from "../../domain/entities/Poem";
 import type { PoemQueryParams } from "../../domain/common/QueryParams";
-import { poems, poemAttributions, poets, inscriptionPoems, inscriptions } from "../db/schema";
+import {
+  poems,
+  poemAttributions,
+  poets,
+  inscriptionPoems,
+  inscriptions,
+} from "../db/schema";
 
 export class PoemRepository implements IPoemRepository {
   constructor(private db: DrizzleD1Database) {}
@@ -72,13 +78,17 @@ export class PoemRepository implements IPoemRepository {
     }
 
     const results = await query.limit(limit).offset(offset);
-    return Promise.all(results.map(async (row) => this.convertToPoemWithRelations(row)));
+    return Promise.all(
+      results.map(async (row) => this.convertToPoemWithRelations(row)),
+    );
   }
 
   async getById(id: number): Promise<Poem | null> {
     const results = await this.db.select().from(poems).where(eq(poems.id, id));
 
-    return results.length > 0 ? await this.convertToPoemWithRelations(results[0]) : null;
+    return results.length > 0
+      ? await this.convertToPoemWithRelations(results[0])
+      : null;
   }
 
   async getByText(text: string): Promise<Poem | null> {
@@ -87,7 +97,9 @@ export class PoemRepository implements IPoemRepository {
       .from(poems)
       .where(eq(poems.text, text));
 
-    return results.length > 0 ? await this.convertToPoemWithRelations(results[0]) : null;
+    return results.length > 0
+      ? await this.convertToPoemWithRelations(results[0])
+      : null;
   }
 
   async getByNormalizedText(normalizedText: string): Promise<Poem | null> {
@@ -96,7 +108,9 @@ export class PoemRepository implements IPoemRepository {
       .from(poems)
       .where(eq(poems.normalizedText, normalizedText));
 
-    return results.length > 0 ? await this.convertToPoemWithRelations(results[0]) : null;
+    return results.length > 0
+      ? await this.convertToPoemWithRelations(results[0])
+      : null;
   }
 
   async getBySeason(season: string): Promise<Poem[]> {
@@ -105,7 +119,9 @@ export class PoemRepository implements IPoemRepository {
       .from(poems)
       .where(eq(poems.season, season));
 
-    return Promise.all(results.map(async (row) => this.convertToPoemWithRelations(row)));
+    return Promise.all(
+      results.map(async (row) => this.convertToPoemWithRelations(row)),
+    );
   }
 
   async getByKigo(kigo: string): Promise<Poem[]> {
@@ -114,7 +130,9 @@ export class PoemRepository implements IPoemRepository {
       .from(poems)
       .where(like(poems.kigo, `%${kigo}%`));
 
-    return Promise.all(results.map(async (row) => this.convertToPoemWithRelations(row)));
+    return Promise.all(
+      results.map(async (row) => this.convertToPoemWithRelations(row)),
+    );
   }
 
   async create(poem: CreatePoemInput): Promise<Poem> {
@@ -181,7 +199,9 @@ export class PoemRepository implements IPoemRepository {
     };
   }
 
-  private async convertToPoemWithRelations(row: typeof poems.$inferSelect): Promise<Poem> {
+  private async convertToPoemWithRelations(
+    row: typeof poems.$inferSelect,
+  ): Promise<Poem> {
     const relatedAttributions = await this.db
       .select({
         id: poemAttributions.id,
@@ -220,7 +240,10 @@ export class PoemRepository implements IPoemRepository {
         updatedAt: inscriptions.updatedAt,
       })
       .from(inscriptionPoems)
-      .innerJoin(inscriptions, eq(inscriptionPoems.inscriptionId, inscriptions.id))
+      .innerJoin(
+        inscriptions,
+        eq(inscriptionPoems.inscriptionId, inscriptions.id),
+      )
       .where(eq(inscriptionPoems.poemId, row.id));
 
     return {
@@ -230,7 +253,7 @@ export class PoemRepository implements IPoemRepository {
       textHash: row.textHash,
       kigo: row.kigo ?? null,
       season: row.season ?? null,
-      attributions: relatedAttributions.map(attr => ({
+      attributions: relatedAttributions.map((attr) => ({
         id: attr.id,
         poemId: attr.poemId,
         poetId: attr.poetId,
@@ -252,7 +275,7 @@ export class PoemRepository implements IPoemRepository {
         },
         source: null,
       })),
-      inscriptions: relatedInscriptions.map(ins => ({
+      inscriptions: relatedInscriptions.map((ins) => ({
         id: ins.id,
         monumentId: ins.monumentId,
         side: ins.side,

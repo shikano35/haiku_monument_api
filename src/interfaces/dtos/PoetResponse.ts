@@ -16,11 +16,15 @@ export const PoetBaseSchema = z.object({
 
 // Poet詳細スキーマ
 export const PoetDetailSchema = PoetBaseSchema.extend({
-  monuments: z.array(z.object({
-    id: z.number(),
-    canonical_name: z.string(),
-    monument_type: z.string().nullable(),
-  })).optional(),
+  monuments: z
+    .array(
+      z.object({
+        id: z.number(),
+        canonical_name: z.string(),
+        monument_type: z.string().nullable(),
+      }),
+    )
+    .optional(),
 });
 
 // Poet一覧レスポンス

@@ -126,7 +126,7 @@ describe("Sources API", () => {
           expect.objectContaining({
             id: 1,
             canonical_name: "本統寺 句碑（松尾芭蕉）",
-          })
+          }),
         ]),
         created_at: expect.any(String),
         updated_at: expect.any(String),

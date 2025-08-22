@@ -15,23 +15,31 @@ export const InscriptionBaseSchema = z.object({
 });
 
 export const InscriptionDetailSchema = InscriptionBaseSchema.extend({
-  poems: z.array(z.object({
-    id: z.number(),
-    text: z.string(),
-    normalized_text: z.string(),
-    text_hash: z.string(),
-    kigo: z.string().nullable(),
-    season: z.string().nullable(),
-  })).nullable(),
-  monument: z.object({
-    id: z.number(),
-    canonical_name: z.string(),
-  }).nullable(),
-  source: z.object({
-    id: z.number(),
-    title: z.string(),
-    url: z.string().nullable(),
-  }).nullable(),
+  poems: z
+    .array(
+      z.object({
+        id: z.number(),
+        text: z.string(),
+        normalized_text: z.string(),
+        text_hash: z.string(),
+        kigo: z.string().nullable(),
+        season: z.string().nullable(),
+      }),
+    )
+    .nullable(),
+  monument: z
+    .object({
+      id: z.number(),
+      canonical_name: z.string(),
+    })
+    .nullable(),
+  source: z
+    .object({
+      id: z.number(),
+      title: z.string(),
+      url: z.string().nullable(),
+    })
+    .nullable(),
 });
 
 export const InscriptionListSchema = z.object({
@@ -46,10 +54,16 @@ export const InscriptionQuerySchema = z.object({
   offset: z.string().optional().default("0").transform(Number),
   ordering: z.string().optional(),
   search: z.string().optional(),
-  monument_id: z.string().optional().transform((val) => (val ? Number(val) : null)),
+  monument_id: z
+    .string()
+    .optional()
+    .transform((val) => (val ? Number(val) : null)),
   side: z.string().optional(),
   language: z.string().optional(),
-  source_id: z.string().optional().transform((val) => (val ? Number(val) : null)),
+  source_id: z
+    .string()
+    .optional()
+    .transform((val) => (val ? Number(val) : null)),
 });
 
 export type InscriptionBase = z.infer<typeof InscriptionBaseSchema>;

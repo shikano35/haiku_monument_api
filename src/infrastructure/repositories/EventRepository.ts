@@ -97,7 +97,9 @@ export class EventRepository implements IEventRepository {
       results = await this.db.select().from(events).limit(limit).offset(offset);
     }
 
-    return Promise.all(results.map(async (row) => this.convertToEventWithRelations(row)));
+    return Promise.all(
+      results.map(async (row) => this.convertToEventWithRelations(row)),
+    );
   }
 
   async getById(id: number): Promise<Event | null> {
@@ -106,7 +108,9 @@ export class EventRepository implements IEventRepository {
       .from(events)
       .where(eq(events.id, id));
 
-    return results.length > 0 ? await this.convertToEventWithRelations(results[0]) : null;
+    return results.length > 0
+      ? await this.convertToEventWithRelations(results[0])
+      : null;
   }
 
   async getByMonumentId(monumentId: number): Promise<Event[]> {
@@ -115,7 +119,9 @@ export class EventRepository implements IEventRepository {
       .from(events)
       .where(eq(events.monumentId, monumentId));
 
-    return Promise.all(results.map(async (row) => this.convertToEventWithRelations(row)));
+    return Promise.all(
+      results.map(async (row) => this.convertToEventWithRelations(row)),
+    );
   }
 
   async getByEventType(eventType: string): Promise<Event[]> {
@@ -124,7 +130,9 @@ export class EventRepository implements IEventRepository {
       .from(events)
       .where(eq(events.eventType, eventType));
 
-    return Promise.all(results.map(async (row) => this.convertToEventWithRelations(row)));
+    return Promise.all(
+      results.map(async (row) => this.convertToEventWithRelations(row)),
+    );
   }
 
   async create(event: CreateEventInput): Promise<Event> {
@@ -199,7 +207,9 @@ export class EventRepository implements IEventRepository {
     };
   }
 
-  private async convertToEventWithRelations(row: typeof events.$inferSelect): Promise<Event> {
+  private async convertToEventWithRelations(
+    row: typeof events.$inferSelect,
+  ): Promise<Event> {
     const relatedSource = row.sourceId
       ? await this.db
           .select()
@@ -218,20 +228,21 @@ export class EventRepository implements IEventRepository {
       uncertaintyNote: row.uncertaintyNote ?? null,
       actor: row.actor ?? null,
       sourceId: row.sourceId ?? null,
-      source: relatedSource.length > 0
-        ? {
-            id: relatedSource[0].id,
-            citation: relatedSource[0].citation,
-            author: relatedSource[0].author,
-            title: relatedSource[0].title,
-            publisher: relatedSource[0].publisher,
-            sourceYear: relatedSource[0].sourceYear,
-            url: relatedSource[0].url,
-            monuments: null,
-            createdAt: this.convertToISOString(relatedSource[0].createdAt),
-            updatedAt: this.convertToISOString(relatedSource[0].updatedAt),
-          }
-        : null,
+      source:
+        relatedSource.length > 0
+          ? {
+              id: relatedSource[0].id,
+              citation: relatedSource[0].citation,
+              author: relatedSource[0].author,
+              title: relatedSource[0].title,
+              publisher: relatedSource[0].publisher,
+              sourceYear: relatedSource[0].sourceYear,
+              url: relatedSource[0].url,
+              monuments: null,
+              createdAt: this.convertToISOString(relatedSource[0].createdAt),
+              updatedAt: this.convertToISOString(relatedSource[0].updatedAt),
+            }
+          : null,
       createdAt: this.convertToISOString(row.createdAt),
     };
   }
