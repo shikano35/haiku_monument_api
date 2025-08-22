@@ -1,5 +1,6 @@
 import type { Poet } from "./Poet";
 import type { Source } from "./Source";
+import type { Inscription } from "./Inscription";
 
 export interface Poem {
   id: number;
@@ -11,6 +12,7 @@ export interface Poem {
   createdAt: string;
   updatedAt: string;
   attributions: PoemAttribution[] | null;
+  inscriptions: Inscription[] | null;
 }
 
 export interface PoemAttribution {

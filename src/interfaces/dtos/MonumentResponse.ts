@@ -25,14 +25,23 @@ export const InscriptionSchema = z.object({
   poems: z.array(z.object({
     id: z.number(),
     text: z.string(),
-    kigo: z.string().nullable(),
     normalized_text: z.string(),
-    text_hash: z.string().optional(),
+    text_hash: z.string(),
+    kigo: z.string().nullable(),
+    season: z.string().nullable(),
+    created_at: z.string(),
+    updated_at: z.string(),
   })).optional(),
   source: z.object({
     id: z.number(),
-    title: z.string(),
+    citation: z.string(),
+    author: z.string().nullable(),
+    title: z.string().nullable(),
+    publisher: z.string().nullable(),
+    source_year: z.number().nullable(),
     url: z.string().nullable(),
+    created_at: z.string(),
+    updated_at: z.string(),
   }).nullable().optional(),
 });
 
@@ -47,7 +56,14 @@ export const EventSchema = z.object({
   actor: z.string().nullable(),
   source: z.object({
     id: z.number(),
-    title: z.string().optional(),
+    citation: z.string(),
+    author: z.string().nullable(),
+    title: z.string().nullable(),
+    publisher: z.string().nullable(),
+    source_year: z.number().nullable(),
+    url: z.string().nullable(),
+    created_at: z.string(),
+    updated_at: z.string(),
   }).nullable().optional(),
 });
 
@@ -82,18 +98,27 @@ export const LocationSchema = z.object({
 export const PoetSchema = z.object({
   id: z.number(),
   name: z.string(),
+  name_kana: z.string().nullable(),
+  biography: z.string().nullable(),
+  birth_year: z.number().nullable(),
+  death_year: z.number().nullable(),
   link_url: z.string().nullable(),
-  image_url: z.string().nullable().optional(),
+  image_url: z.string().nullable(),
+  created_at: z.string(),
+  updated_at: z.string(),
 });
 
 // Source（出典）スキーマ
 export const SourceSchema = z.object({
   id: z.number(),
-  title: z.string(),
+  citation: z.string(),
+  author: z.string().nullable(),
+  title: z.string().nullable(),
+  publisher: z.string().nullable(),
+  source_year: z.number().nullable(),
   url: z.string().nullable(),
-  author: z.string().nullable().optional(),
-  publisher: z.string().nullable().optional(),
-  source_year: z.number().nullable().optional(),
+  created_at: z.string(),
+  updated_at: z.string(),
 });
 
 export const MonumentDetailSchema = MonumentBaseSchema.extend({
