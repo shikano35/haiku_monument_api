@@ -1,6 +1,7 @@
 import type { QueryParams } from "../domain/common/QueryParams";
 
-export function parseQueryParams(query: URLSearchParams): QueryParams {
+export function parseQueryParams(url: string): QueryParams {
+  const query = new URL(url).searchParams;
   return {
     limit: query.get("limit") ? Number(query.get("limit")) : null,
     offset: query.get("offset") ? Number(query.get("offset")) : null,

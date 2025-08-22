@@ -1,16 +1,16 @@
-import type { QueryParams } from "../common/QueryParams";
+import type { MonumentQueryParams } from "../common/QueryParams";
 import type {
   CreateHaikuMonumentInput,
   HaikuMonument,
   UpdateHaikuMonumentInput,
-} from "../entities/HaikuMonument";
-import type { IHaikuMonumentRepository } from "../repositories/IHaikuMonumentRepository";
+} from "../entities/Monument";
+import type { IMonumentRepository } from "../repositories/IMonumentRepository";
 
 export class HaikuMonumentUseCases {
-  constructor(private readonly monumentRepo: IHaikuMonumentRepository) {}
+  constructor(private readonly monumentRepo: IMonumentRepository) {}
 
   async getAllHaikuMonuments(
-    queryParams: QueryParams,
+    queryParams: MonumentQueryParams,
   ): Promise<HaikuMonument[]> {
     return this.monumentRepo.getAll(queryParams);
   }

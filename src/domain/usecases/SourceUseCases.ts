@@ -1,11 +1,15 @@
-import type { QueryParams } from "../common/QueryParams";
-import type { CreateSourceInput, Source } from "../entities/Source";
+import type { SourceQueryParams } from "../common/QueryParams";
+import type {
+  CreateSourceInput,
+  UpdateSourceInput,
+  Source,
+} from "../entities/Source";
 import type { ISourceRepository } from "../repositories/ISourceRepository";
 
 export class SourceUseCases {
   constructor(private readonly sourceRepo: ISourceRepository) {}
 
-  async getAllSources(queryParams: QueryParams): Promise<Source[]> {
+  async getAllSources(queryParams?: SourceQueryParams): Promise<Source[]> {
     return this.sourceRepo.getAll(queryParams);
   }
 
@@ -19,7 +23,7 @@ export class SourceUseCases {
 
   async updateSource(
     id: number,
-    sourceData: Partial<Source>,
+    sourceData: UpdateSourceInput,
   ): Promise<Source | null> {
     return this.sourceRepo.update(id, sourceData);
   }
