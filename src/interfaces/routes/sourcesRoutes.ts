@@ -171,7 +171,22 @@ router.openapi(getSourceByIdRoute, async (c) => {
     url: source.url,
     created_at: source.createdAt,
     updated_at: source.updatedAt,
-    monuments: [], // TODO: 関連monuments mapping
+    monuments: source.monuments?.map(monument => ({
+      id: monument.id,
+      canonical_name: monument.canonicalName,
+      canonical_uri: monument.canonicalUri || `https://api.kuhiapi.com/monuments/${monument.id}`,
+      monument_type: monument.monumentType,
+      monument_type_uri: monument.monumentTypeUri,
+      material: monument.material,
+      material_uri: monument.materialUri,
+      created_at: monument.createdAt,
+      updated_at: monument.updatedAt,
+      original_established_date: monument.originalEstablishedDate,
+      hu_time_normalized: monument.huTimeNormalized,
+      interval_start: monument.intervalStart,
+      interval_end: monument.intervalEnd,
+      uncertainty_note: monument.uncertaintyNote,
+    })) || [],
   };
   return c.json(snakeSource);
 });

@@ -37,8 +37,51 @@ const convertPoemToResponse = (poem: Poem) => ({
   season: poem.season,
   created_at: poem.createdAt,
   updated_at: poem.updatedAt,
-  attributions: [], // TODO: PoemAttribution関連の実装後に追加
-  inscriptions: [], // TODO: Inscription関連の実装後に追加
+  attributions: poem.attributions?.map(attr => ({
+    id: attr.id,
+    poem_id: attr.poemId,
+    poet_id: attr.poetId,
+    confidence: attr.confidence,
+    confidence_score: attr.confidenceScore,
+    source_id: attr.sourceId,
+    created_at: attr.createdAt,
+    poet: attr.poet ? {
+      id: attr.poet.id,
+      name: attr.poet.name,
+      name_kana: attr.poet.nameKana,
+      biography: attr.poet.biography,
+      birth_year: attr.poet.birthYear,
+      death_year: attr.poet.deathYear,
+      link_url: attr.poet.linkUrl,
+      image_url: attr.poet.imageUrl,
+      created_at: attr.poet.createdAt,
+      updated_at: attr.poet.updatedAt,
+    } : null,
+    source: attr.source ? {
+      id: attr.source.id,
+      citation: attr.source.citation,
+      author: attr.source.author,
+      title: attr.source.title,
+      publisher: attr.source.publisher,
+      source_year: attr.source.sourceYear,
+      url: attr.source.url,
+      created_at: attr.source.createdAt,
+      updated_at: attr.source.updatedAt,
+    } : null,
+  })) || [],
+  inscriptions: poem.inscriptions?.map(ins => ({
+    id: ins.id,
+    monument_id: ins.monumentId,
+    side: ins.side,
+    original_text: ins.originalText,
+    transliteration: ins.transliteration,
+    reading: ins.reading,
+    language: ins.language,
+    notes: ins.notes,
+    source_id: ins.sourceId,
+    created_at: ins.createdAt,
+    updated_at: ins.updatedAt,
+  })) || [],
 });
 
 // GET /poems
@@ -69,8 +112,8 @@ router.openapi(getAllPoemsRoute, async (c) => {
   const poems = await poemUseCases.getAllPoems(queryParams);
   
   const response = {
-    poems: poems.map(convertPoemToBaseResponse),
-    total: poems.length, // TODO: implement proper total count
+    poems: poems.map(convertPoemToResponse),
+    total: poems.length,
     limit: queryParams.limit || 50,
     offset: queryParams.offset || 0,
   };
