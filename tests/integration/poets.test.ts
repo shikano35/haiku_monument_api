@@ -59,9 +59,12 @@ describe("Poets API", () => {
       expect(filtered[0]).toEqual({
         id: 1,
         name: "松尾芭蕉",
-        biography: "江戸時代の俳人。奥の細道の著者。",
-        link_url: "https://example.com/basho",
-        image_url: "https://example.com/basho.jpg",
+        name_kana: "まつお ばしょう",
+        biography: "江戸時代の俳人。奥の細道の著者。滑稽や諧謔を主としていた俳諧を、蕉風と呼ばれる芸術性の極めて高い句風として確立し、後世では俳聖として世界的にも知られる、日本史上最高の俳諧師の一人",
+        birth_year: 1644,
+        death_year: 1694,
+        link_url: "https://ja.wikipedia.org/wiki/松尾芭蕉",
+        image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Basho_by_Morikawa_Kyoriku_%281656-1715%29.jpg/500px-Basho_by_Morikawa_Kyoriku_%281656-1715%29.jpg",
         created_at: expect.any(String),
         updated_at: expect.any(String),
       });
@@ -79,9 +82,12 @@ describe("Poets API", () => {
       expect(responseBody).toEqual({
         id: 1,
         name: "松尾芭蕉",
-        biography: "江戸時代の俳人。奥の細道の著者。",
-        link_url: "https://example.com/basho",
-        image_url: "https://example.com/basho.jpg",
+        name_kana: "まつお ばしょう",
+        biography: "江戸時代の俳人。奥の細道の著者。滑稽や諧謔を主としていた俳諧を、蕉風と呼ばれる芸術性の極めて高い句風として確立し、後世では俳聖として世界的にも知られる、日本史上最高の俳諧師の一人",
+        birth_year: 1644,
+        death_year: 1694,
+        link_url: "https://ja.wikipedia.org/wiki/松尾芭蕉",
+        image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Basho_by_Morikawa_Kyoriku_%281656-1715%29.jpg/500px-Basho_by_Morikawa_Kyoriku_%281656-1715%29.jpg",
         created_at: expect.any(String),
         updated_at: expect.any(String),
       });

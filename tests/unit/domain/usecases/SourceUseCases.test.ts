@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SourceUseCases } from '../../../../src/domain/usecases/SourceUseCases';
 import type { ISourceRepository } from '../../../../src/domain/repositories/ISourceRepository';
-import type { Source, CreateSourceInput } from '../../../../src/domain/entities/Source';
-import type { QueryParams } from '../../../../src/domain/common/QueryParams';
+import type { Source, CreateSourceInput, UpdateSourceInput } from '../../../../src/domain/entities/Source';
+import type { SourceQueryParams } from '../../../../src/domain/common/QueryParams';
 
 describe('SourceUseCases', () => {
   let mockSourceRepo: ISourceRepository;
@@ -12,21 +12,25 @@ describe('SourceUseCases', () => {
   const sampleSources: Source[] = [
     {
       id: 1,
+      citation: "奥の細道",
       title: '奥の細道',
       author: '松尾芭蕉',
       publisher: '江戸出版',
       sourceYear: 1702,
       url: 'https://example.com/okuno-hosomichi',
+      monuments: null,
       createdAt: now,
       updatedAt: now,
     },
     {
       id: 2,
+      citation: "おらが春",
       title: 'おらが春',
       author: '小林一茶',
       publisher: '江戸出版',
       sourceYear: 1819,
       url: 'https://example.com/oraga-haru',
+      monuments: null,
       createdAt: now,
       updatedAt: now,
     },
@@ -36,9 +40,15 @@ describe('SourceUseCases', () => {
     mockSourceRepo = {
       getAll: vi.fn(),
       getById: vi.fn(),
+      getByTitle: vi.fn(),
+      getByAuthor: vi.fn(),
+      getByPublisher: vi.fn(),
+      getByYear: vi.fn(),
+      getByYearRange: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+      count: vi.fn(),
     };
     
     sourceUseCases = new SourceUseCases(mockSourceRepo);
@@ -48,7 +58,7 @@ describe('SourceUseCases', () => {
     it('全ての出典を取得する', async () => {
       vi.mocked(mockSourceRepo.getAll).mockResolvedValue(sampleSources);
       
-      const queryParams = {} as QueryParams;
+      const queryParams = {} as SourceQueryParams;
       const result = await sourceUseCases.getAllSources(queryParams);
       
       expect(mockSourceRepo.getAll).toHaveBeenCalledWith(queryParams);
@@ -79,6 +89,7 @@ describe('SourceUseCases', () => {
   describe('createSource', () => {
     it('新しい出典を作成する', async () => {
       const sourceInput: CreateSourceInput = {
+        citation: '蕪村句集 - 与謝蕪村著, 江戸書店, 1775',
         title: '蕪村句集',
         author: '与謝蕪村',
         publisher: '江戸書店',
@@ -89,6 +100,7 @@ describe('SourceUseCases', () => {
       const createdSource: Source = {
         ...sourceInput,
         id: 3,
+        monuments: null,
         createdAt: now,
         updatedAt: now,
       };
@@ -104,14 +116,15 @@ describe('SourceUseCases', () => {
 
   describe('updateSource', () => {
     it('存在する出典を更新する', async () => {
-      const updateData = {
+      const updateData: UpdateSourceInput = {
         title: '更新された奥の細道',
         publisher: '改訂版出版社'
       };
       
-      const updatedSource = {
+      const updatedSource: Source = {
         ...sampleSources[0],
-        ...updateData,
+        title: '更新された奥の細道',
+        publisher: '改訂版出版社',
         updatedAt: now,
       };
       
@@ -124,8 +137,8 @@ describe('SourceUseCases', () => {
     });
 
     it('存在しない出典を更新しようとした場合、nullを返す', async () => {
-      const updateData = {
-        title: '更新された奥の細道',
+      const updateData: UpdateSourceInput = {
+        title: '更新された奥の細道'
       };
       
       vi.mocked(mockSourceRepo.update).mockResolvedValue(null);

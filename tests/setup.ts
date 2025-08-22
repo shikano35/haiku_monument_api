@@ -40,7 +40,7 @@ export async function resetDb() {
   for (let i = 0; i < maxRetries; i++) {
     try {
       execSync(
-        "bunx wrangler d1 execute DB --file ./src/infrastructure/db/seeds/reset_and_seed.sql",
+        "bunx wrangler d1 execute haiku-monument-db --local --file ./src/infrastructure/db/seeds/new_schema_seed.sql",
         {
           timeout: isGithubActions ? 10000 : 5000,
           env: {

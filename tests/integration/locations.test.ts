@@ -58,13 +58,19 @@ describe("Locations API", () => {
 
       expect(filtered[0]).toEqual({
         id: 1,
-        prefecture: "東京都",
-        region: "関東",
-        address: "東京都台東区上野公園",
-        place_name: "上野恩賜公園",
-        municipality: null,
-        latitude: 35.715298,
-        longitude: 139.773037,
+        imi_pref_code: "24",
+        region: "東海",
+        prefecture: "三重県",
+        municipality: "桑名市",
+        address: "桑名市北寺町47",
+        place_name: "本統寺",
+        latitude: 35.065502,
+        longitude: 136.692193,
+        geohash: null,
+        geom_geojson: null,
+        accuracy_m: null,
+        created_at: expect.any(String),
+        updated_at: expect.any(String),
       });
     });
 
@@ -79,13 +85,19 @@ describe("Locations API", () => {
       const responseBody = (await res.json()) as LocationResponse;
       expect(responseBody).toEqual({
         id: 1,
-        prefecture: "東京都",
-        region: "関東",
-        address: "東京都台東区上野公園",
-        place_name: "上野恩賜公園",
-        municipality: null,
-        latitude: 35.715298,
-        longitude: 139.773037,
+        imi_pref_code: "24",
+        region: "東海",
+        prefecture: "三重県",
+        municipality: "桑名市",
+        address: "桑名市北寺町47",
+        place_name: "本統寺",
+        latitude: 35.065502,
+        longitude: 136.692193,
+        geohash: null,
+        geom_geojson: null,
+        accuracy_m: null,
+        created_at: expect.any(String),
+        updated_at: expect.any(String),
       });
     });
 

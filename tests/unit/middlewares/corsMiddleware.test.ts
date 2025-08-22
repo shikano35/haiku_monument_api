@@ -30,6 +30,9 @@ describe("corsMiddleware", () => {
           },
         },
       },
+      req: {
+        method: "GET",
+      },
     } as unknown as Context;
 
     await corsMiddleware(contextMock, nextMock);
@@ -41,6 +44,5 @@ describe("corsMiddleware", () => {
     expect(headerValues["Access-Control-Allow-Headers"]).toBe(
       "Content-Type, Authorization",
     );
-    expect(headerValues["Access-Control-Max-Age"]).toBe("86400");
   });
 });
