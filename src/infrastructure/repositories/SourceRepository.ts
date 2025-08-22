@@ -6,7 +6,7 @@ import type {
 } from "../../domain/entities/Source";
 import type { SourceQueryParams } from "../../domain/common/QueryParams";
 import { getDB } from "../db/db";
-import { sources } from "../db/schema";
+import { sources, monuments, inscriptions } from "../db/schema";
 import { eq, like, gte, lte, and, count, desc, asc } from "drizzle-orm";
 import type { D1Database } from "@cloudflare/workers-types";
 
@@ -29,6 +29,7 @@ function convertToSource(dbSource: {
     publisher: dbSource.publisher ?? null,
     sourceYear: dbSource.sourceYear ?? null,
     url: dbSource.url ?? null,
+    monuments: null,
     createdAt: dbSource.createdAt,
     updatedAt: dbSource.updatedAt,
   };
@@ -166,7 +167,7 @@ export class SourceRepository implements ISourceRepository {
       .from(sources)
       .where(eq(sources.id, id))
       .limit(1);
-    return result.length > 0 ? convertToSource(result[0]) : null;
+    return result.length > 0 ? await this.convertToSourceWithRelations(result[0]) : null;
   }
 
   async getByTitle(title: string): Promise<Source[]> {
@@ -260,5 +261,74 @@ export class SourceRepository implements ISourceRepository {
   async count(): Promise<number> {
     const results = await this.db.select({ count: count() }).from(sources);
     return results[0]?.count ?? 0;
+  }
+
+  private async convertToSourceWithRelations(dbSource: {
+    id: number;
+    citation: string;
+    author: string | null;
+    title: string | null;
+    publisher: string | null;
+    sourceYear: number | null;
+    url: string | null;
+    createdAt: string;
+    updatedAt: string;
+  }): Promise<Source> {
+    const relatedMonuments = await this.db
+      .select({
+        id: monuments.id,
+        canonicalName: monuments.canonicalName,
+        monumentType: monuments.monumentType,
+        monumentTypeUri: monuments.monumentTypeUri,
+        material: monuments.material,
+        materialUri: monuments.materialUri,
+        createdAt: monuments.createdAt,
+        updatedAt: monuments.updatedAt,
+      })
+      .from(monuments)
+      .innerJoin(inscriptions, eq(monuments.id, inscriptions.monumentId))
+      .where(eq(inscriptions.sourceId, dbSource.id));
+
+    return {
+      id: dbSource.id,
+      citation: dbSource.citation,
+      title: dbSource.title ?? null,
+      author: dbSource.author ?? null,
+      publisher: dbSource.publisher ?? null,
+      sourceYear: dbSource.sourceYear ?? null,
+      url: dbSource.url ?? null,
+      monuments: relatedMonuments.map(monument => ({
+        id: monument.id,
+        canonicalName: monument.canonicalName,
+        canonicalUri: `https://api.kuhiapi.com/monuments/${monument.id}`,
+        monumentType: monument.monumentType,
+        monumentTypeUri: monument.monumentTypeUri,
+        material: monument.material,
+        materialUri: monument.materialUri,
+        createdAt: this.convertToISOString(monument.createdAt),
+        updatedAt: this.convertToISOString(monument.updatedAt),
+        inscriptions: null,
+        events: null,
+        media: null,
+        locations: null,
+        poets: null,
+        sources: null,
+        originalEstablishedDate: null,
+        huTimeNormalized: null,
+        intervalStart: null,
+        intervalEnd: null,
+        uncertaintyNote: null,
+      })),
+      createdAt: dbSource.createdAt,
+      updatedAt: dbSource.updatedAt,
+    };
+  }
+
+  private convertToISOString(dateString: string): string {
+    try {
+      return new Date(dateString).toISOString();
+    } catch {
+      return new Date().toISOString();
+    }
   }
 }

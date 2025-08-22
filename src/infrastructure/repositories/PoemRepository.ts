@@ -7,7 +7,7 @@ import type {
   UpdatePoemInput,
 } from "../../domain/entities/Poem";
 import type { PoemQueryParams } from "../../domain/common/QueryParams";
-import { poems } from "../db/schema";
+import { poems, poemAttributions, poets, inscriptionPoems, inscriptions } from "../db/schema";
 
 export class PoemRepository implements IPoemRepository {
   constructor(private db: DrizzleD1Database) {}
@@ -72,13 +72,13 @@ export class PoemRepository implements IPoemRepository {
     }
 
     const results = await query.limit(limit).offset(offset);
-    return results.map((row) => this.convertToPoem(row));
+    return Promise.all(results.map(async (row) => this.convertToPoemWithRelations(row)));
   }
 
   async getById(id: number): Promise<Poem | null> {
     const results = await this.db.select().from(poems).where(eq(poems.id, id));
 
-    return results.length > 0 ? this.convertToPoem(results[0]) : null;
+    return results.length > 0 ? await this.convertToPoemWithRelations(results[0]) : null;
   }
 
   async getByText(text: string): Promise<Poem | null> {
@@ -87,7 +87,7 @@ export class PoemRepository implements IPoemRepository {
       .from(poems)
       .where(eq(poems.text, text));
 
-    return results.length > 0 ? this.convertToPoem(results[0]) : null;
+    return results.length > 0 ? await this.convertToPoemWithRelations(results[0]) : null;
   }
 
   async getByNormalizedText(normalizedText: string): Promise<Poem | null> {
@@ -96,7 +96,7 @@ export class PoemRepository implements IPoemRepository {
       .from(poems)
       .where(eq(poems.normalizedText, normalizedText));
 
-    return results.length > 0 ? this.convertToPoem(results[0]) : null;
+    return results.length > 0 ? await this.convertToPoemWithRelations(results[0]) : null;
   }
 
   async getBySeason(season: string): Promise<Poem[]> {
@@ -105,7 +105,7 @@ export class PoemRepository implements IPoemRepository {
       .from(poems)
       .where(eq(poems.season, season));
 
-    return results.map((row) => this.convertToPoem(row));
+    return Promise.all(results.map(async (row) => this.convertToPoemWithRelations(row)));
   }
 
   async getByKigo(kigo: string): Promise<Poem[]> {
@@ -114,7 +114,7 @@ export class PoemRepository implements IPoemRepository {
       .from(poems)
       .where(like(poems.kigo, `%${kigo}%`));
 
-    return results.map((row) => this.convertToPoem(row));
+    return Promise.all(results.map(async (row) => this.convertToPoemWithRelations(row)));
   }
 
   async create(poem: CreatePoemInput): Promise<Poem> {
@@ -175,6 +175,99 @@ export class PoemRepository implements IPoemRepository {
       kigo: row.kigo ?? null,
       season: row.season ?? null,
       attributions: null,
+      inscriptions: null,
+      createdAt: this.convertToISOString(row.createdAt),
+      updatedAt: this.convertToISOString(row.updatedAt),
+    };
+  }
+
+  private async convertToPoemWithRelations(row: typeof poems.$inferSelect): Promise<Poem> {
+    const relatedAttributions = await this.db
+      .select({
+        id: poemAttributions.id,
+        poemId: poemAttributions.poemId,
+        poetId: poemAttributions.poetId,
+        confidence: poemAttributions.confidence,
+        confidenceScore: poemAttributions.confidenceScore,
+        sourceId: poemAttributions.sourceId,
+        createdAt: poemAttributions.createdAt,
+        poetName: poets.name,
+        poetNameKana: poets.nameKana,
+        poetBiography: poets.biography,
+        poetBirthYear: poets.birthYear,
+        poetDeathYear: poets.deathYear,
+        poetLinkUrl: poets.linkUrl,
+        poetImageUrl: poets.imageUrl,
+        poetCreatedAt: poets.createdAt,
+        poetUpdatedAt: poets.updatedAt,
+      })
+      .from(poemAttributions)
+      .innerJoin(poets, eq(poemAttributions.poetId, poets.id))
+      .where(eq(poemAttributions.poemId, row.id));
+
+    const relatedInscriptions = await this.db
+      .select({
+        id: inscriptions.id,
+        monumentId: inscriptions.monumentId,
+        side: inscriptions.side,
+        originalText: inscriptions.originalText,
+        transliteration: inscriptions.transliteration,
+        reading: inscriptions.reading,
+        language: inscriptions.language,
+        notes: inscriptions.notes,
+        sourceId: inscriptions.sourceId,
+        createdAt: inscriptions.createdAt,
+        updatedAt: inscriptions.updatedAt,
+      })
+      .from(inscriptionPoems)
+      .innerJoin(inscriptions, eq(inscriptionPoems.inscriptionId, inscriptions.id))
+      .where(eq(inscriptionPoems.poemId, row.id));
+
+    return {
+      id: row.id,
+      text: row.text,
+      normalizedText: row.normalizedText,
+      textHash: row.textHash,
+      kigo: row.kigo ?? null,
+      season: row.season ?? null,
+      attributions: relatedAttributions.map(attr => ({
+        id: attr.id,
+        poemId: attr.poemId,
+        poetId: attr.poetId,
+        confidence: attr.confidence ?? "certain",
+        confidenceScore: attr.confidenceScore ?? 1.0,
+        sourceId: attr.sourceId,
+        createdAt: this.convertToISOString(attr.createdAt),
+        poet: {
+          id: attr.poetId,
+          name: attr.poetName,
+          nameKana: attr.poetNameKana,
+          biography: attr.poetBiography,
+          birthYear: attr.poetBirthYear,
+          deathYear: attr.poetDeathYear,
+          linkUrl: attr.poetLinkUrl,
+          imageUrl: attr.poetImageUrl,
+          createdAt: this.convertToISOString(attr.poetCreatedAt),
+          updatedAt: this.convertToISOString(attr.poetUpdatedAt),
+        },
+        source: null,
+      })),
+      inscriptions: relatedInscriptions.map(ins => ({
+        id: ins.id,
+        monumentId: ins.monumentId,
+        side: ins.side,
+        originalText: ins.originalText,
+        transliteration: ins.transliteration,
+        reading: ins.reading,
+        language: ins.language ?? "ja",
+        notes: ins.notes,
+        sourceId: ins.sourceId,
+        createdAt: this.convertToISOString(ins.createdAt),
+        updatedAt: this.convertToISOString(ins.updatedAt),
+        poems: null,
+        monument: null,
+        source: null,
+      })),
       createdAt: this.convertToISOString(row.createdAt),
       updatedAt: this.convertToISOString(row.updatedAt),
     };

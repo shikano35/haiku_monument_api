@@ -7,7 +7,13 @@ import type {
   UpdateInscriptionInput,
 } from "../../domain/entities/Inscription";
 import type { InscriptionQueryParams } from "../../domain/common/QueryParams";
-import { inscriptions } from "../db/schema";
+import { 
+  inscriptions, 
+  inscriptionPoems, 
+  poems, 
+  monuments, 
+  sources 
+} from "../db/schema";
 
 export class InscriptionRepository implements IInscriptionRepository {
   constructor(private db: DrizzleD1Database) {}
@@ -112,7 +118,7 @@ export class InscriptionRepository implements IInscriptionRepository {
         .offset(offset);
     }
 
-    return results.map((row) => this.convertToInscription(row));
+    return Promise.all(results.map(async (row) => this.convertToInscriptionWithRelations(row)));
   }
 
   async getById(id: number): Promise<Inscription | null> {
@@ -121,7 +127,7 @@ export class InscriptionRepository implements IInscriptionRepository {
       .from(inscriptions)
       .where(eq(inscriptions.id, id));
 
-    return results.length > 0 ? this.convertToInscription(results[0]) : null;
+    return results.length > 0 ? await this.convertToInscriptionWithRelations(results[0]) : null;
   }
 
   async getByMonumentId(monumentId: number): Promise<Inscription[]> {
@@ -130,7 +136,7 @@ export class InscriptionRepository implements IInscriptionRepository {
       .from(inscriptions)
       .where(eq(inscriptions.monumentId, monumentId));
 
-    return results.map((row) => this.convertToInscription(row));
+    return Promise.all(results.map(async (row) => this.convertToInscriptionWithRelations(row)));
   }
 
   async create(inscription: CreateInscriptionInput): Promise<Inscription> {
@@ -207,7 +213,107 @@ export class InscriptionRepository implements IInscriptionRepository {
       notes: row.notes ?? null,
       sourceId: row.sourceId ?? null,
       poems: null,
+      monument: null,
       source: null,
+      createdAt: this.convertToISOString(row.createdAt),
+      updatedAt: this.convertToISOString(row.updatedAt),
+    };
+  }
+
+  private async convertToInscriptionWithRelations(
+    row: typeof inscriptions.$inferSelect,
+  ): Promise<Inscription> {
+    const relatedPoems = await this.db
+      .select({
+        id: poems.id,
+        text: poems.text,
+        normalizedText: poems.normalizedText,
+        textHash: poems.textHash,
+        kigo: poems.kigo,
+        season: poems.season,
+        createdAt: poems.createdAt,
+        updatedAt: poems.updatedAt,
+      })
+      .from(poems)
+      .innerJoin(inscriptionPoems, eq(poems.id, inscriptionPoems.poemId))
+      .where(eq(inscriptionPoems.inscriptionId, row.id));
+
+    const relatedMonument = row.monumentId
+      ? await this.db
+          .select()
+          .from(monuments)
+          .where(eq(monuments.id, row.monumentId))
+          .limit(1)
+      : [];
+
+    const relatedSource = row.sourceId
+      ? await this.db
+          .select()
+          .from(sources)
+          .where(eq(sources.id, row.sourceId))
+          .limit(1)
+      : [];
+
+    return {
+      id: row.id,
+      monumentId: row.monumentId,
+      side: row.side,
+      originalText: row.originalText ?? null,
+      transliteration: row.transliteration ?? null,
+      reading: row.reading ?? null,
+      language: row.language ?? "ja",
+      notes: row.notes ?? null,
+      sourceId: row.sourceId ?? null,
+      poems: relatedPoems.map(poem => ({
+        id: poem.id,
+        text: poem.text,
+        normalizedText: poem.normalizedText,
+        textHash: poem.textHash,
+        kigo: poem.kigo,
+        season: poem.season,
+        attributions: null,
+        inscriptions: null,
+        createdAt: this.convertToISOString(poem.createdAt),
+        updatedAt: this.convertToISOString(poem.updatedAt),
+      })),
+      monument: relatedMonument.length > 0 
+        ? {
+            id: relatedMonument[0].id,
+            canonicalName: relatedMonument[0].canonicalName,
+            canonicalUri: `https://api.kuhiapi.com/monuments/${relatedMonument[0].id}`,
+            monumentType: relatedMonument[0].monumentType,
+            monumentTypeUri: relatedMonument[0].monumentTypeUri,
+            material: relatedMonument[0].material,
+            materialUri: relatedMonument[0].materialUri,
+            createdAt: this.convertToISOString(relatedMonument[0].createdAt),
+            updatedAt: this.convertToISOString(relatedMonument[0].updatedAt),
+            inscriptions: null,
+            events: null,
+            media: null,
+            locations: null,
+            poets: null,
+            sources: null,
+            originalEstablishedDate: null,
+            huTimeNormalized: null,
+            intervalStart: null,
+            intervalEnd: null,
+            uncertaintyNote: null,
+          }
+        : null,
+      source: relatedSource.length > 0
+        ? {
+            id: relatedSource[0].id,
+            citation: relatedSource[0].citation,
+            author: relatedSource[0].author,
+            title: relatedSource[0].title,
+            publisher: relatedSource[0].publisher,
+            sourceYear: relatedSource[0].sourceYear,
+            url: relatedSource[0].url,
+            monuments: null,
+            createdAt: this.convertToISOString(relatedSource[0].createdAt),
+            updatedAt: this.convertToISOString(relatedSource[0].updatedAt),
+          }
+        : null,
       createdAt: this.convertToISOString(row.createdAt),
       updatedAt: this.convertToISOString(row.updatedAt),
     };

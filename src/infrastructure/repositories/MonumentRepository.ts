@@ -9,6 +9,11 @@ import {
   inscriptions,
   inscriptionPoems,
   poemAttributions,
+  poems,
+  events,
+  media,
+  poets,
+  sources,
 } from "../db/schema";
 import type { IMonumentRepository } from "../../domain/repositories/IMonumentRepository";
 import type { MonumentQueryParams } from "../../domain/common/QueryParams";
@@ -17,6 +22,12 @@ import type {
   CreateMonumentInput,
   UpdateMonumentInput,
 } from "../../domain/entities/Monument";
+import type { Inscription } from "../../domain/entities/Inscription";
+import type { Event } from "../../domain/entities/Event";
+import type { Media } from "../../domain/entities/Media";
+import type { Location } from "../../domain/entities/Location";
+import type { Poet } from "../../domain/entities/Poet";
+import type { Source } from "../../domain/entities/Source";
 
 export class MonumentRepository implements IMonumentRepository {
   private db: DrizzleD1Database;
@@ -121,7 +132,7 @@ export class MonumentRepository implements IMonumentRepository {
     }
 
     const results = await query.limit(limit).offset(offset);
-    return results.map((row) => this.convertToMonument(row));
+    return Promise.all(results.map(async (row) => this.convertToMonumentWithRelations(row)));
   }
 
   async getById(id: number): Promise<Monument | null> {
@@ -135,7 +146,7 @@ export class MonumentRepository implements IMonumentRepository {
       return null;
     }
 
-    return this.convertToMonument(result[0]);
+    return this.convertToMonumentWithRelations(result[0]);
   }
 
   async getByPoetId(poetId: number): Promise<Monument[]> {
@@ -162,7 +173,7 @@ export class MonumentRepository implements IMonumentRepository {
       )
       .where(eq(poemAttributions.poetId, poetId));
 
-    return results.map((row) => this.convertToMonument(row));
+    return Promise.all(results.map(async (row) => this.convertToMonumentWithRelations(row)));
   }
 
   async getByLocationId(locationId: number): Promise<Monument[]> {
@@ -184,7 +195,7 @@ export class MonumentRepository implements IMonumentRepository {
       )
       .where(eq(monumentLocations.locationId, locationId));
 
-    return results.map((row) => this.convertToMonument(row));
+    return Promise.all(results.map(async (row) => this.convertToMonumentWithRelations(row)));
   }
 
   async getBySourceId(sourceId: number): Promise<Monument[]> {
@@ -203,7 +214,7 @@ export class MonumentRepository implements IMonumentRepository {
       .innerJoin(inscriptions, eq(monuments.id, inscriptions.monumentId))
       .where(eq(inscriptions.sourceId, sourceId));
 
-    return results.map((row) => this.convertToMonument(row));
+    return Promise.all(results.map(async (row) => this.convertToMonumentWithRelations(row)));
   }
 
   async getByCoordinates(
@@ -240,7 +251,7 @@ export class MonumentRepository implements IMonumentRepository {
         ) <= ${radius}`,
       );
 
-    return results.map((row) => this.convertToMonument(row));
+    return Promise.all(results.map(async (row) => this.convertToMonumentWithRelations(row)));
   }
 
   async create(input: CreateMonumentInput): Promise<Monument> {
@@ -326,6 +337,258 @@ export class MonumentRepository implements IMonumentRepository {
       .where(eq(locations.prefecture, prefecture));
 
     return result[0].count;
+  }
+
+  private async convertToMonumentWithRelations(row: {
+    id: number;
+    canonicalName: string;
+    monumentType: string | null;
+    monumentTypeUri: string | null;
+    material: string | null;
+    materialUri: string | null;
+    createdAt: string;
+    updatedAt: string;
+  }): Promise<Monument> {
+    const relatedInscriptions = await this.db
+      .select()
+      .from(inscriptions)
+      .where(eq(inscriptions.monumentId, row.id));
+
+    const inscriptionsWithPoems = await Promise.all(
+      relatedInscriptions.map(async (inscription) => {
+        const relatedPoems = await this.db
+          .select({
+            id: poems.id,
+            text: poems.text,
+            normalizedText: poems.normalizedText,
+            textHash: poems.textHash,
+            kigo: poems.kigo,
+            season: poems.season,
+            createdAt: poems.createdAt,
+            updatedAt: poems.updatedAt,
+          })
+          .from(poems)
+          .innerJoin(inscriptionPoems, eq(poems.id, inscriptionPoems.poemId))
+          .where(eq(inscriptionPoems.inscriptionId, inscription.id));
+
+        const inscriptionSource = inscription.sourceId
+          ? await this.db
+              .select()
+              .from(sources)
+              .where(eq(sources.id, inscription.sourceId))
+              .limit(1)
+          : [];
+
+        return {
+          id: inscription.id,
+          monumentId: inscription.monumentId,
+          side: inscription.side,
+          originalText: inscription.originalText,
+          transliteration: inscription.transliteration,
+          reading: inscription.reading,
+          language: inscription.language ?? "ja",
+          notes: inscription.notes,
+          sourceId: inscription.sourceId,
+          poems: relatedPoems.map(poem => ({
+            id: poem.id,
+            text: poem.text,
+            normalizedText: poem.normalizedText,
+            textHash: poem.textHash,
+            kigo: poem.kigo,
+            season: poem.season,
+            attributions: null,
+            inscriptions: null,
+            createdAt: this.convertToISOString(poem.createdAt),
+            updatedAt: this.convertToISOString(poem.updatedAt),
+          })),
+          monument: null,
+          source: inscriptionSource.length > 0
+            ? {
+                id: inscriptionSource[0].id,
+                citation: inscriptionSource[0].citation,
+                author: inscriptionSource[0].author,
+                title: inscriptionSource[0].title,
+                publisher: inscriptionSource[0].publisher,
+                sourceYear: inscriptionSource[0].sourceYear,
+                url: inscriptionSource[0].url,
+                monuments: null,
+                createdAt: this.convertToISOString(inscriptionSource[0].createdAt),
+                updatedAt: this.convertToISOString(inscriptionSource[0].updatedAt),
+              }
+            : null,
+          createdAt: this.convertToISOString(inscription.createdAt),
+          updatedAt: this.convertToISOString(inscription.updatedAt),
+        };
+      })
+    );
+
+    const relatedEvents = await this.db
+      .select()
+      .from(events)
+      .where(eq(events.monumentId, row.id));
+
+    const eventsWithSources = await Promise.all(
+      relatedEvents.map(async (event) => {
+        const eventSource = event.sourceId
+          ? await this.db
+              .select()
+              .from(sources)
+              .where(eq(sources.id, event.sourceId))
+              .limit(1)
+          : [];
+
+        return {
+          id: event.id,
+          monumentId: event.monumentId,
+          eventType: event.eventType,
+          huTimeNormalized: event.huTimeNormalized,
+          intervalStart: event.intervalStart,
+          intervalEnd: event.intervalEnd,
+          uncertaintyNote: event.uncertaintyNote,
+          actor: event.actor,
+          sourceId: event.sourceId,
+          source: eventSource.length > 0
+            ? {
+                id: eventSource[0].id,
+                citation: eventSource[0].citation,
+                author: eventSource[0].author,
+                title: eventSource[0].title,
+                publisher: eventSource[0].publisher,
+                sourceYear: eventSource[0].sourceYear,
+                url: eventSource[0].url,
+                monuments: null,
+                createdAt: this.convertToISOString(eventSource[0].createdAt),
+                updatedAt: this.convertToISOString(eventSource[0].updatedAt),
+              }
+            : null,
+          createdAt: this.convertToISOString(event.createdAt),
+        };
+      })
+    );
+
+    const relatedMedia = await this.db
+      .select()
+      .from(media)
+      .where(eq(media.monumentId, row.id));
+
+    const relatedLocations = await this.db
+      .select({
+        id: locations.id,
+        imiPrefCode: locations.imiPrefCode,
+        region: locations.region,
+        prefecture: locations.prefecture,
+        municipality: locations.municipality,
+        address: locations.address,
+        placeName: locations.placeName,
+        latitude: locations.latitude,
+        longitude: locations.longitude,
+        geohash: locations.geohash,
+        geomGeojson: locations.geomGeojson,
+        accuracyM: locations.accuracyM,
+        createdAt: locations.createdAt,
+        updatedAt: locations.updatedAt,
+      })
+      .from(locations)
+      .innerJoin(monumentLocations, eq(locations.id, monumentLocations.locationId))
+      .where(eq(monumentLocations.monumentId, row.id));
+
+    const relatedPoets = await this.db
+      .select({
+        id: poets.id,
+        name: poets.name,
+        nameKana: poets.nameKana,
+        biography: poets.biography,
+        birthYear: poets.birthYear,
+        deathYear: poets.deathYear,
+        linkUrl: poets.linkUrl,
+        imageUrl: poets.imageUrl,
+        createdAt: poets.createdAt,
+        updatedAt: poets.updatedAt,
+      })
+      .from(poets)
+      .innerJoin(poemAttributions, eq(poets.id, poemAttributions.poetId))
+      .innerJoin(poems, eq(poemAttributions.poemId, poems.id))
+      .innerJoin(inscriptionPoems, eq(poems.id, inscriptionPoems.poemId))
+      .innerJoin(inscriptions, eq(inscriptionPoems.inscriptionId, inscriptions.id))
+      .where(eq(inscriptions.monumentId, row.id));
+
+    const relatedSources = await this.db
+      .select()
+      .from(sources)
+      .innerJoin(inscriptions, eq(sources.id, inscriptions.sourceId))
+      .where(eq(inscriptions.monumentId, row.id));
+
+    return {
+      id: row.id,
+      canonicalName: row.canonicalName,
+      canonicalUri: `https://api.kuhiapi.com/monuments/${row.id}`,
+      monumentType: row.monumentType ?? null,
+      monumentTypeUri: row.monumentTypeUri ?? null,
+      material: row.material ?? null,
+      materialUri: row.materialUri ?? null,
+      createdAt: this.convertToISOString(row.createdAt),
+      updatedAt: this.convertToISOString(row.updatedAt),
+      inscriptions: inscriptionsWithPoems,
+      events: eventsWithSources,
+      media: relatedMedia.map(mediaItem => ({
+        id: mediaItem.id,
+        monumentId: mediaItem.monumentId,
+        mediaType: mediaItem.mediaType,
+        url: mediaItem.url,
+        iiifManifestUrl: mediaItem.iiifManifestUrl,
+        capturedAt: mediaItem.capturedAt,
+        photographer: mediaItem.photographer,
+        license: mediaItem.license,
+        exifJson: mediaItem.exifJson,
+        createdAt: this.convertToISOString(mediaItem.createdAt),
+        updatedAt: this.convertToISOString(mediaItem.updatedAt),
+      })),
+      locations: relatedLocations.map(location => ({
+        id: location.id,
+        imiPrefCode: location.imiPrefCode,
+        region: location.region,
+        prefecture: location.prefecture,
+        municipality: location.municipality,
+        address: location.address,
+        placeName: location.placeName,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        geohash: location.geohash,
+        geomGeojson: location.geomGeojson,
+        accuracyM: location.accuracyM,
+        createdAt: this.convertToISOString(location.createdAt),
+        updatedAt: this.convertToISOString(location.updatedAt),
+      })),
+      poets: relatedPoets.map(poet => ({
+        id: poet.id,
+        name: poet.name,
+        nameKana: poet.nameKana,
+        biography: poet.biography,
+        birthYear: poet.birthYear,
+        deathYear: poet.deathYear,
+        linkUrl: poet.linkUrl,
+        imageUrl: poet.imageUrl,
+        createdAt: this.convertToISOString(poet.createdAt),
+        updatedAt: this.convertToISOString(poet.updatedAt),
+      })),
+      sources: relatedSources.map(sourceResult => ({
+        id: sourceResult.sources.id,
+        citation: sourceResult.sources.citation,
+        author: sourceResult.sources.author,
+        title: sourceResult.sources.title,
+        publisher: sourceResult.sources.publisher,
+        sourceYear: sourceResult.sources.sourceYear,
+        url: sourceResult.sources.url,
+        monuments: null,
+        createdAt: this.convertToISOString(sourceResult.sources.createdAt),
+        updatedAt: this.convertToISOString(sourceResult.sources.updatedAt),
+      })),
+      originalEstablishedDate: null,
+      huTimeNormalized: null,
+      intervalStart: null,
+      intervalEnd: null,
+      uncertaintyNote: null,
+    };
   }
 
   private convertToMonument(row: {
