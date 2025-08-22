@@ -1,4 +1,5 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { Hono } from "hono";
 import { corsMiddleware } from "./interfaces/middlewares/corsMiddleware";
 import {errorHandler }  from "./interfaces/middlewares/errorHandler";
 import { requestLogger } from "./interfaces/middlewares/requestLogger";
@@ -10,6 +11,7 @@ import poemsRoutes from "./interfaces/routes/poemsRoutes";
 import poetsRoutes from "./interfaces/routes/poetsRoutes";
 import sourcesRoutes from "./interfaces/routes/sourcesRoutes";
 import type { Env } from "./types/env";
+import { swaggerUI } from "@hono/swagger-ui";
 
 const openApiSpec = {
   openapi: "3.0.3",
@@ -53,13 +55,11 @@ app.route("/sources", sourcesRoutes);
 
 app.doc("/docs/json", openApiSpec);
 
-app.get("/docs", (c) => {
-  return c.json({
-    message: "API Documentation",
-    openapi_spec_url: "/docs/json",
-    description: "Use the /docs/json endpoint to get the OpenAPI specification",
-    swagger_ui: "Use external Swagger UI tool with the /docs/json URL"
-  });
+const docsApp = new Hono<{ Bindings: Env }>();
+docsApp.get("/docs", swaggerUI({ url: "/docs/json" }));
+
+app.use("/docs", async (c, next) => {
+  return await docsApp.fetch(c.req.raw, c.env);
 });
 
 app.all("*", (ctx) => ctx.json({ error: "Not Found" }, 404));
