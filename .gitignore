@@ -36,3 +36,4 @@ lerna-debug.log*
 .cursor
 coverage/
 .github/instructions
+scripts/
