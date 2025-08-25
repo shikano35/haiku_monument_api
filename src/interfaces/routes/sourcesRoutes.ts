@@ -1,11 +1,13 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import { convertKeysToCamelCase } from "../../utils/convertKeysToCamelCase";
-import { convertKeysToSnakeCase } from "../../utils/convertKeysToSnakeCase";
 import { parseQueryParams } from "../../utils/parseQueryParams";
-import type { SourceResponse } from "../dtos/SourceResponse";
+import type { SourceDetail } from "../dtos/SourceResponse";
+import {
+  SourceBaseSchema,
+  SourceDetailSchema,
+  SourceQuerySchema,
+} from "../dtos/SourceResponse";
 import { createRouter } from "./commonRouter";
 import { createUseCases } from "./createUseCases";
-import type { HaikuMonument } from "../../domain/entities/HaikuMonument";
 
 const idParamSchema = z
   .object({
@@ -103,66 +105,42 @@ const sourcesQuerySchema = z.object({
     }),
 });
 
-const createSourceSchema = z.object({
-  title: z
-    .string()
-    .min(1, "タイトルは必須です")
-    .max(255, "タイトルが長すぎます"),
-  author: z.string().optional().nullable(),
-  source_year: z.number().optional().nullable(),
-  url: z.string().optional().nullable(),
-  publisher: z.string().optional().nullable(),
-});
-
-const updateSourceSchema = z.object({
-  title: z
-    .string()
-    .min(1, "タイトルは必須です")
-    .max(255, "タイトルが長すぎます")
-    .optional(),
-  author: z.string().optional().nullable(),
-  source_year: z.number().optional().nullable(),
-  url: z.string().optional().nullable(),
-  publisher: z.string().optional().nullable(),
-});
-
 const router = createRouter();
 
 const getAllSourcesRoute = createRoute({
   method: "get",
   tags: ["sources"],
   path: "/",
-  request: { query: sourcesQuerySchema },
+  request: { query: SourceQuerySchema },
   responses: {
     200: {
       description: "情報源一覧の取得に成功しました",
       content: {
         "application/json": {
-          schema: z.array(
-            z.object({
-              id: z.number(),
-              title: z.string(),
-              author: z.string().nullable(),
-              source_year: z.number().nullable(),
-              url: z.string().nullable(),
-              publisher: z.string().nullable(),
-              created_at: z.string(),
-              updated_at: z.string(),
-            }),
-          ),
+          schema: z.array(SourceBaseSchema),
         },
       },
     },
   },
 });
 router.openapi(getAllSourcesRoute, async (c) => {
-  const queryParams = parseQueryParams(new URLSearchParams(c.req.query()));
+  const queryParams = parseQueryParams(c.req.url);
   const { sourceUseCases } = createUseCases(c.env, "sources");
   const sources = await sourceUseCases.getAllSources(queryParams);
-  const snakeSources = convertKeysToSnakeCase(
-    sources,
-  ) as unknown as SourceResponse[];
-  return c.json(snakeSources);
+
+  const convertedSources = sources.map((source) => ({
+    id: source.id,
+    citation: source.citation,
+    author: source.author,
+    publisher: source.publisher,
+    source_year: source.sourceYear,
+    title: source.title,
+    url: source.url,
+    created_at: source.createdAt,
+    updated_at: source.updatedAt,
+  }));
+
+  return c.json(convertedSources);
 });
 
 const getSourceByIdRoute = createRoute({
@@ -175,16 +153,7 @@ const getSourceByIdRoute = createRoute({
       description: "情報源詳細の取得に成功しました",
       content: {
         "application/json": {
-          schema: z.object({
-            id: z.number(),
-            title: z.string(),
-            author: z.string().nullable(),
-            source_year: z.number().nullable(),
-            url: z.string().nullable(),
-            publisher: z.string().nullable(),
-            created_at: z.string(),
-            updated_at: z.string(),
-          }),
+          schema: SourceDetailSchema,
         },
       },
     },
@@ -196,128 +165,44 @@ router.openapi(getSourceByIdRoute, async (c) => {
   const { sourceUseCases } = createUseCases(c.env, "sources");
   const source = await sourceUseCases.getSourceById(id);
   if (!source) return c.json({ error: "情報源が見つかりません" }, 404);
-  const snakeSource = convertKeysToSnakeCase(
-    source,
-  ) as unknown as SourceResponse;
+  const snakeSource: SourceDetail = {
+    id: source.id,
+    citation: source.citation,
+    author: source.author,
+    title: source.title,
+    publisher: source.publisher,
+    source_year: source.sourceYear,
+    url: source.url,
+    created_at: source.createdAt,
+    updated_at: source.updatedAt,
+    monuments:
+      source.monuments?.map((monument) => ({
+        id: monument.id,
+        canonical_name: monument.canonicalName,
+        canonical_uri:
+          monument.canonicalUri ||
+          `https://api.kuhiapi.com/monuments/${monument.id}`,
+        monument_type: monument.monumentType,
+        monument_type_uri: monument.monumentTypeUri,
+        material: monument.material,
+        material_uri: monument.materialUri,
+        created_at: monument.createdAt,
+        updated_at: monument.updatedAt,
+        original_established_date: monument.originalEstablishedDate,
+        hu_time_normalized: monument.huTimeNormalized,
+        interval_start: monument.intervalStart,
+        interval_end: monument.intervalEnd,
+        uncertainty_note: monument.uncertaintyNote,
+      })) || [],
+  };
   return c.json(snakeSource);
 });
 
-// const createSourceRoute = createRoute({
-//   method: 'post',
-//   tags: ['sources'],
-//   path: '/',
-//   request: {
-//     body: {
-//       content: { 'application/json': { schema: createSourceSchema } },
-//       required: true,
-//       description: '情報源の作成',
-//     },
-//   },
-//   responses: {
-//     201: {
-//       description: '情報源が作成されました',
-//       content: {
-//         'application/json': {
-//           schema: z.object({
-//             id: z.number(),
-//             title: z.string(),
-//             author: z.string().nullable(),
-//             year: z.number().nullable(),
-//             url: z.string().nullable(),
-//             publisher: z.string().nullable(),
-//             created_at: z.string(),
-//             updated_at: z.string(),
-//           }),
-//         },
-//       },
-//     },
-//   },
-// });
-// router.openapi(createSourceRoute, async (c) => {
-//   const rawPayload = c.req.valid('json');
-//   const payload = convertKeysToCamelCase(rawPayload);
-//   const { sourceUseCases } = createUseCases(c.env, 'sources');
-//   const created = await sourceUseCases.createSource(payload);
-//   const snakeCreated = convertKeysToSnakeCase(created) as unknown as SourceResponse;
-//   return c.json(snakeCreated, 201);
-// });
-
-// const updateSourceRoute = createRoute({
-//   method: 'put',
-//   tags: ['sources'],
-//   path: '/{id}',
-//   request: {
-//     params: idParamSchema,
-//     body: {
-//       content: { 'application/json': { schema: updateSourceSchema } },
-//       required: true,
-//       description: '情報源の更新',
-//     },
-//   },
-//   responses: {
-//     200: {
-//       description: '情報源が更新されました',
-//       content: {
-//         'application/json': {
-//           schema: z.object({
-//             id: z.number(),
-//             title: z.string(),
-//             author: z.string().nullable(),
-//             year: z.number().nullable(),
-//             url: z.string().nullable(),
-//             publisher: z.string().nullable(),
-//             created_at: z.string(),
-//             updated_at: z.string(),
-//           }),
-//         },
-//       },
-//     },
-//     404: { description: '情報源が見つかりません' },
-//   },
-// });
-// router.openapi(updateSourceRoute, async (c) => {
-//   const { id } = c.req.valid('param');
-//   const rawPayload = c.req.valid('json');
-//   const payload = convertKeysToCamelCase(rawPayload);
-//   const { sourceUseCases } = createUseCases(c.env, 'sources');
-//   const updated = await sourceUseCases.updateSource(id, payload);
-//   if (!updated) return c.json({ error: '情報源が見つかりません' }, 404);
-//   const snakeUpdated = convertKeysToSnakeCase(updated) as unknown as SourceResponse;
-//   return c.json(snakeUpdated);
-// });
-
-// const deleteSourceRoute = createRoute({
-//   method: 'delete',
-//   tags: ['sources'],
-//   path: '/{id}',
-//   request: { params: idParamSchema },
-//   responses: {
-//     200: {
-//       description: '情報源が削除されました',
-//       content: {
-//         'application/json': {
-//           schema: z.object({
-//             id: z.number(),
-//             message: z.string(),
-//           }),
-//         },
-//       },
-//     },
-//     404: { description: '句碑の情報源が見つかりません' },
-//   },
-// });
-// router.openapi(deleteSourceRoute, async (c) => {
-//   const { id } = c.req.valid('param');
-//   const { sourceUseCases } = createUseCases(c.env, 'sources');
-//   const success = await sourceUseCases.deleteSource(id);
-//   if (!success) return c.json({ error: '句碑の情報源が見つかりません' }, 404);
-//   return c.json({ id, message: '句碑の情報源が正常に削除されました' });
-// });
-
-const getSourceHaikuMonumentsRoute = createRoute({
+// GET /sources/:id/monuments
+const getSourceMonumentsRoute = createRoute({
   method: "get",
   tags: ["sources"],
-  path: "/{id}/haiku-monuments",
+  path: "/{id}/monuments",
   request: { params: idParamSchema },
   responses: {
     200: {
@@ -327,62 +212,17 @@ const getSourceHaikuMonumentsRoute = createRoute({
           schema: z.array(
             z.object({
               id: z.number(),
-              inscription: z.string(),
-              commentary: z.string().nullable(),
-              kigo: z.string().nullable(),
-              season: z.string().nullable(),
-              is_reliable: z.boolean().nullable(),
-              has_reverse_inscription: z.boolean().nullable(),
-              material: z.string().nullable(),
-              total_height: z.number().nullable(),
-              width: z.number().nullable(),
-              depth: z.number().nullable(),
-              established_date: z.string().nullable(),
-              established_year: z.number().nullable(),
-              founder: z.string().nullable(),
+              canonical_name: z.string(),
+              canonical_uri: z.string(),
               monument_type: z.string().nullable(),
-              designation_status: z.string().nullable(),
-              photo_url: z.string().nullable(),
-              photo_date: z.string().nullable(),
-              photographer: z.string().nullable(),
-              model3d_url: z.string().nullable(),
-              remarks: z.string().nullable(),
+              material: z.string().nullable(),
               created_at: z.string(),
               updated_at: z.string(),
-              poets: z.array(
-                z.object({
-                  id: z.number(),
-                  name: z.string(),
-                  biography: z.string().nullable(),
-                  links: z.string().nullable(),
-                  image_url: z.string().nullable(),
-                  created_at: z.string(),
-                  updated_at: z.string(),
-                }),
-              ),
-              sources: z.array(
-                z.object({
-                  id: z.number(),
-                  title: z.string(),
-                  author: z.string().nullable(),
-                  publisher: z.string().nullable(),
-                  year: z.number().nullable(),
-                  url: z.string().nullable(),
-                  created_at: z.string(),
-                  updated_at: z.string(),
-                }),
-              ),
-              locations: z.array(
-                z.object({
-                  id: z.number(),
-                  prefecture: z.string(),
-                  region: z.string().nullable(),
-                  address: z.string().nullable(),
-                  name: z.string().nullable(),
-                  latitude: z.number(),
-                  longitude: z.number(),
-                }),
-              ),
+              original_established_date: z.string().nullable(),
+              hu_time_normalized: z.string().nullable(),
+              interval_start: z.string().nullable(),
+              interval_end: z.string().nullable(),
+              uncertainty_note: z.string().nullable(),
             }),
           ),
         },
@@ -391,76 +231,26 @@ const getSourceHaikuMonumentsRoute = createRoute({
     400: { description: "無効なIDです" },
   },
 });
-router.openapi(getSourceHaikuMonumentsRoute, async (c) => {
+router.openapi(getSourceMonumentsRoute, async (c) => {
   const { id } = c.req.valid("param");
-  const { monumentUseCases } = createUseCases(c.env, "haikuMonuments");
-  const monuments: HaikuMonument[] =
-    await monumentUseCases.getHaikuMonumentsBySource(id);
+  const { monumentUseCases } = createUseCases(c.env, "monuments");
+  const monuments = await monumentUseCases.getMonumentsBySource(id);
 
   const convertedMonuments = monuments.map((monument) => ({
     id: monument.id,
-    inscription: monument.inscription,
-    commentary: monument.commentary,
-    kigo: monument.kigo,
-    season: monument.season,
-    is_reliable: monument.isReliable,
-    has_reverse_inscription: monument.hasReverseInscription,
-    material: monument.material,
-    total_height: monument.totalHeight,
-    width: monument.width,
-    depth: monument.depth,
-    established_date: monument.establishedDate,
-    established_year: monument.establishedYear,
-    founder: monument.founder,
+    canonical_name: monument.canonicalName,
+    canonical_uri:
+      monument.canonicalUri ||
+      `https://api.kuhiapi.com/monuments/${monument.id}`,
     monument_type: monument.monumentType,
-    designation_status: monument.designationStatus,
-    photo_url: monument.photoUrl,
-    photo_date: monument.photoDate,
-    photographer: monument.photographer,
-    model3d_url: monument.model3dUrl,
-    remarks: monument.remarks,
-    created_at: monument.createdAt ?? "",
-    updated_at: monument.updatedAt ?? "",
-    poets: monument.poet
-      ? [
-          {
-            id: monument.poet.id,
-            name: monument.poet.name,
-            biography: monument.poet.biography ?? null,
-            link_url: monument.poet.linkUrl ?? null,
-            image_url: monument.poet.imageUrl ?? null,
-            created_at: monument.poet.createdAt ?? "",
-            updated_at: monument.poet.updatedAt ?? "",
-          },
-        ]
-      : [],
-    sources: monument.source
-      ? [
-          {
-            id: monument.source.id,
-            title: monument.source.title,
-            author: monument.source.author ?? null,
-            publisher: monument.source.publisher ?? null,
-            source_year: monument.source.sourceYear ?? null,
-            url: monument.source.url ?? null,
-            created_at: monument.source.createdAt ?? "",
-            updated_at: monument.source.updatedAt ?? "",
-          },
-        ]
-      : [],
-    locations: monument.location
-      ? [
-          {
-            id: monument.location.id,
-            prefecture: monument.location.prefecture,
-            region: monument.location.region ?? null,
-            address: monument.location.address ?? null,
-            place_name: monument.location.placeName ?? null,
-            latitude: monument.location.latitude ?? 0,
-            longitude: monument.location.longitude ?? 0,
-          },
-        ]
-      : [],
+    material: monument.material,
+    created_at: monument.createdAt,
+    updated_at: monument.updatedAt,
+    original_established_date: monument.originalEstablishedDate,
+    hu_time_normalized: monument.huTimeNormalized,
+    interval_start: monument.intervalStart,
+    interval_end: monument.intervalEnd,
+    uncertainty_note: monument.uncertaintyNote,
   }));
 
   return c.json(convertedMonuments);

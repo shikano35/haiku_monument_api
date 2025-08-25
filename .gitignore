@@ -35,3 +35,5 @@ lerna-debug.log*
 .DS_Store
 .cursor
 coverage/
+.github/instructions
+scripts/

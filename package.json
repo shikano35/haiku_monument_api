@@ -18,7 +18,7 @@
     "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^22.13.4",
     "dotenv": "^16.4.7",
-    "drizzle-orm": "^0.39.1",
+    "drizzle-orm": "^0.44.4",
     "hono": "^4.6.8",
     "miniflare": "^3.20250129.0",
     "vitest": "2.1.9"
@@ -27,8 +27,9 @@
     "@biomejs/biome": "1.9.4",
     "@cloudflare/workers-types": "^4.20250204.0",
     "@vitest/coverage-v8": "2.1.8",
-    "drizzle-kit": "^0.30.4",
+    "drizzle-kit": "^0.30.6",
     "tsx": "^4.19.2",
+    "typescript": "^5.9.2",
     "wrangler": "^4.15.2"
   },
   "type": "module",

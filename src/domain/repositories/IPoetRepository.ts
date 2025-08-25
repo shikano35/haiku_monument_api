@@ -1,10 +1,15 @@
-import type { Poet, CreatePoetInput } from "../entities/Poet";
-import type { QueryParams } from "../common/QueryParams";
+import type { Poet, CreatePoetInput, UpdatePoetInput } from "../entities/Poet";
+import type { PoetQueryParams } from "../common/QueryParams";
 
-export type IPoetRepository = {
-  getAll(queryParams: QueryParams): Promise<Poet[]>;
+export interface IPoetRepository {
+  getAll(queryParams?: PoetQueryParams): Promise<Poet[]>;
   getById(id: number): Promise<Poet | null>;
+  getByName(name: string): Promise<Poet[]>;
+  getByNameContains(nameFragment: string): Promise<Poet[]>;
+  getByBirthYear(birthYear: number): Promise<Poet[]>;
+  getByBirthYearRange(startYear: number, endYear: number): Promise<Poet[]>;
   create(poet: CreatePoetInput): Promise<Poet>;
-  update(id: number, poetData: Partial<Poet>): Promise<Poet | null>;
+  update(id: number, poetData: UpdatePoetInput): Promise<Poet | null>;
   delete(id: number): Promise<boolean>;
-};
+  count(): Promise<number>;
+}
