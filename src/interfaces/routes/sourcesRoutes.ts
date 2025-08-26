@@ -150,8 +150,7 @@ router.openapi(getSourceMonumentsRoute, async (c) => {
     id: monument.id,
     canonical_name: monument.canonicalName,
     canonical_uri:
-      monument.canonicalUri ||
-      `https://api.kuhi.jp/monuments/${monument.id}`,
+      monument.canonicalUri || `https://api.kuhi.jp/monuments/${monument.id}`,
     monument_type: monument.monumentType,
     material: monument.material,
     created_at: monument.createdAt,
