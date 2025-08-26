@@ -77,21 +77,6 @@ const inscriptionsQuerySchema = z.object({
     }),
 });
 
-// Inscription変換関数
-const convertInscriptionToBaseResponse = (inscription: Inscription) => ({
-  id: inscription.id,
-  monument_id: inscription.monumentId,
-  side: inscription.side,
-  original_text: inscription.originalText,
-  transliteration: inscription.transliteration,
-  reading: inscription.reading,
-  language: inscription.language,
-  notes: inscription.notes,
-  source_id: inscription.sourceId,
-  created_at: inscription.createdAt,
-  updated_at: inscription.updatedAt,
-});
-
 const convertInscriptionToResponse = (inscription: Inscription) => ({
   id: inscription.id,
   monument_id: inscription.monumentId,
@@ -121,7 +106,7 @@ const convertInscriptionToResponse = (inscription: Inscription) => ({
         canonical_name: inscription.monument.canonicalName,
         canonical_uri:
           inscription.monument.canonicalUri ||
-          `https://api.kuhiapi.com/monuments/${inscription.monument.id}`,
+          `https://api.kuhi.jp/monuments/${inscription.monument.id}`,
         monument_type: inscription.monument.monumentType,
         monument_type_uri: inscription.monument.monumentTypeUri,
         material: inscription.monument.material,

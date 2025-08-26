@@ -17,17 +17,6 @@ const idParamSchema = z
   })
   .openapi({ param: { name: "id", in: "path" } });
 
-const convertPoemToBaseResponse = (poem: Poem) => ({
-  id: poem.id,
-  text: poem.text,
-  normalized_text: poem.normalizedText,
-  text_hash: poem.textHash,
-  kigo: poem.kigo,
-  season: poem.season,
-  created_at: poem.createdAt,
-  updated_at: poem.updatedAt,
-});
-
 const convertPoemToResponse = (poem: Poem) => ({
   id: poem.id,
   text: poem.text,

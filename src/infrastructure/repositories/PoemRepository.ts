@@ -32,7 +32,7 @@ export class PoemRepository implements IPoemRepository {
     const offset = paramOffset ?? 0;
     const ordering = paramOrdering ?? [];
 
-    let baseQuery = this.db.select().from(poems);
+    const baseQuery = this.db.select().from(poems);
 
     const conditions = [];
 

@@ -87,7 +87,7 @@ export class InscriptionRepository implements IInscriptionRepository {
     });
 
     // クエリ構築
-    let results;
+    let results: (typeof inscriptions.$inferSelect)[];
     if (conditions.length > 0 && orderClauses.length > 0) {
       results = await this.db
         .select()
@@ -287,7 +287,7 @@ export class InscriptionRepository implements IInscriptionRepository {
           ? {
               id: relatedMonument[0].id,
               canonicalName: relatedMonument[0].canonicalName,
-              canonicalUri: `https://api.kuhiapi.com/monuments/${relatedMonument[0].id}`,
+              canonicalUri: `https://api.kuhi.jp/monuments/${relatedMonument[0].id}`,
               monumentType: relatedMonument[0].monumentType,
               monumentTypeUri: relatedMonument[0].monumentTypeUri,
               material: relatedMonument[0].material,

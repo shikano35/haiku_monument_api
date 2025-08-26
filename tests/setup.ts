@@ -35,7 +35,7 @@ export async function stopWorker() {
 export async function resetDb() {
   const maxRetries = isGithubActions ? 10 : 5;
   const retryDelay = isGithubActions ? 1000 : 300;
-  let lastErr;
+  let lastErr: unknown;
 
   for (let i = 0; i < maxRetries; i++) {
     try {
@@ -64,7 +64,7 @@ export async function resetDb() {
       }
 
       if (i === maxRetries - 1) {
-        throw new Error("DBリセットに失敗しました: " + (e as Error).message);
+        throw new Error(`DBリセットに失敗しました: ${(e as Error).message}`);
       }
 
       await new Promise((resolve) => setTimeout(resolve, retryDelay));
@@ -72,6 +72,6 @@ export async function resetDb() {
   }
 
   throw new Error(
-    "DBリセットに失敗しました（リトライ上限）: " + (lastErr as Error).message,
+    `DBリセットに失敗しました（リトライ上限）: ${(lastErr as Error).message}`,
   );
 }

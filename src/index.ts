@@ -20,11 +20,11 @@ const openApiSpec = {
     version: "2.0.0",
     description: `このAPIは句碑の情報を提供します。
 
-APIの概要については、[句碑APIドキュメント](https://developers.kuhiapi.com)をご参照ください。`,
+APIの概要については、[句碑APIドキュメント](https://developers.kuhi.jp)をご参照ください。`,
   },
   servers: [
     {
-      url: "https://api.kuhiapi.com",
+      url: "https://api.kuhi.jp",
       description: "Production server",
     },
   ],
@@ -58,7 +58,7 @@ app.doc("/docs/json", openApiSpec);
 const docsApp = new Hono<{ Bindings: Env }>();
 docsApp.get("/docs", swaggerUI({ url: "/docs/json" }));
 
-app.use("/docs", async (c, next) => {
+app.use("/docs", async (c) => {
   return await docsApp.fetch(c.req.raw, c.env);
 });
 
