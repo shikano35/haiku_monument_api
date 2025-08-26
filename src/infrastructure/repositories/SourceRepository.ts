@@ -302,7 +302,7 @@ export class SourceRepository implements ISourceRepository {
       monuments: relatedMonuments.map((monument) => ({
         id: monument.id,
         canonicalName: monument.canonicalName,
-        canonicalUri: `https://api.kuhiapi.com/monuments/${monument.id}`,
+        canonicalUri: `https://api.kuhi.jp/monuments/${monument.id}`,
         monumentType: monument.monumentType,
         monumentTypeUri: monument.monumentTypeUri,
         material: monument.material,

@@ -20,11 +20,11 @@ const openApiSpec = {
     version: "2.0.0",
     description: `このAPIは句碑の情報を提供します。
 
-APIの概要については、[句碑APIドキュメント](https://developers.kuhiapi.com)をご参照ください。`,
+APIの概要については、[句碑APIドキュメント](https://developers.kuhi.jp)をご参照ください。`,
   },
   servers: [
     {
-      url: "https://api.kuhiapi.com",
+      url: "https://api.kuhi.jp",
       description: "Production server",
     },
   ],

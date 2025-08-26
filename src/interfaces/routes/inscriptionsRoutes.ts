@@ -121,7 +121,7 @@ const convertInscriptionToResponse = (inscription: Inscription) => ({
         canonical_name: inscription.monument.canonicalName,
         canonical_uri:
           inscription.monument.canonicalUri ||
-          `https://api.kuhiapi.com/monuments/${inscription.monument.id}`,
+          `https://api.kuhi.jp/monuments/${inscription.monument.id}`,
         monument_type: inscription.monument.monumentType,
         monument_type_uri: inscription.monument.monumentTypeUri,
         material: inscription.monument.material,

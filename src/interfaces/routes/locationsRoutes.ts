@@ -237,7 +237,7 @@ router.openapi(getLocationMonumentsRoute, async (c) => {
     canonical_name: monument.canonicalName,
     canonical_uri:
       monument.canonicalUri ||
-      `https://api.kuhiapi.com/monuments/${monument.id}`,
+      `https://api.kuhi.jp/monuments/${monument.id}`,
     monument_type: monument.monumentType,
     material: monument.material,
     created_at: monument.createdAt,

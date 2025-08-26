@@ -181,7 +181,7 @@ router.openapi(getSourceByIdRoute, async (c) => {
         canonical_name: monument.canonicalName,
         canonical_uri:
           monument.canonicalUri ||
-          `https://api.kuhiapi.com/monuments/${monument.id}`,
+          `https://api.kuhi.jp/monuments/${monument.id}`,
         monument_type: monument.monumentType,
         monument_type_uri: monument.monumentTypeUri,
         material: monument.material,
@@ -241,7 +241,7 @@ router.openapi(getSourceMonumentsRoute, async (c) => {
     canonical_name: monument.canonicalName,
     canonical_uri:
       monument.canonicalUri ||
-      `https://api.kuhiapi.com/monuments/${monument.id}`,
+      `https://api.kuhi.jp/monuments/${monument.id}`,
     monument_type: monument.monumentType,
     material: monument.material,
     created_at: monument.createdAt,

@@ -543,7 +543,7 @@ export class MonumentRepository implements IMonumentRepository {
     return {
       id: row.id,
       canonicalName: row.canonicalName,
-      canonicalUri: `https://api.kuhiapi.com/monuments/${row.id}`,
+      canonicalUri: `https://api.kuhi.jp/monuments/${row.id}`,
       monumentType: row.monumentType ?? null,
       monumentTypeUri: row.monumentTypeUri ?? null,
       material: row.material ?? null,

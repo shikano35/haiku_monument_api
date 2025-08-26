@@ -25,7 +25,7 @@ const convertMonumentToResponse = (monument: Monument): MonumentDetail => ({
   id: monument.id,
   canonical_name: monument.canonicalName,
   canonical_uri:
-    monument.canonicalUri || `https://api.kuhiapi.com/monuments/${monument.id}`,
+    monument.canonicalUri || `https://api.kuhi.jp/monuments/${monument.id}`,
   monument_type: monument.monumentType,
   monument_type_uri: monument.monumentTypeUri,
   material: monument.material,
