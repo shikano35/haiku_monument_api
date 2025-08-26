@@ -77,21 +77,6 @@ const inscriptionsQuerySchema = z.object({
     }),
 });
 
-// Inscription変換関数
-const convertInscriptionToBaseResponse = (inscription: Inscription) => ({
-  id: inscription.id,
-  monument_id: inscription.monumentId,
-  side: inscription.side,
-  original_text: inscription.originalText,
-  transliteration: inscription.transliteration,
-  reading: inscription.reading,
-  language: inscription.language,
-  notes: inscription.notes,
-  source_id: inscription.sourceId,
-  created_at: inscription.createdAt,
-  updated_at: inscription.updatedAt,
-});
-
 const convertInscriptionToResponse = (inscription: Inscription) => ({
   id: inscription.id,
   monument_id: inscription.monumentId,

@@ -114,7 +114,7 @@ export class PoetRepository implements IPoetRepository {
     }
 
     // 基本クエリ実行
-    let results = await query.limit(limit).offset(offset);
+    const results = await query.limit(limit).offset(offset);
 
     // メモリ内での追加フィルタリング
     let filteredResults = results;

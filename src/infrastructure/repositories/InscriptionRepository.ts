@@ -87,7 +87,7 @@ export class InscriptionRepository implements IInscriptionRepository {
     });
 
     // クエリ構築
-    let results;
+    let results: (typeof inscriptions.$inferSelect)[];
     if (conditions.length > 0 && orderClauses.length > 0) {
       results = await this.db
         .select()

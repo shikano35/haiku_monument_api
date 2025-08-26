@@ -46,7 +46,7 @@ describe("Poets API", () => {
       expect(filtered.length).toBe(5);
 
       // 各俳人のデータ構造を検証
-      filtered.forEach((poet: PoetResponse) => {
+      for (const poet of filtered) {
         expect(poet).toHaveProperty("id");
         expect(poet).toHaveProperty("name");
         expect(poet).toHaveProperty("biography");
@@ -54,7 +54,7 @@ describe("Poets API", () => {
         expect(poet).toHaveProperty("image_url");
         expect(poet).toHaveProperty("created_at");
         expect(poet).toHaveProperty("updated_at");
-      });
+      }
 
       expect(filtered[0]).toEqual({
         id: 1,

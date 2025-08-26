@@ -58,7 +58,7 @@ app.doc("/docs/json", openApiSpec);
 const docsApp = new Hono<{ Bindings: Env }>();
 docsApp.get("/docs", swaggerUI({ url: "/docs/json" }));
 
-app.use("/docs", async (c, next) => {
+app.use("/docs", async (c) => {
   return await docsApp.fetch(c.req.raw, c.env);
 });
 

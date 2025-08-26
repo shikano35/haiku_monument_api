@@ -1,4 +1,4 @@
-import { eq, count, sql, and, or, like, inArray, desc, asc } from "drizzle-orm";
+import { eq, count, sql, and,  like, desc, asc } from "drizzle-orm";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import { drizzle } from "drizzle-orm/d1";
 import type { D1Database } from "@cloudflare/workers-types";
@@ -22,12 +22,6 @@ import type {
   CreateMonumentInput,
   UpdateMonumentInput,
 } from "../../domain/entities/Monument";
-import type { Inscription } from "../../domain/entities/Inscription";
-import type { Event } from "../../domain/entities/Event";
-import type { Media } from "../../domain/entities/Media";
-import type { Location } from "../../domain/entities/Location";
-import type { Poet } from "../../domain/entities/Poet";
-import type { Source } from "../../domain/entities/Source";
 
 export class MonumentRepository implements IMonumentRepository {
   private db: DrizzleD1Database;
