@@ -1,4 +1,4 @@
-import { eq, count, sql, and, or, like, inArray, desc, asc } from "drizzle-orm";
+import { eq, count, sql, and, like, desc, asc } from "drizzle-orm";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import { drizzle } from "drizzle-orm/d1";
 import type { D1Database } from "@cloudflare/workers-types";
@@ -22,12 +22,6 @@ import type {
   CreateMonumentInput,
   UpdateMonumentInput,
 } from "../../domain/entities/Monument";
-import type { Inscription } from "../../domain/entities/Inscription";
-import type { Event } from "../../domain/entities/Event";
-import type { Media } from "../../domain/entities/Media";
-import type { Location } from "../../domain/entities/Location";
-import type { Poet } from "../../domain/entities/Poet";
-import type { Source } from "../../domain/entities/Source";
 
 export class MonumentRepository implements IMonumentRepository {
   private db: DrizzleD1Database;
@@ -175,9 +169,7 @@ export class MonumentRepository implements IMonumentRepository {
       )
       .where(eq(poemAttributions.poetId, poetId));
 
-    return Promise.all(
-      results.map(async (row) => this.convertToMonumentWithRelations(row)),
-    );
+    return results.map((row) => this.convertToMonument(row));
   }
 
   async getByLocationId(locationId: number): Promise<Monument[]> {
@@ -199,9 +191,7 @@ export class MonumentRepository implements IMonumentRepository {
       )
       .where(eq(monumentLocations.locationId, locationId));
 
-    return Promise.all(
-      results.map(async (row) => this.convertToMonumentWithRelations(row)),
-    );
+    return results.map((row) => this.convertToMonument(row));
   }
 
   async getBySourceId(sourceId: number): Promise<Monument[]> {
@@ -220,9 +210,7 @@ export class MonumentRepository implements IMonumentRepository {
       .innerJoin(inscriptions, eq(monuments.id, inscriptions.monumentId))
       .where(eq(inscriptions.sourceId, sourceId));
 
-    return Promise.all(
-      results.map(async (row) => this.convertToMonumentWithRelations(row)),
-    );
+    return results.map((row) => this.convertToMonument(row));
   }
 
   async getByCoordinates(
@@ -259,9 +247,7 @@ export class MonumentRepository implements IMonumentRepository {
         ) <= ${radius}`,
       );
 
-    return Promise.all(
-      results.map(async (row) => this.convertToMonumentWithRelations(row)),
-    );
+    return results.map((row) => this.convertToMonument(row));
   }
 
   async create(input: CreateMonumentInput): Promise<Monument> {
@@ -543,7 +529,7 @@ export class MonumentRepository implements IMonumentRepository {
     return {
       id: row.id,
       canonicalName: row.canonicalName,
-      canonicalUri: `https://api.kuhiapi.com/monuments/${row.id}`,
+      canonicalUri: `https://api.kuhi.jp/monuments/${row.id}`,
       monumentType: row.monumentType ?? null,
       monumentTypeUri: row.monumentTypeUri ?? null,
       material: row.material ?? null,
@@ -626,7 +612,7 @@ export class MonumentRepository implements IMonumentRepository {
     return {
       id: row.id,
       canonicalName: row.canonicalName,
-      canonicalUri: null,
+      canonicalUri: `https://api.kuhi.jp/monuments/${row.id}`,
       monumentType: row.monumentType ?? null,
       monumentTypeUri: row.monumentTypeUri ?? null,
       material: row.material ?? null,

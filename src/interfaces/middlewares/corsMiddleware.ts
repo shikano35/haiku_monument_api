@@ -9,7 +9,10 @@ interface CorsMiddlewareContext {
   };
 }
 
-export const corsMiddleware = async (ctx: CorsMiddlewareContext, next: () => Promise<void>) => {
+export const corsMiddleware = async (
+  ctx: CorsMiddlewareContext,
+  next: () => Promise<void>,
+) => {
   ctx.res.headers.set("Access-Control-Allow-Origin", "*");
   ctx.res.headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
   ctx.res.headers.set(

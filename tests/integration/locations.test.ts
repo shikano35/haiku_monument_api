@@ -46,7 +46,7 @@ describe("Locations API", () => {
       );
       expect(filtered.length).toBe(5);
 
-      filtered.forEach((location: LocationResponse) => {
+      for (const location of filtered) {
         expect(location).toHaveProperty("id");
         expect(location).toHaveProperty("prefecture");
         expect(location).toHaveProperty("region");
@@ -54,7 +54,7 @@ describe("Locations API", () => {
         expect(location).toHaveProperty("place_name");
         expect(location).toHaveProperty("latitude");
         expect(location).toHaveProperty("longitude");
-      });
+      }
 
       expect(filtered[0]).toEqual({
         id: 1,

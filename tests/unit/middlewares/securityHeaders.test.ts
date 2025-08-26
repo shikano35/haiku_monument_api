@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { securityHeaders } from "../../../src/interfaces/middlewares/securityHeaders";
-import { Context } from "hono";
+import type { Context } from "hono";
 
 describe("securityHeaders", () => {
   it("セキュリティヘッダーを適切に設定する", async () => {
