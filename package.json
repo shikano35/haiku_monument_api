@@ -23,7 +23,7 @@
     "drizzle-orm": "^0.44.5",
     "hono": "^4.9.4",
     "miniflare": "^3.20250718.1",
-    "vitest": "2.1.8"
+    "vitest": "2.1.9"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
