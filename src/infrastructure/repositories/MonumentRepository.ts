@@ -37,7 +37,7 @@ export class MonumentRepository implements IMonumentRepository {
 
   async getAll(params: MonumentQueryParams = {}): Promise<Monument[]> {
     const {
-      limit: paramLimit = MonumentRepository.DEFAULT_LIMIT,
+      limit: paramLimit,
       offset: paramOffset = 0,
       search,
       prefecture,
