@@ -37,3 +37,4 @@ lerna-debug.log*
 coverage/
 .github/instructions
 scripts/
+docs/
