@@ -10,6 +10,10 @@ database_name = "haiku-monument-db"
 database_id = "c86570ec-9fbb-4658-8e98-956ee306616a"
 migrations_dir = "src/infrastructure/db/migrations"
 
+# 環境変数: 有料プランの場合は 'paid' に設定
+[vars]
+WORKERS_PLAN = "free"
+
 # [[kv_namespaces]]
 # binding = "MY_KV_NAMESPACE"
 # id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"

@@ -66,7 +66,7 @@ export function createUseCases(
   switch (domain) {
     case "locations": {
       const locationRepo = new LocationRepository(env.DB);
-      const monumentRepo = new MonumentRepository(env.DB);
+      const monumentRepo = new MonumentRepository(env.DB, env.WORKERS_PLAN);
       return {
         locationUseCases: new LocationUseCases(locationRepo),
         monumentUseCases: new MonumentUseCases(monumentRepo),
@@ -74,7 +74,7 @@ export function createUseCases(
     }
     case "poets": {
       const poetRepo = new PoetRepository(env.DB);
-      const monumentRepo = new MonumentRepository(env.DB);
+      const monumentRepo = new MonumentRepository(env.DB, env.WORKERS_PLAN);
       return {
         poetUseCases: new PoetUseCases(poetRepo),
         monumentUseCases: new MonumentUseCases(monumentRepo),
@@ -82,14 +82,14 @@ export function createUseCases(
     }
     case "sources": {
       const sourceRepo = new SourceRepository(env.DB);
-      const monumentRepo = new MonumentRepository(env.DB);
+      const monumentRepo = new MonumentRepository(env.DB, env.WORKERS_PLAN);
       return {
         sourceUseCases: new SourceUseCases(sourceRepo),
         monumentUseCases: new MonumentUseCases(monumentRepo),
       };
     }
     case "monuments": {
-      const monumentRepo = new MonumentRepository(env.DB);
+      const monumentRepo = new MonumentRepository(env.DB, env.WORKERS_PLAN);
       return { monumentUseCases: new MonumentUseCases(monumentRepo) };
     }
     case "inscriptions": {
