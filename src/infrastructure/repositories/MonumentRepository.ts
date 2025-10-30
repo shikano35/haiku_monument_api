@@ -1,4 +1,4 @@
-import { eq, count, sql, and, like, desc, asc } from "drizzle-orm";
+import { eq, count, sql, and, like, desc, asc, inArray } from "drizzle-orm";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import { drizzle } from "drizzle-orm/d1";
 import type { D1Database } from "@cloudflare/workers-types";
@@ -25,14 +25,19 @@ import type {
 
 export class MonumentRepository implements IMonumentRepository {
   private db: DrizzleD1Database;
+  private isPaidPlan: boolean;
+  private static readonly DEFAULT_LIMIT = 50;
+  private static readonly MAX_LIMIT_FREE = 20; // 無料プランの安全な上限
+  private static readonly MAX_LIMIT_PAID = 500; // 有料プランの上限（MCP対応）
 
-  constructor(database: D1Database) {
+  constructor(database: D1Database, workersPlan?: "free" | "paid") {
     this.db = drizzle(database);
+    this.isPaidPlan = workersPlan === "paid";
   }
 
   async getAll(params: MonumentQueryParams = {}): Promise<Monument[]> {
     const {
-      limit: paramLimit = 50,
+      limit: paramLimit = MonumentRepository.DEFAULT_LIMIT,
       offset: paramOffset = 0,
       search,
       prefecture,
@@ -43,7 +48,17 @@ export class MonumentRepository implements IMonumentRepository {
       ordering: paramOrdering = [],
     } = params;
 
-    const limit = paramLimit ?? 50;
+    // 有料/無料プランに応じた上限設定
+    const maxLimit = this.isPaidPlan
+      ? MonumentRepository.MAX_LIMIT_PAID
+      : MonumentRepository.MAX_LIMIT_FREE;
+
+    // limit が null/undefined の場合はデフォルト、それ以外は上限でキャップ
+    const limit =
+      paramLimit === null || paramLimit === undefined
+        ? MonumentRepository.DEFAULT_LIMIT
+        : Math.min(paramLimit, maxLimit);
+
     const offset = paramOffset ?? 0;
     const ordering = paramOrdering ?? [];
 
@@ -126,9 +141,7 @@ export class MonumentRepository implements IMonumentRepository {
     }
 
     const results = await query.limit(limit).offset(offset);
-    return Promise.all(
-      results.map(async (row) => this.convertToMonumentWithRelations(row)),
-    );
+    return this.convertToMonumentsWithRelationsBatch(results);
   }
 
   async getById(id: number): Promise<Monument | null> {
@@ -638,5 +651,485 @@ export class MonumentRepository implements IMonumentRepository {
       return date;
     }
     return date.toISOString();
+  }
+
+  /**
+   * 複数のmonumentの関連データを一括で取得する最適化メソッド
+   */
+  private async convertToMonumentsWithRelationsBatch(
+    rows: Array<{
+      id: number;
+      canonicalName: string;
+      monumentType: string | null;
+      monumentTypeUri: string | null;
+      material: string | null;
+      materialUri: string | null;
+      createdAt: string;
+      updatedAt: string;
+    }>,
+  ): Promise<Monument[]> {
+    if (rows.length === 0) {
+      return [];
+    }
+
+    const monumentIds = rows.map((row) => row.id);
+
+    const allInscriptions = await this.db
+      .select()
+      .from(inscriptions)
+      .where(inArray(inscriptions.monumentId, monumentIds));
+
+    const inscriptionIds = allInscriptions.map((i) => i.id);
+
+    let allInscriptionPoems: Array<{
+      inscriptionId: number;
+      poemId: number;
+    }> = [];
+    let allPoems: Array<{
+      id: number;
+      text: string;
+      normalizedText: string;
+      textHash: string;
+      kigo: string | null;
+      season: string | null;
+      createdAt: string;
+      updatedAt: string;
+    }> = [];
+
+    if (inscriptionIds.length > 0) {
+      allInscriptionPoems = await this.db
+        .select({
+          inscriptionId: inscriptionPoems.inscriptionId,
+          poemId: inscriptionPoems.poemId,
+        })
+        .from(inscriptionPoems)
+        .where(inArray(inscriptionPoems.inscriptionId, inscriptionIds));
+
+      const poemIds = [...new Set(allInscriptionPoems.map((ip) => ip.poemId))];
+      if (poemIds.length > 0) {
+        allPoems = await this.db
+          .select({
+            id: poems.id,
+            text: poems.text,
+            normalizedText: poems.normalizedText,
+            textHash: poems.textHash,
+            kigo: poems.kigo,
+            season: poems.season,
+            createdAt: poems.createdAt,
+            updatedAt: poems.updatedAt,
+          })
+          .from(poems)
+          .where(inArray(poems.id, poemIds));
+      }
+    }
+
+    const inscriptionSourceIds = [
+      ...new Set(
+        allInscriptions
+          .map((i) => i.sourceId)
+          .filter((id): id is number => id !== null),
+      ),
+    ];
+    let allInscriptionSources: Array<{
+      id: number;
+      citation: string;
+      author: string | null;
+      title: string | null;
+      publisher: string | null;
+      sourceYear: number | null;
+      url: string | null;
+      createdAt: string;
+      updatedAt: string;
+    }> = [];
+    if (inscriptionSourceIds.length > 0) {
+      allInscriptionSources = await this.db
+        .select()
+        .from(sources)
+        .where(inArray(sources.id, inscriptionSourceIds));
+    }
+
+    const allEvents = await this.db
+      .select()
+      .from(events)
+      .where(inArray(events.monumentId, monumentIds));
+
+    const eventSourceIds = [
+      ...new Set(
+        allEvents
+          .map((e) => e.sourceId)
+          .filter((id): id is number => id !== null),
+      ),
+    ];
+    let allEventSources: Array<{
+      id: number;
+      citation: string;
+      author: string | null;
+      title: string | null;
+      publisher: string | null;
+      sourceYear: number | null;
+      url: string | null;
+      createdAt: string;
+      updatedAt: string;
+    }> = [];
+    if (eventSourceIds.length > 0) {
+      allEventSources = await this.db
+        .select()
+        .from(sources)
+        .where(inArray(sources.id, eventSourceIds));
+    }
+
+    const allMedia = await this.db
+      .select()
+      .from(media)
+      .where(inArray(media.monumentId, monumentIds));
+
+    const allMonumentLocations = await this.db
+      .select({
+        monumentId: monumentLocations.monumentId,
+        locationId: monumentLocations.locationId,
+      })
+      .from(monumentLocations)
+      .where(inArray(monumentLocations.monumentId, monumentIds));
+
+    const locationIds = [
+      ...new Set(allMonumentLocations.map((ml) => ml.locationId)),
+    ];
+    let allLocations: Array<{
+      id: number;
+      imiPrefCode: string | null;
+      region: string | null;
+      prefecture: string | null;
+      municipality: string | null;
+      address: string | null;
+      placeName: string | null;
+      latitude: number | null;
+      longitude: number | null;
+      geohash: string | null;
+      geomGeojson: string | null;
+      accuracyM: number | null;
+      createdAt: string;
+      updatedAt: string;
+    }> = [];
+    if (locationIds.length > 0) {
+      allLocations = await this.db
+        .select()
+        .from(locations)
+        .where(inArray(locations.id, locationIds));
+    }
+
+    let allPoets: Array<{
+      monumentId: number;
+      id: number;
+      name: string;
+      nameKana: string | null;
+      biography: string | null;
+      birthYear: number | null;
+      deathYear: number | null;
+      linkUrl: string | null;
+      imageUrl: string | null;
+      createdAt: string;
+      updatedAt: string;
+    }> = [];
+    if (inscriptionIds.length > 0) {
+      allPoets = await this.db
+        .select({
+          monumentId: inscriptions.monumentId,
+          id: poets.id,
+          name: poets.name,
+          nameKana: poets.nameKana,
+          biography: poets.biography,
+          birthYear: poets.birthYear,
+          deathYear: poets.deathYear,
+          linkUrl: poets.linkUrl,
+          imageUrl: poets.imageUrl,
+          createdAt: poets.createdAt,
+          updatedAt: poets.updatedAt,
+        })
+        .from(poets)
+        .innerJoin(poemAttributions, eq(poets.id, poemAttributions.poetId))
+        .innerJoin(poems, eq(poemAttributions.poemId, poems.id))
+        .innerJoin(inscriptionPoems, eq(poems.id, inscriptionPoems.poemId))
+        .innerJoin(
+          inscriptions,
+          eq(inscriptionPoems.inscriptionId, inscriptions.id),
+        )
+        .where(inArray(inscriptions.monumentId, monumentIds));
+    }
+
+    let allMonumentSources: Array<{
+      monumentId: number;
+      id: number;
+      citation: string;
+      author: string | null;
+      title: string | null;
+      publisher: string | null;
+      sourceYear: number | null;
+      url: string | null;
+      createdAt: string;
+      updatedAt: string;
+    }> = [];
+    if (inscriptionIds.length > 0) {
+      allMonumentSources = await this.db
+        .select({
+          monumentId: inscriptions.monumentId,
+          id: sources.id,
+          citation: sources.citation,
+          author: sources.author,
+          title: sources.title,
+          publisher: sources.publisher,
+          sourceYear: sources.sourceYear,
+          url: sources.url,
+          createdAt: sources.createdAt,
+          updatedAt: sources.updatedAt,
+        })
+        .from(sources)
+        .innerJoin(inscriptions, eq(sources.id, inscriptions.sourceId))
+        .where(inArray(inscriptions.monumentId, monumentIds));
+    }
+
+    const inscriptionsByMonument = new Map<number, typeof allInscriptions>();
+    for (const inscription of allInscriptions) {
+      if (!inscriptionsByMonument.has(inscription.monumentId)) {
+        inscriptionsByMonument.set(inscription.monumentId, []);
+      }
+      inscriptionsByMonument.get(inscription.monumentId)?.push(inscription);
+    }
+
+    const poemsByInscription = new Map<number, typeof allPoems>();
+    for (const ip of allInscriptionPoems) {
+      if (!poemsByInscription.has(ip.inscriptionId)) {
+        poemsByInscription.set(ip.inscriptionId, []);
+      }
+      const poem = allPoems.find((p) => p.id === ip.poemId);
+      if (poem) {
+        poemsByInscription.get(ip.inscriptionId)?.push(poem);
+      }
+    }
+
+    const sourcesMap = new Map<number, (typeof allInscriptionSources)[0]>();
+    for (const source of allInscriptionSources) {
+      sourcesMap.set(source.id, source);
+    }
+    for (const source of allEventSources) {
+      sourcesMap.set(source.id, source);
+    }
+
+    const eventsByMonument = new Map<number, typeof allEvents>();
+    for (const event of allEvents) {
+      if (!eventsByMonument.has(event.monumentId)) {
+        eventsByMonument.set(event.monumentId, []);
+      }
+      eventsByMonument.get(event.monumentId)?.push(event);
+    }
+
+    const mediaByMonument = new Map<number, typeof allMedia>();
+    for (const m of allMedia) {
+      if (!mediaByMonument.has(m.monumentId)) {
+        mediaByMonument.set(m.monumentId, []);
+      }
+      mediaByMonument.get(m.monumentId)?.push(m);
+    }
+
+    const locationsMap = new Map<number, (typeof allLocations)[0]>();
+    for (const location of allLocations) {
+      locationsMap.set(location.id, location);
+    }
+
+    const locationsByMonument = new Map<number, number[]>();
+    for (const ml of allMonumentLocations) {
+      if (!locationsByMonument.has(ml.monumentId)) {
+        locationsByMonument.set(ml.monumentId, []);
+      }
+      locationsByMonument.get(ml.monumentId)?.push(ml.locationId);
+    }
+
+    const poetsByMonument = new Map<number, typeof allPoets>();
+    for (const poet of allPoets) {
+      if (!poetsByMonument.has(poet.monumentId)) {
+        poetsByMonument.set(poet.monumentId, []);
+      }
+      poetsByMonument.get(poet.monumentId)?.push(poet);
+    }
+
+    const sourcesByMonument = new Map<number, typeof allMonumentSources>();
+    for (const source of allMonumentSources) {
+      if (!sourcesByMonument.has(source.monumentId)) {
+        sourcesByMonument.set(source.monumentId, []);
+      }
+      sourcesByMonument.get(source.monumentId)?.push(source);
+    }
+
+    return rows.map((row) => {
+      const monumentInscriptions = inscriptionsByMonument.get(row.id) || [];
+      const inscriptionsWithPoems = monumentInscriptions.map((inscription) => {
+        const relatedPoems = poemsByInscription.get(inscription.id) || [];
+        const inscriptionSource = inscription.sourceId
+          ? sourcesMap.get(inscription.sourceId)
+          : null;
+
+        return {
+          id: inscription.id,
+          monumentId: inscription.monumentId,
+          side: inscription.side,
+          originalText: inscription.originalText,
+          transliteration: inscription.transliteration,
+          reading: inscription.reading,
+          language: inscription.language ?? "ja",
+          notes: inscription.notes,
+          sourceId: inscription.sourceId,
+          poems: relatedPoems.map((poem) => ({
+            id: poem.id,
+            text: poem.text,
+            normalizedText: poem.normalizedText,
+            textHash: poem.textHash,
+            kigo: poem.kigo,
+            season: poem.season,
+            attributions: null,
+            inscriptions: null,
+            createdAt: this.convertToISOString(poem.createdAt),
+            updatedAt: this.convertToISOString(poem.updatedAt),
+          })),
+          monument: null,
+          source: inscriptionSource
+            ? {
+                id: inscriptionSource.id,
+                citation: inscriptionSource.citation,
+                author: inscriptionSource.author,
+                title: inscriptionSource.title,
+                publisher: inscriptionSource.publisher,
+                sourceYear: inscriptionSource.sourceYear,
+                url: inscriptionSource.url,
+                monuments: null,
+                createdAt: this.convertToISOString(inscriptionSource.createdAt),
+                updatedAt: this.convertToISOString(inscriptionSource.updatedAt),
+              }
+            : null,
+          createdAt: this.convertToISOString(inscription.createdAt),
+          updatedAt: this.convertToISOString(inscription.updatedAt),
+        };
+      });
+
+      const monumentEvents = eventsByMonument.get(row.id) || [];
+      const eventsWithSources = monumentEvents.map((event) => {
+        const eventSource = event.sourceId
+          ? sourcesMap.get(event.sourceId)
+          : null;
+
+        return {
+          id: event.id,
+          monumentId: event.monumentId,
+          eventType: event.eventType,
+          huTimeNormalized: event.huTimeNormalized,
+          intervalStart: event.intervalStart,
+          intervalEnd: event.intervalEnd,
+          uncertaintyNote: event.uncertaintyNote,
+          actor: event.actor,
+          sourceId: event.sourceId,
+          source: eventSource
+            ? {
+                id: eventSource.id,
+                citation: eventSource.citation,
+                author: eventSource.author,
+                title: eventSource.title,
+                publisher: eventSource.publisher,
+                sourceYear: eventSource.sourceYear,
+                url: eventSource.url,
+                monuments: null,
+                createdAt: this.convertToISOString(eventSource.createdAt),
+                updatedAt: this.convertToISOString(eventSource.updatedAt),
+              }
+            : null,
+          createdAt: this.convertToISOString(event.createdAt),
+        };
+      });
+
+      const monumentMedia = mediaByMonument.get(row.id) || [];
+      const monumentLocationIds = locationsByMonument.get(row.id) || [];
+      const monumentLocations = monumentLocationIds
+        .map((locId) => locationsMap.get(locId))
+        .filter((loc): loc is NonNullable<typeof loc> => loc !== undefined);
+
+      const monumentPoets = poetsByMonument.get(row.id) || [];
+      const uniquePoets = Array.from(
+        new Map(monumentPoets.map((p) => [p.id, p])).values(),
+      );
+
+      const monumentSources = sourcesByMonument.get(row.id) || [];
+      const uniqueSources = Array.from(
+        new Map(monumentSources.map((s) => [s.id, s])).values(),
+      );
+
+      return {
+        id: row.id,
+        canonicalName: row.canonicalName,
+        canonicalUri: `https://api.kuhi.jp/monuments/${row.id}`,
+        monumentType: row.monumentType ?? null,
+        monumentTypeUri: row.monumentTypeUri ?? null,
+        material: row.material ?? null,
+        materialUri: row.materialUri ?? null,
+        createdAt: this.convertToISOString(row.createdAt),
+        updatedAt: this.convertToISOString(row.updatedAt),
+        inscriptions: inscriptionsWithPoems,
+        events: eventsWithSources,
+        media: monumentMedia.map((mediaItem) => ({
+          id: mediaItem.id,
+          monumentId: mediaItem.monumentId,
+          mediaType: mediaItem.mediaType,
+          url: mediaItem.url,
+          iiifManifestUrl: mediaItem.iiifManifestUrl,
+          capturedAt: mediaItem.capturedAt,
+          photographer: mediaItem.photographer,
+          license: mediaItem.license,
+          exifJson: mediaItem.exifJson,
+          createdAt: this.convertToISOString(mediaItem.createdAt),
+          updatedAt: this.convertToISOString(mediaItem.updatedAt),
+        })),
+        locations: monumentLocations.map((location) => ({
+          id: location.id,
+          imiPrefCode: location.imiPrefCode,
+          region: location.region,
+          prefecture: location.prefecture,
+          municipality: location.municipality,
+          address: location.address,
+          placeName: location.placeName,
+          latitude: location.latitude,
+          longitude: location.longitude,
+          geohash: location.geohash,
+          geomGeojson: location.geomGeojson,
+          accuracyM: location.accuracyM,
+          createdAt: this.convertToISOString(location.createdAt),
+          updatedAt: this.convertToISOString(location.updatedAt),
+        })),
+        poets: uniquePoets.map((poet) => ({
+          id: poet.id,
+          name: poet.name,
+          nameKana: poet.nameKana,
+          biography: poet.biography,
+          birthYear: poet.birthYear,
+          deathYear: poet.deathYear,
+          linkUrl: poet.linkUrl,
+          imageUrl: poet.imageUrl,
+          createdAt: this.convertToISOString(poet.createdAt),
+          updatedAt: this.convertToISOString(poet.updatedAt),
+        })),
+        sources: uniqueSources.map((source) => ({
+          id: source.id,
+          citation: source.citation,
+          author: source.author,
+          title: source.title,
+          publisher: source.publisher,
+          sourceYear: source.sourceYear,
+          url: source.url,
+          monuments: null,
+          createdAt: this.convertToISOString(source.createdAt),
+          updatedAt: this.convertToISOString(source.updatedAt),
+        })),
+        originalEstablishedDate: null,
+        huTimeNormalized: null,
+        intervalStart: null,
+        intervalEnd: null,
+        uncertaintyNote: null,
+      };
+    });
   }
 }
