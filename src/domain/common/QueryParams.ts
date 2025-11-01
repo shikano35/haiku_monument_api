@@ -113,6 +113,7 @@ export interface InscriptionQueryParams extends BaseQueryParams {
 
 // Poem専用QueryParams
 export interface PoemQueryParams extends BaseQueryParams {
+  text_contains?: string | null;
   kigo?: string | null;
   season?: string | null;
   poetId?: number | null;
@@ -137,6 +138,11 @@ export interface MediaQueryParams extends BaseQueryParams {
 }
 
 export interface QueryParams extends BaseQueryParams {
+  text_contains?: string | null;
+  inscription_contains?: string | null;
+  kigo?: string | null;
+  season?: string | null;
+  poet_id?: number | null;
   title_contains?: string | null;
   description_contains?: string | null;
   name_contains?: string | null;
