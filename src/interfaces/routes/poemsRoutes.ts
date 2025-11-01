@@ -104,7 +104,19 @@ const getAllPoemsRoute = createRoute({
 router.openapi(getAllPoemsRoute, async (c) => {
   const queryParams = parseQueryParams(c.req.url);
   const { poemUseCases } = createUseCases(c.env, "poems");
-  const poems = await poemUseCases.getAllPoems(queryParams);
+
+  const poemQueryParams = {
+    limit: queryParams.limit,
+    offset: queryParams.offset,
+    ordering: queryParams.ordering,
+    search: queryParams.search,
+    text_contains: queryParams.text_contains,
+    kigo: queryParams.kigo,
+    season: queryParams.season,
+    poetId: queryParams.poet_id,
+  };
+
+  const poems = await poemUseCases.getAllPoems(poemQueryParams);
 
   const response = {
     poems: poems.map(convertPoemToResponse),

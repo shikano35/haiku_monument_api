@@ -44,6 +44,7 @@ export class MonumentRepository implements IMonumentRepository {
       monumentType,
       q,
       canonicalNameContains,
+      inscriptionContains,
       ordering: paramOrdering = [],
     } = params;
 
@@ -90,6 +91,18 @@ export class MonumentRepository implements IMonumentRepository {
 
     if (monumentType) {
       conditions.push(eq(monuments.monumentType, monumentType));
+    }
+
+    if (inscriptionContains) {
+      const joinedQuery = query.innerJoin(
+        inscriptions,
+        eq(monuments.id, inscriptions.monumentId),
+      );
+
+      query = joinedQuery as unknown as typeof query;
+      conditions.push(
+        like(inscriptions.originalText, `%${inscriptionContains}%`),
+      );
     }
 
     // 地理的フィルタ
