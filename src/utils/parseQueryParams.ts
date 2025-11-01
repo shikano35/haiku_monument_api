@@ -9,6 +9,8 @@ export function parseQueryParams(url: string): QueryParams {
     updated_at_gt: query.get("updated_at_gt") || null,
     updated_at_lt: query.get("updated_at_lt") || null,
     search: query.get("search") || null,
+    text_contains: query.get("text_contains") || null,
+    inscription_contains: query.get("inscription_contains") || null,
     title_contains: query.get("title_contains") || null,
     name_contains: query.get("name_contains") || null,
     biography_contains: query.get("biography_contains") || null,
@@ -17,5 +19,8 @@ export function parseQueryParams(url: string): QueryParams {
     prefecture: query.get("prefecture") || null,
     region: query.get("region") || null,
     description_contains: query.get("description_contains") || null,
+    kigo: query.get("kigo") || null,
+    season: query.get("season") || null,
+    poet_id: query.get("poet_id") ? Number(query.get("poet_id")) : null,
   };
 }
