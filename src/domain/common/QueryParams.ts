@@ -114,7 +114,7 @@ export interface InscriptionQueryParams extends BaseQueryParams {
 
 // Poem専用QueryParams
 export interface PoemQueryParams extends BaseQueryParams {
-  text_contains?: string | null;
+  textContains?: string | null;
   kigo?: string | null;
   season?: string | null;
   poetId?: number | null;
@@ -139,20 +139,22 @@ export interface MediaQueryParams extends BaseQueryParams {
 }
 
 export interface QueryParams extends BaseQueryParams {
-  text_contains?: string | null;
-  inscription_contains?: string | null;
-  kigo?: string | null;
-  season?: string | null;
-  poet_id?: number | null;
-  title_contains?: string | null;
-  description_contains?: string | null;
-  name_contains?: string | null;
-  biography_contains?: string | null;
+  inscriptionContains?: string | null;
+  titleContains?: string | null;
+  nameContains?: string | null;
+  biographyContains?: string | null;
+  canonicalNameContains?: string | null;
+  commentaryContains?: string | null;
+  poetNameContains?: string | null;
+  textContains?: string | null;
   prefecture?: string | null;
   region?: string | null;
   municipality?: string | null;
-  created_at_gt?: string | null;
-  created_at_lt?: string | null;
-  updated_at_gt?: string | null;
-  updated_at_lt?: string | null;
+  kigo?: string | null;
+  season?: string | null;
+  poetId?: number | null;
+  locationId?: number | null;
+  material?: string | null;
+  monumentType?: string | null;
+  q?: string | null;
 }

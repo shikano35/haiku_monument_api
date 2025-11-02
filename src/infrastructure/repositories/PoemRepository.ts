@@ -24,7 +24,7 @@ export class PoemRepository implements IPoemRepository {
       offset: paramOffset = 0,
       ordering: paramOrdering = [],
       search,
-      text_contains,
+      textContains,
       kigo,
       season,
     } = queryParams || {};
@@ -46,7 +46,7 @@ export class PoemRepository implements IPoemRepository {
     }
 
     // 全文検索
-    const searchTerm = text_contains || search;
+    const searchTerm = textContains || search;
     if (searchTerm) {
       conditions.push(like(poems.text, `%${searchTerm}%`));
     }

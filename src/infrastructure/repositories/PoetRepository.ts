@@ -7,7 +7,7 @@ import type {
 import type { PoetQueryParams } from "../../domain/common/QueryParams";
 import { getDB } from "../db/db";
 import { poets } from "../db/schema";
-import { eq, like, gte, lte, and, count, desc, asc } from "drizzle-orm";
+import { eq, like, gte, lte, and, count, desc, asc, sql } from "drizzle-orm";
 import type { D1Database } from "@cloudflare/workers-types";
 
 const convertToPoet = (dbPoet: {
@@ -77,7 +77,12 @@ export class PoetRepository implements IPoetRepository {
     }
 
     if (biographyContains) {
-      conditions.push(like(poets.biography, `%${biographyContains}%`));
+      conditions.push(
+        and(
+          sql`${poets.biography} IS NOT NULL`,
+          like(poets.biography, `%${biographyContains}%`),
+        ),
+      );
     }
 
     if (birthYear) {

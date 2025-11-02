@@ -110,10 +110,10 @@ router.openapi(getAllPoemsRoute, async (c) => {
     offset: queryParams.offset,
     ordering: queryParams.ordering,
     search: queryParams.search,
-    text_contains: queryParams.text_contains,
+    textContains: queryParams.textContains,
     kigo: queryParams.kigo,
     season: queryParams.season,
-    poetId: queryParams.poet_id,
+    poetId: queryParams.poetId,
   };
 
   const poems = await poemUseCases.getAllPoems(poemQueryParams);

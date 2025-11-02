@@ -107,6 +107,7 @@ export class MonumentRepository implements IMonumentRepository {
       );
     }
 
+    let validMonumentIds: number[] | null = null;
     if (poetId) {
       const monumentIdsSubquery = this.db
         .selectDistinct({ monumentId: inscriptions.monumentId })
@@ -122,13 +123,11 @@ export class MonumentRepository implements IMonumentRepository {
         .where(eq(poemAttributions.poetId, poetId));
 
       const monumentIdsResult = await monumentIdsSubquery;
-      const validMonumentIds = monumentIdsResult.map((row) => row.monumentId);
+      validMonumentIds = monumentIdsResult.map((row) => row.monumentId);
 
       if (validMonumentIds.length === 0) {
         return [];
       }
-
-      conditions.push(inArray(monuments.id, validMonumentIds));
     }
 
     // 地理的フィルタ
@@ -151,6 +150,10 @@ export class MonumentRepository implements IMonumentRepository {
       if (municipality) {
         conditions.push(eq(locations.municipality, municipality));
       }
+    }
+
+    if (validMonumentIds !== null) {
+      conditions.push(inArray(monuments.id, validMonumentIds));
     }
 
     // 条件適用
