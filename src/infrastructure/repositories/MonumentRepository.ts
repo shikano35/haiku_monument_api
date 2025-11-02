@@ -109,8 +109,9 @@ export class MonumentRepository implements IMonumentRepository {
     }
 
     if (poetId) {
-      const joinedQuery = query
-        .innerJoin(inscriptions, eq(monuments.id, inscriptions.monumentId))
+      const monumentIdsSubquery = this.db
+        .selectDistinct({ monumentId: inscriptions.monumentId })
+        .from(inscriptions)
         .innerJoin(
           inscriptionPoems,
           eq(inscriptions.id, inscriptionPoems.inscriptionId),
@@ -118,10 +119,17 @@ export class MonumentRepository implements IMonumentRepository {
         .innerJoin(
           poemAttributions,
           eq(inscriptionPoems.poemId, poemAttributions.poemId),
-        );
+        )
+        .where(eq(poemAttributions.poetId, poetId));
 
-      query = joinedQuery as unknown as typeof query;
-      conditions.push(eq(poemAttributions.poetId, poetId));
+      const monumentIdsResult = await monumentIdsSubquery;
+      const validMonumentIds = monumentIdsResult.map((row) => row.monumentId);
+
+      if (validMonumentIds.length === 0) {
+        return [];
+      }
+
+      conditions.push(inArray(monuments.id, validMonumentIds));
     }
 
     // 地理的フィルタ
