@@ -18,6 +18,7 @@ export function parseQueryParams(url: string): QueryParams {
     created_at_lt: query.get("created_at_lt") || null,
     prefecture: query.get("prefecture") || null,
     region: query.get("region") || null,
+    municipality: query.get("municipality") || null,
     description_contains: query.get("description_contains") || null,
     kigo: query.get("kigo") || null,
     season: query.get("season") || null,

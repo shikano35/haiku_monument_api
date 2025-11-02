@@ -21,6 +21,7 @@ export interface SearchParams {
 export interface LocationFilterParams {
   prefecture?: string | null;
   region?: string | null;
+  municipality?: string | null;
   bbox?: [number, number, number, number] | null; // [minLon, minLat, maxLon, maxLat]
 }
 
@@ -149,6 +150,7 @@ export interface QueryParams extends BaseQueryParams {
   biography_contains?: string | null;
   prefecture?: string | null;
   region?: string | null;
+  municipality?: string | null;
   created_at_gt?: string | null;
   created_at_lt?: string | null;
   updated_at_gt?: string | null;
