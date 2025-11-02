@@ -43,6 +43,7 @@ export class MonumentRepository implements IMonumentRepository {
       region,
       municipality,
       monumentType,
+      poetId,
       q,
       canonicalNameContains,
       inscriptionContains,
@@ -104,6 +105,22 @@ export class MonumentRepository implements IMonumentRepository {
       conditions.push(
         like(inscriptions.originalText, `%${inscriptionContains}%`),
       );
+    }
+
+    if (poetId) {
+      const joinedQuery = query
+        .innerJoin(inscriptions, eq(monuments.id, inscriptions.monumentId))
+        .innerJoin(
+          inscriptionPoems,
+          eq(inscriptions.id, inscriptionPoems.inscriptionId),
+        )
+        .innerJoin(
+          poemAttributions,
+          eq(inscriptionPoems.poemId, poemAttributions.poemId),
+        );
+
+      query = joinedQuery as unknown as typeof query;
+      conditions.push(eq(poemAttributions.poetId, poetId));
     }
 
     // 地理的フィルタ
