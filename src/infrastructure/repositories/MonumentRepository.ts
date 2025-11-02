@@ -41,6 +41,7 @@ export class MonumentRepository implements IMonumentRepository {
       search,
       prefecture,
       region,
+      municipality,
       monumentType,
       q,
       canonicalNameContains,
@@ -106,7 +107,7 @@ export class MonumentRepository implements IMonumentRepository {
     }
 
     // 地理的フィルタ
-    if (prefecture || region) {
+    if (prefecture || region || municipality) {
       const joinedQuery = query
         .innerJoin(
           monumentLocations,
@@ -121,6 +122,9 @@ export class MonumentRepository implements IMonumentRepository {
       }
       if (region) {
         conditions.push(eq(locations.region, region));
+      }
+      if (municipality) {
+        conditions.push(eq(locations.municipality, municipality));
       }
     }
 

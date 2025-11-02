@@ -172,6 +172,7 @@ export const MonumentQuerySchema = z.object({
   monument_type: z.string().optional(),
   prefecture: z.string().optional(),
   region: z.string().optional(),
+  municipality: z.string().optional(),
   location_id: z
     .string()
     .optional()
