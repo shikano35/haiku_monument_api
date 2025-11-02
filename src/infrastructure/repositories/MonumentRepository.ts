@@ -27,9 +27,8 @@ export class MonumentRepository implements IMonumentRepository {
   private db: DrizzleD1Database;
   private isPaidPlan: boolean;
   private static readonly DEFAULT_LIMIT = 50;
-  private static readonly MAX_LIMIT_FREE = 20; // 無料プランの安全な上限
-  private static readonly MAX_LIMIT_PAID = 500; // 有料プランの上限（MCP対応）
-
+  private static readonly MAX_LIMIT_FREE = 100;
+  private static readonly MAX_LIMIT_PAID = 500;
   constructor(database: D1Database, workersPlan?: "free" | "paid") {
     this.db = drizzle(database);
     this.isPaidPlan = workersPlan === "paid";
@@ -108,6 +107,7 @@ export class MonumentRepository implements IMonumentRepository {
       );
     }
 
+    let validMonumentIds: number[] | null = null;
     if (poetId) {
       const monumentIdsSubquery = this.db
         .selectDistinct({ monumentId: inscriptions.monumentId })
@@ -123,13 +123,11 @@ export class MonumentRepository implements IMonumentRepository {
         .where(eq(poemAttributions.poetId, poetId));
 
       const monumentIdsResult = await monumentIdsSubquery;
-      const validMonumentIds = monumentIdsResult.map((row) => row.monumentId);
+      validMonumentIds = monumentIdsResult.map((row) => row.monumentId);
 
       if (validMonumentIds.length === 0) {
         return [];
       }
-
-      conditions.push(inArray(monuments.id, validMonumentIds));
     }
 
     // 地理的フィルタ
@@ -152,6 +150,10 @@ export class MonumentRepository implements IMonumentRepository {
       if (municipality) {
         conditions.push(eq(locations.municipality, municipality));
       }
+    }
+
+    if (validMonumentIds !== null) {
+      conditions.push(inArray(monuments.id, validMonumentIds));
     }
 
     // 条件適用
