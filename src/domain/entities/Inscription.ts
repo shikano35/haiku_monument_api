@@ -1,6 +1,6 @@
+import type { Monument } from "./Monument";
 import type { Poem } from "./Poem";
 import type { Source } from "./Source";
-import type { Monument } from "./Monument";
 
 export interface Inscription {
   id: number;

@@ -1,9 +1,9 @@
+import type { EventQueryParams } from "../common/QueryParams";
 import type {
-  Event,
   CreateEventInput,
+  Event,
   UpdateEventInput,
 } from "../entities/Event";
-import type { EventQueryParams } from "../common/QueryParams";
 
 export interface IEventRepository {
   getAll(queryParams?: EventQueryParams): Promise<Event[]>;

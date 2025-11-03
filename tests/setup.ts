@@ -1,6 +1,6 @@
-import { unstable_dev } from "wrangler";
-import type { Unstable_DevWorker, Unstable_DevOptions } from "wrangler";
 import { execSync } from "node:child_process";
+import { unstable_dev } from "wrangler";
+import type { Unstable_DevOptions, Unstable_DevWorker } from "wrangler";
 
 let worker: Unstable_DevWorker;
 const isGithubActions = process.env.GITHUB_ACTIONS === "true";
@@ -34,15 +34,17 @@ export async function stopWorker() {
 
 export async function resetDb() {
   const maxRetries = isGithubActions ? 10 : 5;
-  const retryDelay = isGithubActions ? 1000 : 300;
+  const retryDelay = isGithubActions ? 2000 : 500;
   let lastErr: unknown;
+
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   for (let i = 0; i < maxRetries; i++) {
     try {
       execSync(
         "bunx wrangler d1 execute haiku-monument-db --local --file ./src/infrastructure/db/seeds/new_schema_seed.sql",
         {
-          timeout: isGithubActions ? 10000 : 5000,
+          timeout: isGithubActions ? 15000 : 10000,
           env: {
             ...process.env,
             ...(useLocalDatabase ? { D1_LOCAL_DATABASE: "true" } : {}),
@@ -50,7 +52,7 @@ export async function resetDb() {
         },
       );
 
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       return;
     } catch (e) {
       lastErr = e;

@@ -1,8 +1,8 @@
 import type { LocationQueryParams } from "../common/QueryParams";
 import type {
   CreateLocationInput,
-  UpdateLocationInput,
   Location,
+  UpdateLocationInput,
 } from "../entities/Location";
 import type { ILocationRepository } from "../repositories/ILocationRepository";
 

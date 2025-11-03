@@ -1,14 +1,14 @@
-import type { ILocationRepository } from "../../domain/repositories/ILocationRepository";
+import type { D1Database } from "@cloudflare/workers-types";
+import { and, asc, count, desc, eq, like } from "drizzle-orm";
+import type { LocationQueryParams } from "../../domain/common/QueryParams";
 import type {
   CreateLocationInput,
-  UpdateLocationInput,
   Location,
+  UpdateLocationInput,
 } from "../../domain/entities/Location";
-import type { LocationQueryParams } from "../../domain/common/QueryParams";
+import type { ILocationRepository } from "../../domain/repositories/ILocationRepository";
 import { getDB } from "../db/db";
 import { locations } from "../db/schema";
-import { and, asc, desc, eq, like, count } from "drizzle-orm";
-import type { D1Database } from "@cloudflare/workers-types";
 
 export class LocationRepository implements ILocationRepository {
   constructor(private readonly dbBinding: D1Database) {}

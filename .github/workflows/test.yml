@@ -34,12 +34,12 @@ jobs:
 
       - name: Apply D1 migrations
         run: |
-          bunx wrangler d1 migrations apply DB
+          bunx wrangler d1 migrations apply DB --local
           sleep 5
 
       - name: Setup D1 DB
         run: |
-          bunx wrangler d1 execute DB --file ./src/infrastructure/db/seeds/seeds.sql
+          bunx wrangler d1 execute DB --local --file ./src/infrastructure/db/seeds/new_schema_seed.sql
           sleep 5
 
       - name: Run tests

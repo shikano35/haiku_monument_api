@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from "vitest";
-import { corsMiddleware } from "../../../src/interfaces/middlewares/corsMiddleware";
 import type { Context } from "hono";
+import { describe, expect, it, vi } from "vitest";
+import { corsMiddleware } from "../../../src/interfaces/middlewares/corsMiddleware";
 
 vi.mock("hono/cors", () => ({
   cors: () => {

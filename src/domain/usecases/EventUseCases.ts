@@ -1,10 +1,10 @@
-import type { IEventRepository } from "../repositories/IEventRepository";
 import type { EventQueryParams } from "../common/QueryParams";
 import type {
-  Event,
   CreateEventInput,
+  Event,
   UpdateEventInput,
 } from "../entities/Event";
+import type { IEventRepository } from "../repositories/IEventRepository";
 
 export class EventUseCases {
   constructor(private eventRepository: IEventRepository) {}

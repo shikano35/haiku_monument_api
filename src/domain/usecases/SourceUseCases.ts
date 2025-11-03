@@ -1,8 +1,8 @@
 import type { SourceQueryParams } from "../common/QueryParams";
 import type {
   CreateSourceInput,
-  UpdateSourceInput,
   Source,
+  UpdateSourceInput,
 } from "../entities/Source";
 import type { ISourceRepository } from "../repositories/ISourceRepository";
 

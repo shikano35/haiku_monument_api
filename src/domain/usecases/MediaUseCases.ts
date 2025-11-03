@@ -1,10 +1,10 @@
-import type { IMediaRepository } from "../repositories/IMediaRepository";
 import type { MediaQueryParams } from "../common/QueryParams";
 import type {
-  Media,
   CreateMediaInput,
+  Media,
   UpdateMediaInput,
 } from "../entities/Media";
+import type { IMediaRepository } from "../repositories/IMediaRepository";
 
 export class MediaUseCases {
   constructor(private mediaRepository: IMediaRepository) {}

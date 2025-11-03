@@ -1,12 +1,12 @@
+import { and, asc, count, desc, eq, like } from "drizzle-orm";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
-import { eq, count, and, like, desc, asc } from "drizzle-orm";
-import type { IMediaRepository } from "../../domain/repositories/IMediaRepository";
+import type { MediaQueryParams } from "../../domain/common/QueryParams";
 import type {
-  Media,
   CreateMediaInput,
+  Media,
   UpdateMediaInput,
 } from "../../domain/entities/Media";
-import type { MediaQueryParams } from "../../domain/common/QueryParams";
+import type { IMediaRepository } from "../../domain/repositories/IMediaRepository";
 import { media } from "../db/schema";
 
 export class MediaRepository implements IMediaRepository {

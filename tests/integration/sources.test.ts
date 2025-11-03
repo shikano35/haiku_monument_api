@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
-import { startWorker, stopWorker, resetDb } from "../setup";
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { Unstable_DevWorker } from "wrangler";
+import { resetDb, startWorker, stopWorker } from "../setup";
 
 type SourceResponse = {
   id: number;

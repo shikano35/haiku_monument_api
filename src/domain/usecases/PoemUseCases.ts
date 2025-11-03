@@ -1,6 +1,6 @@
-import type { IPoemRepository } from "../repositories/IPoemRepository";
 import type { PoemQueryParams } from "../common/QueryParams";
-import type { Poem, CreatePoemInput, UpdatePoemInput } from "../entities/Poem";
+import type { CreatePoemInput, Poem, UpdatePoemInput } from "../entities/Poem";
+import type { IPoemRepository } from "../repositories/IPoemRepository";
 
 export class PoemUseCases {
   constructor(private poemRepository: IPoemRepository) {}

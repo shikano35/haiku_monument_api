@@ -1,17 +1,17 @@
+import { swaggerUI } from "@hono/swagger-ui";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Hono } from "hono";
 import { corsMiddleware } from "./interfaces/middlewares/corsMiddleware";
 import { errorHandler } from "./interfaces/middlewares/errorHandler";
 import { requestLogger } from "./interfaces/middlewares/requestLogger";
 import { securityHeaders } from "./interfaces/middlewares/securityHeaders";
+import inscriptionsRoutes from "./interfaces/routes/inscriptionsRoutes";
 import locationsRoutes from "./interfaces/routes/locationsRoutes";
 import monumentsRoutes from "./interfaces/routes/monumentsRoutes";
-import inscriptionsRoutes from "./interfaces/routes/inscriptionsRoutes";
 import poemsRoutes from "./interfaces/routes/poemsRoutes";
 import poetsRoutes from "./interfaces/routes/poetsRoutes";
 import sourcesRoutes from "./interfaces/routes/sourcesRoutes";
 import type { Env } from "./types/env";
-import { swaggerUI } from "@hono/swagger-ui";
 
 const openApiSpec = {
   openapi: "3.0.3",
