@@ -3,6 +3,7 @@ import { createRouter } from "./commonRouter";
 import { createUseCases } from "./createUseCases";
 import { parseQueryParams } from "../../utils/parseQueryParams";
 import type { Monument } from "../../domain/entities/Monument";
+import type { Source } from "../../domain/entities/Source";
 import {
   MonumentDetailSchema,
   MonumentBaseSchema,
@@ -21,127 +22,173 @@ const idParamSchema = z
   })
   .openapi({ param: { name: "id", in: "path" } });
 
-const convertMonumentToResponse = (monument: Monument): MonumentDetail => ({
-  id: monument.id,
-  canonical_name: monument.canonicalName,
-  canonical_uri:
-    monument.canonicalUri || `https://api.kuhi.jp/monuments/${monument.id}`,
-  monument_type: monument.monumentType,
-  monument_type_uri: monument.monumentTypeUri,
-  material: monument.material,
-  material_uri: monument.materialUri,
-  created_at: monument.createdAt,
-  updated_at: monument.updatedAt,
-  inscriptions:
-    monument.inscriptions?.map((inscription) => ({
-      id: inscription.id,
-      side: inscription.side,
-      original_text: inscription.originalText,
-      transliteration: inscription.transliteration,
-      reading: inscription.reading,
-      language: inscription.language,
-      notes: inscription.notes,
-      poems:
-        inscription.poems?.map((poem) => ({
-          id: poem.id,
-          text: poem.text,
-          normalized_text: poem.normalizedText,
-          text_hash: poem.textHash,
-          kigo: poem.kigo,
-          season: poem.season,
-          created_at: poem.createdAt,
-          updated_at: poem.updatedAt,
-        })) || [],
-      source: inscription.source
-        ? {
-            id: inscription.source.id,
-            citation: inscription.source.citation,
-            author: inscription.source.author,
-            title: inscription.source.title,
-            publisher: inscription.source.publisher,
-            source_year: inscription.source.sourceYear,
-            url: inscription.source.url,
-            created_at: inscription.source.createdAt,
-            updated_at: inscription.source.updatedAt,
-          }
-        : null,
-    })) || [],
-  events:
-    monument.events?.map((event) => ({
-      id: event.id,
-      event_type: event.eventType,
-      hu_time_normalized: event.huTimeNormalized,
-      interval_start: event.intervalStart,
-      interval_end: event.intervalEnd,
-      uncertainty_note: event.uncertaintyNote,
-      actor: event.actor,
-      source: event.source
-        ? {
-            id: event.source.id,
-            citation: event.source.citation,
-            author: event.source.author,
-            title: event.source.title,
-            publisher: event.source.publisher,
-            source_year: event.source.sourceYear,
-            url: event.source.url,
-            created_at: event.source.createdAt,
-            updated_at: event.source.updatedAt,
-          }
-        : null,
-    })) || [],
-  media:
-    monument.media?.map((media) => ({
-      id: media.id,
-      media_type: media.mediaType,
-      url: media.url,
-      iiif_manifest_url: media.iiifManifestUrl,
-      captured_at: media.capturedAt,
-      photographer: media.photographer,
-      license: media.license,
-    })) || [],
-  locations:
-    monument.locations?.map((location) => ({
-      id: location.id,
-      imi_pref_code: location.imiPrefCode,
-      region: location.region,
-      prefecture: location.prefecture,
-      municipality: location.municipality,
-      place_name: location.placeName,
-      latitude: location.latitude,
-      longitude: location.longitude,
-      geojson: location.geomGeojson ? JSON.parse(location.geomGeojson) : null,
-    })) || [],
-  poets:
-    monument.poets?.map((poet) => ({
-      id: poet.id,
-      name: poet.name,
-      name_kana: poet.nameKana,
-      biography: poet.biography,
-      birth_year: poet.birthYear,
-      death_year: poet.deathYear,
-      link_url: poet.linkUrl,
-      image_url: poet.imageUrl,
-      created_at: poet.createdAt,
-      updated_at: poet.updatedAt,
-    })) || [],
-  sources:
-    monument.sources?.map((source) => ({
-      id: source.id,
-      citation: source.citation,
-      author: source.author,
-      title: source.title,
-      publisher: source.publisher,
-      source_year: source.sourceYear,
-      url: source.url,
-      created_at: source.createdAt,
-      updated_at: source.updatedAt,
-    })) || [],
-  original_established_date: monument.originalEstablishedDate,
-  hu_time_normalized: monument.huTimeNormalized,
-  interval_start: monument.intervalStart,
-  interval_end: monument.intervalEnd,
-  uncertainty_note: monument.uncertaintyNote,
-});
+const safeParseGeoJSON = (
+  geojson: string | null | undefined,
+): Record<string, unknown> | null => {
+  if (!geojson) return null;
+  try {
+    const parsed = JSON.parse(geojson);
+    return typeof parsed === "object" && parsed !== null ? parsed : null;
+  } catch {
+    return null;
+  }
+};
+
+const convertSourceToResponse = (source: Source | null | undefined) => {
+  if (!source) return null;
+  return {
+    id: source.id,
+    citation: source.citation,
+    author: source.author,
+    title: source.title,
+    publisher: source.publisher,
+    source_year: source.sourceYear,
+    url: source.url,
+    created_at: source.createdAt,
+    updated_at: source.updatedAt,
+  };
+};
+
+const convertMonumentToResponse = (monument: Monument): MonumentDetail => {
+  try {
+    const inscriptions =
+      monument.inscriptions?.map((inscription) => {
+        const poems =
+          inscription.poems?.map((poem) => ({
+            id: poem.id,
+            text: poem.text,
+            normalized_text: poem.normalizedText,
+            text_hash: poem.textHash,
+            kigo: poem.kigo,
+            season: poem.season,
+            created_at: poem.createdAt,
+            updated_at: poem.updatedAt,
+          })) || [];
+
+        return {
+          id: inscription.id,
+          side: inscription.side,
+          original_text: inscription.originalText,
+          transliteration: inscription.transliteration,
+          reading: inscription.reading,
+          language: inscription.language,
+          notes: inscription.notes,
+          poems,
+          source: convertSourceToResponse(inscription.source),
+        };
+      }) || [];
+
+    const events =
+      monument.events?.map((event) => ({
+        id: event.id,
+        event_type: event.eventType,
+        hu_time_normalized: event.huTimeNormalized,
+        interval_start: event.intervalStart,
+        interval_end: event.intervalEnd,
+        uncertainty_note: event.uncertaintyNote,
+        actor: event.actor,
+        source: convertSourceToResponse(event.source),
+      })) || [];
+
+    const media =
+      monument.media?.map((m) => ({
+        id: m.id,
+        media_type: m.mediaType,
+        url: m.url,
+        iiif_manifest_url: m.iiifManifestUrl,
+        captured_at: m.capturedAt,
+        photographer: m.photographer,
+        license: m.license,
+      })) || [];
+
+    const locations =
+      monument.locations?.map((location) => ({
+        id: location.id,
+        imi_pref_code: location.imiPrefCode,
+        region: location.region,
+        prefecture: location.prefecture,
+        municipality: location.municipality,
+        place_name: location.placeName,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        geojson: safeParseGeoJSON(location.geomGeojson),
+      })) || [];
+
+    const poets =
+      monument.poets?.map((poet) => ({
+        id: poet.id,
+        name: poet.name,
+        name_kana: poet.nameKana,
+        biography: poet.biography,
+        birth_year: poet.birthYear,
+        death_year: poet.deathYear,
+        link_url: poet.linkUrl,
+        image_url: poet.imageUrl,
+        created_at: poet.createdAt,
+        updated_at: poet.updatedAt,
+      })) || [];
+
+    const sources =
+      monument.sources?.map((source) => ({
+        id: source.id,
+        citation: source.citation,
+        author: source.author,
+        title: source.title,
+        publisher: source.publisher,
+        source_year: source.sourceYear,
+        url: source.url,
+        created_at: source.createdAt,
+        updated_at: source.updatedAt,
+      })) || [];
+
+    return {
+      id: monument.id,
+      canonical_name: monument.canonicalName,
+      canonical_uri:
+        monument.canonicalUri || `https://api.kuhi.jp/monuments/${monument.id}`,
+      monument_type: monument.monumentType,
+      monument_type_uri: monument.monumentTypeUri,
+      material: monument.material,
+      material_uri: monument.materialUri,
+      created_at: monument.createdAt,
+      updated_at: monument.updatedAt,
+      inscriptions,
+      events,
+      media,
+      locations,
+      poets,
+      sources,
+      original_established_date: monument.originalEstablishedDate,
+      hu_time_normalized: monument.huTimeNormalized,
+      interval_start: monument.intervalStart,
+      interval_end: monument.intervalEnd,
+      uncertainty_note: monument.uncertaintyNote,
+    };
+  } catch (error) {
+    return {
+      id: monument.id,
+      canonical_name: monument.canonicalName,
+      canonical_uri: `https://api.kuhi.jp/monuments/${monument.id}`,
+      monument_type: monument.monumentType,
+      monument_type_uri: monument.monumentTypeUri,
+      material: monument.material,
+      material_uri: monument.materialUri,
+      created_at: monument.createdAt,
+      updated_at: monument.updatedAt,
+      inscriptions: [],
+      events: [],
+      media: [],
+      locations: [],
+      poets: [],
+      sources: [],
+      original_established_date: null,
+      hu_time_normalized: null,
+      interval_start: null,
+      interval_end: null,
+      uncertainty_note: null,
+    };
+  }
+};
 
 // GET /monuments
 const getAllMonumentsRoute = createRoute({
