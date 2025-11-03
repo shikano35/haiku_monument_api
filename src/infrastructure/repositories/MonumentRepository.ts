@@ -95,23 +95,23 @@ export class MonumentRepository implements IMonumentRepository {
       conditions.push(eq(monuments.monumentType, monumentType));
     }
 
-    if (inscriptionContains) {
-      const joinedQuery = query.innerJoin(
+    const needsInscriptionJoin = inscriptionContains || poetId;
+
+    if (needsInscriptionJoin) {
+      query = query.innerJoin(
         inscriptions,
         eq(monuments.id, inscriptions.monumentId),
-      );
+      ) as unknown as typeof query;
 
-      query = joinedQuery as unknown as typeof query;
-      conditions.push(
-        like(inscriptions.originalText, `%${inscriptionContains}%`),
-      );
+      if (inscriptionContains) {
+        conditions.push(
+          like(inscriptions.originalText, `%${inscriptionContains}%`),
+        );
+      }
     }
 
-    let validMonumentIds: number[] | null = null;
     if (poetId) {
-      const monumentIdsSubquery = this.db
-        .selectDistinct({ monumentId: inscriptions.monumentId })
-        .from(inscriptions)
+      query = query
         .innerJoin(
           inscriptionPoems,
           eq(inscriptions.id, inscriptionPoems.inscriptionId),
@@ -119,15 +119,9 @@ export class MonumentRepository implements IMonumentRepository {
         .innerJoin(
           poemAttributions,
           eq(inscriptionPoems.poemId, poemAttributions.poemId),
-        )
-        .where(eq(poemAttributions.poetId, poetId));
+        ) as unknown as typeof query;
 
-      const monumentIdsResult = await monumentIdsSubquery;
-      validMonumentIds = monumentIdsResult.map((row) => row.monumentId);
-
-      if (validMonumentIds.length === 0) {
-        return [];
-      }
+      conditions.push(eq(poemAttributions.poetId, poetId));
     }
 
     // 地理的フィルタ
@@ -150,10 +144,6 @@ export class MonumentRepository implements IMonumentRepository {
       if (municipality) {
         conditions.push(eq(locations.municipality, municipality));
       }
-    }
-
-    if (validMonumentIds !== null) {
-      conditions.push(inArray(monuments.id, validMonumentIds));
     }
 
     // 条件適用

@@ -26,7 +26,9 @@ export function parseQueryParams(url: string): QueryParams {
     kigo: query.get("kigo") || null,
     season: query.get("season") || null,
     poetId: query.get("poet_id") ? Number(query.get("poet_id")) : null,
-    locationId: query.get("location_id") ? Number(query.get("location_id")) : null,
+    locationId: query.get("location_id")
+      ? Number(query.get("location_id"))
+      : null,
     material: query.get("material") || null,
     monumentType: query.get("monument_type") || null,
   };
