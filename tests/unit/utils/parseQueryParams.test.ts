@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { parseQueryParams } from "../../../src/utils/parseQueryParams";
 
 describe("parseQueryParams", () => {
@@ -11,17 +11,29 @@ describe("parseQueryParams", () => {
       limit: 10,
       offset: 20,
       ordering: null,
-      updated_at_gt: null,
-      updated_at_lt: null,
+      updatedAtGt: null,
+      updatedAtLt: null,
+      createdAtGt: null,
+      createdAtLt: null,
       search: null,
-      title_contains: null,
-      name_contains: null,
-      biography_contains: null,
-      created_at_gt: null,
-      created_at_lt: null,
+      q: null,
+      inscriptionContains: null,
+      titleContains: null,
+      nameContains: null,
+      biographyContains: null,
+      canonicalNameContains: null,
+      commentaryContains: null,
+      poetNameContains: null,
+      textContains: null,
       prefecture: null,
       region: "Tokyo",
-      description_contains: null,
+      municipality: null,
+      kigo: null,
+      season: null,
+      poetId: null,
+      locationId: null,
+      material: null,
+      monumentType: null,
     });
   });
 
