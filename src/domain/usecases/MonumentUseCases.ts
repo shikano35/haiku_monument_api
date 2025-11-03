@@ -1,10 +1,10 @@
-import type { IMonumentRepository } from "../repositories/IMonumentRepository";
 import type { MonumentQueryParams } from "../common/QueryParams";
 import type {
-  Monument,
   CreateMonumentInput,
+  Monument,
   UpdateMonumentInput,
 } from "../entities/Monument";
+import type { IMonumentRepository } from "../repositories/IMonumentRepository";
 
 export class MonumentUseCases {
   constructor(private monumentRepository: IMonumentRepository) {}

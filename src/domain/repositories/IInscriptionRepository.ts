@@ -1,9 +1,9 @@
+import type { InscriptionQueryParams } from "../common/QueryParams";
 import type {
-  Inscription,
   CreateInscriptionInput,
+  Inscription,
   UpdateInscriptionInput,
 } from "../entities/Inscription";
-import type { InscriptionQueryParams } from "../common/QueryParams";
 
 export interface IInscriptionRepository {
   getAll(queryParams?: InscriptionQueryParams): Promise<Inscription[]>;

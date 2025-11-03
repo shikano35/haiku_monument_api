@@ -1,6 +1,6 @@
+import type { Inscription } from "./Inscription";
 import type { Poet } from "./Poet";
 import type { Source } from "./Source";
-import type { Inscription } from "./Inscription";
 
 export interface Poem {
   id: number;

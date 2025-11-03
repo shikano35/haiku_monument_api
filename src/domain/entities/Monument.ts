@@ -1,9 +1,9 @@
+import type { Event } from "./Event";
+import type { Inscription } from "./Inscription";
+import type { Location } from "./Location";
+import type { Media } from "./Media";
 import type { Poet } from "./Poet";
 import type { Source } from "./Source";
-import type { Location } from "./Location";
-import type { Inscription } from "./Inscription";
-import type { Event } from "./Event";
-import type { Media } from "./Media";
 
 export interface Monument {
   id: number;

@@ -1,12 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { LocationUseCases } from "../../../../src/domain/usecases/LocationUseCases";
-import type { ILocationRepository } from "../../../../src/domain/repositories/ILocationRepository";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { LocationQueryParams } from "../../../../src/domain/common/QueryParams";
 import type {
-  Location,
   CreateLocationInput,
+  Location,
   UpdateLocationInput,
 } from "../../../../src/domain/entities/Location";
-import type { LocationQueryParams } from "../../../../src/domain/common/QueryParams";
+import type { ILocationRepository } from "../../../../src/domain/repositories/ILocationRepository";
+import { LocationUseCases } from "../../../../src/domain/usecases/LocationUseCases";
 
 describe("LocationUseCases", () => {
   let mockLocationRepo: ILocationRepository;

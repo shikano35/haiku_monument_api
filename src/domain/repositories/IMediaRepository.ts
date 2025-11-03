@@ -1,9 +1,9 @@
+import type { MediaQueryParams } from "../common/QueryParams";
 import type {
-  Media,
   CreateMediaInput,
+  Media,
   UpdateMediaInput,
 } from "../entities/Media";
-import type { MediaQueryParams } from "../common/QueryParams";
 
 export interface IMediaRepository {
   getAll(queryParams?: MediaQueryParams): Promise<Media[]>;

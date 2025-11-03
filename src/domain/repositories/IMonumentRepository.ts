@@ -1,9 +1,9 @@
+import type { MonumentQueryParams } from "../common/QueryParams";
 import type {
-  Monument,
   CreateMonumentInput,
+  Monument,
   UpdateMonumentInput,
 } from "../entities/Monument";
-import type { MonumentQueryParams } from "../common/QueryParams";
 
 export interface IMonumentRepository {
   getAll(queryParams?: MonumentQueryParams): Promise<Monument[]>;

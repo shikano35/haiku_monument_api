@@ -1,12 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { SourceUseCases } from "../../../../src/domain/usecases/SourceUseCases";
-import type { ISourceRepository } from "../../../../src/domain/repositories/ISourceRepository";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { SourceQueryParams } from "../../../../src/domain/common/QueryParams";
 import type {
-  Source,
   CreateSourceInput,
+  Source,
   UpdateSourceInput,
 } from "../../../../src/domain/entities/Source";
-import type { SourceQueryParams } from "../../../../src/domain/common/QueryParams";
+import type { ISourceRepository } from "../../../../src/domain/repositories/ISourceRepository";
+import { SourceUseCases } from "../../../../src/domain/usecases/SourceUseCases";
 
 describe("SourceUseCases", () => {
   let mockSourceRepo: ISourceRepository;

@@ -1,9 +1,9 @@
+import type { SourceQueryParams } from "../common/QueryParams";
 import type {
   CreateSourceInput,
-  UpdateSourceInput,
   Source,
+  UpdateSourceInput,
 } from "../entities/Source";
-import type { SourceQueryParams } from "../common/QueryParams";
 
 export interface ISourceRepository {
   getAll(queryParams?: SourceQueryParams): Promise<Source[]>;

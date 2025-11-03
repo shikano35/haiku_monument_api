@@ -1,5 +1,5 @@
-import type { Poem, CreatePoemInput, UpdatePoemInput } from "../entities/Poem";
 import type { PoemQueryParams } from "../common/QueryParams";
+import type { CreatePoemInput, Poem, UpdatePoemInput } from "../entities/Poem";
 
 export interface IPoemRepository {
   getAll(queryParams?: PoemQueryParams): Promise<Poem[]>;

@@ -1,9 +1,9 @@
+import type { LocationQueryParams } from "../common/QueryParams";
 import type {
   CreateLocationInput,
-  UpdateLocationInput,
   Location,
+  UpdateLocationInput,
 } from "../entities/Location";
-import type { LocationQueryParams } from "../common/QueryParams";
 
 export interface ILocationRepository {
   getAll(queryParams?: LocationQueryParams): Promise<Location[]>;

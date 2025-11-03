@@ -1,12 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { PoetUseCases } from "../../../../src/domain/usecases/PoetUseCases";
-import type { IPoetRepository } from "../../../../src/domain/repositories/IPoetRepository";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { PoetQueryParams } from "../../../../src/domain/common/QueryParams";
 import type {
-  Poet,
   CreatePoetInput,
+  Poet,
   UpdatePoetInput,
 } from "../../../../src/domain/entities/Poet";
-import type { PoetQueryParams } from "../../../../src/domain/common/QueryParams";
+import type { IPoetRepository } from "../../../../src/domain/repositories/IPoetRepository";
+import { PoetUseCases } from "../../../../src/domain/usecases/PoetUseCases";
 
 describe("PoetUseCases", () => {
   let mockPoetRepo: IPoetRepository;

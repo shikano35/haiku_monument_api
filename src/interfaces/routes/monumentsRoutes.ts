@@ -1,18 +1,18 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import { createRouter } from "./commonRouter";
-import { createUseCases } from "./createUseCases";
-import { parseQueryParams } from "../../utils/parseQueryParams";
 import type { Monument } from "../../domain/entities/Monument";
 import type { Source } from "../../domain/entities/Source";
+import { parseQueryParams } from "../../utils/parseQueryParams";
 import {
-  MonumentDetailSchema,
-  MonumentBaseSchema,
-  MonumentQuerySchema,
-  InscriptionSchema,
   EventSchema,
+  InscriptionSchema,
   MediaSchema,
+  MonumentBaseSchema,
   type MonumentDetail,
+  MonumentDetailSchema,
+  MonumentQuerySchema,
 } from "../dtos/MonumentResponse";
+import { createRouter } from "./commonRouter";
+import { createUseCases } from "./createUseCases";
 
 const router = createRouter();
 
@@ -164,7 +164,7 @@ const convertMonumentToResponse = (monument: Monument): MonumentDetail => {
       interval_end: monument.intervalEnd,
       uncertainty_note: monument.uncertaintyNote,
     };
-  } catch (error) {
+  } catch (_error) {
     return {
       id: monument.id,
       canonical_name: monument.canonicalName,

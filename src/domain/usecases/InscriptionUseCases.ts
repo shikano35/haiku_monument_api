@@ -1,10 +1,10 @@
-import type { IInscriptionRepository } from "../repositories/IInscriptionRepository";
 import type { InscriptionQueryParams } from "../common/QueryParams";
 import type {
-  Inscription,
   CreateInscriptionInput,
+  Inscription,
   UpdateInscriptionInput,
 } from "../entities/Inscription";
+import type { IInscriptionRepository } from "../repositories/IInscriptionRepository";
 
 export class InscriptionUseCases {
   constructor(private inscriptionRepository: IInscriptionRepository) {}

@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from "vitest";
-import { errorHandler } from "../../../src/interfaces/middlewares/errorHandler";
 import type { Context } from "hono";
+import { describe, expect, it, vi } from "vitest";
+import { errorHandler } from "../../../src/interfaces/middlewares/errorHandler";
 
 describe("errorHandler", () => {
   it("エラーなしの場合は次のハンドラーを呼び出す", async () => {

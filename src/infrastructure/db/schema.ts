@@ -1,11 +1,11 @@
-import {
-  sqliteTable,
-  integer,
-  text,
-  real,
-  index,
-} from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
+import {
+  index,
+  integer,
+  real,
+  sqliteTable,
+  text,
+} from "drizzle-orm/sqlite-core";
 
 // ============================================================================
 // CIDOC-CRM準拠のスキーマ設計
