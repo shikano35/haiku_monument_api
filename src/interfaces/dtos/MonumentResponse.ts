@@ -9,6 +9,11 @@ export const MonumentBaseSchema = z.object({
   monument_type_uri: z.string().nullable(),
   material: z.string().nullable(),
   material_uri: z.string().nullable(),
+  is_reliable: z.boolean().nullable(),
+  verification_status: z.string().nullable(),
+  verified_at: z.string().nullable(),
+  verified_by: z.string().nullable(),
+  reliability_note: z.string().nullable(),
   created_at: z.string(), // ISO8601形式
   updated_at: z.string(), // ISO8601形式
 });

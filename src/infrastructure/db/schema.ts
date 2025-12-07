@@ -21,6 +21,12 @@ export const monuments = sqliteTable(
     monumentTypeUri: text("monument_type_uri"), // Getty AAT等のURI
     material: text("material"), // 材質ラベル
     materialUri: text("material_uri"), // 材質のURI
+    // 信頼性情報
+    isReliable: integer("is_reliable", { mode: "boolean" }).default(true), // データの信頼性フラグ
+    verificationStatus: text("verification_status").default("unverified"), // verified, unverified, disputed
+    verifiedAt: text("verified_at"), // 検証日時
+    verifiedBy: text("verified_by"), // 検証者
+    reliabilityNote: text("reliability_note"), // 信頼性に関する注記
     createdAt: text("created_at")
       .default(sql`(DATETIME('now','localtime'))`)
       .notNull(),
@@ -31,6 +37,7 @@ export const monuments = sqliteTable(
   (table) => [
     index("monuments_canonical_name_idx").on(table.canonicalName),
     index("monuments_type_idx").on(table.monumentType),
+    index("monuments_reliability_idx").on(table.verificationStatus),
   ],
 );
 

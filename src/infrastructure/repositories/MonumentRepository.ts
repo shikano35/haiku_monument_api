@@ -72,6 +72,11 @@ export class MonumentRepository implements IMonumentRepository {
         monumentTypeUri: monuments.monumentTypeUri,
         material: monuments.material,
         materialUri: monuments.materialUri,
+        isReliable: monuments.isReliable,
+        verificationStatus: monuments.verificationStatus,
+        verifiedAt: monuments.verifiedAt,
+        verifiedBy: monuments.verifiedBy,
+        reliabilityNote: monuments.reliabilityNote,
         createdAt: monuments.createdAt,
         updatedAt: monuments.updatedAt,
       })
@@ -201,6 +206,11 @@ export class MonumentRepository implements IMonumentRepository {
         monumentTypeUri: monuments.monumentTypeUri,
         material: monuments.material,
         materialUri: monuments.materialUri,
+        isReliable: monuments.isReliable,
+        verificationStatus: monuments.verificationStatus,
+        verifiedAt: monuments.verifiedAt,
+        verifiedBy: monuments.verifiedBy,
+        reliabilityNote: monuments.reliabilityNote,
         createdAt: monuments.createdAt,
         updatedAt: monuments.updatedAt,
       })
@@ -228,6 +238,11 @@ export class MonumentRepository implements IMonumentRepository {
         monumentTypeUri: monuments.monumentTypeUri,
         material: monuments.material,
         materialUri: monuments.materialUri,
+        isReliable: monuments.isReliable,
+        verificationStatus: monuments.verificationStatus,
+        verifiedAt: monuments.verifiedAt,
+        verifiedBy: monuments.verifiedBy,
+        reliabilityNote: monuments.reliabilityNote,
         createdAt: monuments.createdAt,
         updatedAt: monuments.updatedAt,
       })
@@ -250,6 +265,11 @@ export class MonumentRepository implements IMonumentRepository {
         monumentTypeUri: monuments.monumentTypeUri,
         material: monuments.material,
         materialUri: monuments.materialUri,
+        isReliable: monuments.isReliable,
+        verificationStatus: monuments.verificationStatus,
+        verifiedAt: monuments.verifiedAt,
+        verifiedBy: monuments.verifiedBy,
+        reliabilityNote: monuments.reliabilityNote,
         createdAt: monuments.createdAt,
         updatedAt: monuments.updatedAt,
       })
@@ -273,6 +293,11 @@ export class MonumentRepository implements IMonumentRepository {
         monumentTypeUri: monuments.monumentTypeUri,
         material: monuments.material,
         materialUri: monuments.materialUri,
+        isReliable: monuments.isReliable,
+        verificationStatus: monuments.verificationStatus,
+        verifiedAt: monuments.verifiedAt,
+        verifiedBy: monuments.verifiedBy,
+        reliabilityNote: monuments.reliabilityNote,
         createdAt: monuments.createdAt,
         updatedAt: monuments.updatedAt,
       })
@@ -306,6 +331,11 @@ export class MonumentRepository implements IMonumentRepository {
         monumentTypeUri: input.monumentTypeUri ?? null,
         material: input.material ?? null,
         materialUri: input.materialUri ?? null,
+        isReliable: input.isReliable ?? true,
+        verificationStatus: input.verificationStatus ?? "unverified",
+        verifiedAt: input.verifiedAt ?? null,
+        verifiedBy: input.verifiedBy ?? null,
+        reliabilityNote: input.reliabilityNote ?? null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       })
@@ -328,6 +358,13 @@ export class MonumentRepository implements IMonumentRepository {
       updateData.monumentTypeUri = input.monumentTypeUri;
     if (input.material !== null) updateData.material = input.material;
     if (input.materialUri !== null) updateData.materialUri = input.materialUri;
+    if (input.isReliable !== null) updateData.isReliable = input.isReliable;
+    if (input.verificationStatus !== null)
+      updateData.verificationStatus = input.verificationStatus;
+    if (input.verifiedAt !== null) updateData.verifiedAt = input.verifiedAt;
+    if (input.verifiedBy !== null) updateData.verifiedBy = input.verifiedBy;
+    if (input.reliabilityNote !== null)
+      updateData.reliabilityNote = input.reliabilityNote;
     if (input.originalEstablishedDate !== null)
       updateData.originalEstablishedDate = input.originalEstablishedDate;
     if (input.huTimeNormalized !== null)
@@ -389,6 +426,11 @@ export class MonumentRepository implements IMonumentRepository {
     monumentTypeUri: string | null;
     material: string | null;
     materialUri: string | null;
+    isReliable: boolean | null;
+    verificationStatus: string | null;
+    verifiedAt: string | null;
+    verifiedBy: string | null;
+    reliabilityNote: string | null;
     createdAt: string;
     updatedAt: string;
   }): Promise<Monument> {
@@ -581,6 +623,11 @@ export class MonumentRepository implements IMonumentRepository {
       monumentTypeUri: row.monumentTypeUri ?? null,
       material: row.material ?? null,
       materialUri: row.materialUri ?? null,
+      isReliable: row.isReliable ?? true,
+      verificationStatus: row.verificationStatus ?? "unverified",
+      verifiedAt: row.verifiedAt ?? null,
+      verifiedBy: row.verifiedBy ?? null,
+      reliabilityNote: row.reliabilityNote ?? null,
       createdAt: this.convertToISOString(row.createdAt),
       updatedAt: this.convertToISOString(row.updatedAt),
       inscriptions: inscriptionsWithPoems,
@@ -653,6 +700,11 @@ export class MonumentRepository implements IMonumentRepository {
     monumentTypeUri: string | null;
     material: string | null;
     materialUri: string | null;
+    isReliable: boolean | null;
+    verificationStatus: string | null;
+    verifiedAt: string | null;
+    verifiedBy: string | null;
+    reliabilityNote: string | null;
     createdAt: string;
     updatedAt: string;
   }): Monument {
@@ -664,6 +716,11 @@ export class MonumentRepository implements IMonumentRepository {
       monumentTypeUri: row.monumentTypeUri ?? null,
       material: row.material ?? null,
       materialUri: row.materialUri ?? null,
+      isReliable: row.isReliable ?? true,
+      verificationStatus: row.verificationStatus ?? "unverified",
+      verifiedAt: row.verifiedAt ?? null,
+      verifiedBy: row.verifiedBy ?? null,
+      reliabilityNote: row.reliabilityNote ?? null,
       createdAt: this.convertToISOString(row.createdAt),
       updatedAt: this.convertToISOString(row.updatedAt),
       inscriptions: null,
@@ -698,6 +755,11 @@ export class MonumentRepository implements IMonumentRepository {
       monumentTypeUri: string | null;
       material: string | null;
       materialUri: string | null;
+      isReliable: boolean | null;
+      verificationStatus: string | null;
+      verifiedAt: string | null;
+      verifiedBy: string | null;
+      reliabilityNote: string | null;
       createdAt: string;
       updatedAt: string;
     }>,
@@ -1101,6 +1163,11 @@ export class MonumentRepository implements IMonumentRepository {
         monumentTypeUri: row.monumentTypeUri ?? null,
         material: row.material ?? null,
         materialUri: row.materialUri ?? null,
+        isReliable: row.isReliable ?? true,
+        verificationStatus: row.verificationStatus ?? "unverified",
+        verifiedAt: row.verifiedAt ?? null,
+        verifiedBy: row.verifiedBy ?? null,
+        reliabilityNote: row.reliabilityNote ?? null,
         createdAt: this.convertToISOString(row.createdAt),
         updatedAt: this.convertToISOString(row.updatedAt),
         inscriptions: inscriptionsWithPoems,

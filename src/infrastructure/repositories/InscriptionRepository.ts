@@ -292,6 +292,12 @@ export class InscriptionRepository implements IInscriptionRepository {
               monumentTypeUri: relatedMonument[0].monumentTypeUri,
               material: relatedMonument[0].material,
               materialUri: relatedMonument[0].materialUri,
+              isReliable: relatedMonument[0].isReliable ?? true,
+              verificationStatus:
+                relatedMonument[0].verificationStatus ?? "unverified",
+              verifiedAt: relatedMonument[0].verifiedAt ?? null,
+              verifiedBy: relatedMonument[0].verifiedBy ?? null,
+              reliabilityNote: relatedMonument[0].reliabilityNote ?? null,
               createdAt: this.convertToISOString(relatedMonument[0].createdAt),
               updatedAt: this.convertToISOString(relatedMonument[0].updatedAt),
               inscriptions: null,
