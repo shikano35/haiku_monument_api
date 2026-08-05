@@ -14,14 +14,8 @@ export default defineConfig({
     },
     testTimeout: isCI ? 30000 : 10000,
     pool: isCI ? "forks" : "threads",
-    poolOptions: {
-      threads: {
-        singleThread: isCI,
-      },
-      forks: {
-        isolate: true,
-      },
-    },
+    isolate: true,
+    fileParallelism: !isCI,
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
