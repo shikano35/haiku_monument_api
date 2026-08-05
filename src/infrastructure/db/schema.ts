@@ -7,10 +7,6 @@ import {
   text,
 } from "drizzle-orm/sqlite-core";
 
-// ============================================================================
-// CIDOC-CRM準拠のスキーマ設計
-// ============================================================================
-
 // Monuments（句碑）- 物体（E22 Human-Made Object）
 export const monuments = sqliteTable(
   "monuments",
@@ -21,7 +17,6 @@ export const monuments = sqliteTable(
     monumentTypeUri: text("monument_type_uri"), // Getty AAT等のURI
     material: text("material"), // 材質ラベル
     materialUri: text("material_uri"), // 材質のURI
-    // 信頼性情報
     isReliable: integer("is_reliable", { mode: "boolean" }).default(true), // データの信頼性フラグ
     verificationStatus: text("verification_status").default("unverified"), // verified, unverified, disputed
     verifiedAt: text("verified_at"), // 検証日時
