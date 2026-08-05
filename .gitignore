@@ -39,3 +39,5 @@ coverage/
 scripts/
 docs/
 data
+report/
+CLAUDE.md
